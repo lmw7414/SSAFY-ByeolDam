@@ -1,0 +1,38 @@
+
+spring:
+  profiles:
+    active: local #default
+    group:
+      local:
+        -common
+      prod:
+        -common
+
+
+---
+spring:
+  config:
+    active:
+      on-profile: common
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    hikari:
+      maximum-pool-size: 4
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://local:3306/byeol_dam?allowPublicKeyRetrieval=true&useSSL=false
+    username: ${SPRING_DATASOUCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MariaDB
+      ddl-auto: update
+    show-sql: true
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
