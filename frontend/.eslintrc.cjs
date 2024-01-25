@@ -20,6 +20,7 @@ module.exports = {
     'react/no-unknown-property': 'off',
     'implicit-arrow-linebreak': 'off',
     'object-curly-newline': 'off',
+    'import/no-extraneous-dependencies': 'off',
   },
   settings: {
     react: { version: 'detect' },
