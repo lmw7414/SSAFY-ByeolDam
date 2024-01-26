@@ -24,8 +24,8 @@ spring:
     hikari:
       maximum-pool-size: 4
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://local:3306/byeol_dam?allowPublicKeyRetrieval=true&useSSL=false
-    username: ${SPRING_DATASOUCE_USERNAME}
+    url: jdbc:mariadb://local:3306/byeol_dam
+    username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
@@ -36,3 +36,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+cloud:
+  aws:
+    s3:
+      bucket: byeoldam
+    credentials:
+      access-key : AKIA47SBDGN2JZ65CFX2
+      secret-key : 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
+    region:
+      static : ap-northeast-2
+      auto : false
+    stack:
+      auto : false
