@@ -3,7 +3,7 @@ import { Route } from 'wouter';
 import Member from './pages/member/Member';
 import Universe from './pages/Universe';
 
-import './assets/styles/main.scss';
+import './assets/styles/scss/main.scss';
 
 export default function App() {
   return (
