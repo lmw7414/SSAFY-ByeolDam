@@ -1,0 +1,24 @@
+@import '/src/assets/styles/scss/base/color.scss';
+
+.member-box {
+  height: 400px;
+  width: 400px;
+  background-color: $modal-background;
+  border-radius: 20px;
+}
+
+.member-box-logo {
+  height: 80px;
+}
+
+.social-logo {
+  height: 50px;
+}
+
+.member-button {
+  background-color: $secondary;
+  border: none;
+  border-radius: 12px;
+  height: 50px;
+  width: 300px;
+}
