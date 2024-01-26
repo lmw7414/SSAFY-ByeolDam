@@ -4,7 +4,8 @@
 
 html,
 body,
-#root {
+#root,
+.App {
   width: 100vw;
   height: 100%;
   margin: 0;
@@ -15,9 +16,4 @@ body,
 body {
   color: white;
   user-select: none;
-}
-
-#canvas-container {
-  height: 100vh;
-  width: 100vw;
 }
