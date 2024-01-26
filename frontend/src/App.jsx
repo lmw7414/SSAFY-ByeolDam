@@ -1,6 +1,6 @@
 import { Route } from 'wouter';
 
-import Login from './pages/Login';
+import Member from './pages/member/Member';
 import Universe from './pages/Universe';
 
 import './assets/styles/main.scss';
@@ -8,7 +8,7 @@ import './assets/styles/main.scss';
 export default function App() {
   return (
     <div className="App">
-      <Route path="/" component={Login} />
+      <Route path="/" component={Member} />
       <Route path="/home" component={Universe} />
     </div>
   );

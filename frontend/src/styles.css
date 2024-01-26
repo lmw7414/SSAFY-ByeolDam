@@ -12,8 +12,3 @@ body,
   padding: 0;
   overflow: hidden;
 }
-
-body {
-  color: white;
-  user-select: none;
-}
