@@ -13,8 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import static com.ssafy.star.common.utils.ImageUtils.convert;
-import static com.ssafy.star.common.utils.ImageUtils.resizeImage;
+import static com.ssafy.star.common.utils.ImageUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,7 +29,6 @@ public class S3uploader {
         BufferedImage resizedImage = resizeImage(multipartFile);
         File uploadFile = convert(resizedImage, multipartFile.getOriginalFilename());
 
-
         String uuid = UUID.randomUUID().toString();
         String extension = uploadFile.getName().substring(uploadFile.getName().lastIndexOf(".")+1);
         if(extension.equals("blob")) extension = "png";
@@ -38,18 +36,32 @@ public class S3uploader {
 //        String fileName = dirName + "/" + uploadFile.getName();
         String uploadImageUrl = putS3(uploadFile, fileName);
 
-        removeNewFile(uploadFile);
+//        removeNewFile(uploadFile);
 
         return uploadImageUrl;
     }
 
-    private void removeNewFile(File targetFile) {
-        if(targetFile.delete()){
-            log.info("파일이 삭제되었습니다.");
-        }else {
-            log.info("파일이 삭제되지 않았습니다.");
-        }
+    public String uploadThumbnail(MultipartFile multipartFile, String dirName) throws IOException {
+
+        BufferedImage resizedThumbnail = resizeThumbnail(multipartFile);
+        File uploadThumbnail = convert(resizedThumbnail, multipartFile.getOriginalFilename());
+
+        String uuid = UUID.randomUUID().toString();
+        String extension = uploadThumbnail.getName().substring(uploadThumbnail.getName().lastIndexOf(".")+1);
+        if(extension.equals("blob")) extension = "png";
+        String fileName = dirName + "/" + uuid + "." + extension;
+        String uploadThumbnailUrl = putS3(uploadThumbnail, fileName);
+
+        return uploadThumbnailUrl;
     }
+
+//    private void removeNewFile(File targetFile) {
+//        if(targetFile.delete()){
+//            log.info("파일이 삭제되었습니다.");
+//        }else {
+//            log.info("파일이 삭제되지 않았습니다.");
+//        }
+//    }
 
     private String putS3(File uploadFile, String fileName){
         amazonS3Client.putObject(
