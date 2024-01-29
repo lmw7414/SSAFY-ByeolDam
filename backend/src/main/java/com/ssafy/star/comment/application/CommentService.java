@@ -76,7 +76,7 @@ public class CommentService {
                 new StarApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
     }
 
-    // 유저가 존재하는지
+    // 댓글이 존재하는지
     private CommentEntity getCommentEntityOrException(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(() ->
                 new StarApplicationException(ErrorCode.COMMENT_NOT_FOUND, String.format("%d not founded", commentId)));
