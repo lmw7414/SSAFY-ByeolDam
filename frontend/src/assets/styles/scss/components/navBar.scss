@@ -1,11 +1,24 @@
+// $nav-bar-width: 400px;
+
+.nav-bar-big-container {
+  position: absolute;
+}
+
 .nav-bar-container {
   height: 100vh;
   width: 400px;
   z-index: 1;
   background-color: $modal-background;
-  position: absolute;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
+  position: relative;
+  display: inline-block;
+  text-align: right;
+}
+
+.nav-bar-logo {
+  display: flex;
+  justify-content: center;
 }
 
 .nav-bar-profile-box {
@@ -62,6 +75,12 @@
   align-items: center;
 }
 
+.nav-bar-menu-icon-box {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+}
+
 .nav-bar-menu-icon {
   height: 30px;
 }
@@ -69,4 +88,23 @@
 .nav-bar-menu-text {
   color: $text-primary;
   margin-left: 40px;
+}
+
+.nav-bar-toggle-container {
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  height: 100px;
+  background-color: $modal-background;
+  position: absolute; /* 절대 위치 설정 */
+  top: 50%; /* 상위 부모 중앙으로 이동 */
+  transform: translateY(-50%); /* 세로 중앙 정렬을 위해 사용 */
+  right: -40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggle-button {
+  height: 30px;
 }
