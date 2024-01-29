@@ -1,17 +1,12 @@
-package com.ssafy.star.global.swagger;
+package com.ssafy.star.global.swagger.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-public class SwaggerConfiguration
-
-        import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
     @Bean
     public OpenAPI openAPI() {
