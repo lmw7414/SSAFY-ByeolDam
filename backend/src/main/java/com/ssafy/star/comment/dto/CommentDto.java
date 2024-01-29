@@ -10,7 +10,7 @@ import java.util.Set;
 public record CommentDto(
         Long id,
         Long articleId,
-        String userName,
+        String nickName,
         String content,
         Long parentCommentId,
         LocalDateTime createdAt,
@@ -21,7 +21,7 @@ public record CommentDto(
         return new CommentDto(
             entity.getId(),
             entity.getArticleEntity().getId(),
-            entity.getUserEntity().getUserName(),
+            entity.getUserEntity().getnickName(),
             entity.getContent(),
             entity.getParentCommentId(),
             entity.getCreatedAt(),
