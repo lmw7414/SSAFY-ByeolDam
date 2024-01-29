@@ -21,34 +21,34 @@ export default function NavBar() {
           </div>
           <div className="profile-info-box">
             <div className="profile-info">
-              <div class="profile-info-text button-light">
+              <div className="profile-info-text button-light">
                 <p>별</p>
               </div>
-              <div class="profile-info-num button-bold">
+              <div className="profile-info-num button-bold">
                 <p>24</p>
               </div>
             </div>
             <div className="profile-info">
-              <div class="profile-info-text button-light">
+              <div className="profile-info-text button-light">
                 <p>별자리</p>
               </div>
-              <div class="profile-info-num button-bold">
+              <div className="profile-info-num button-bold">
                 <p>24</p>
               </div>
             </div>
             <div className="profile-info">
-              <div class="profile-info-text button-light">
+              <div className="profile-info-text button-light">
                 <p>팔로워</p>
               </div>
-              <div class="profile-info-num button-bold">
+              <div className="profile-info-num button-bold">
                 <p>24</p>
               </div>
             </div>
             <div className="profile-info">
-              <div class="profile-info-text button-light">
+              <div className="profile-info-text button-light">
                 <p>팔로잉</p>
               </div>
-              <div class="profile-info-num button-bold">
+              <div className="profile-info-num button-bold">
                 <p>24</p>
               </div>
             </div>
