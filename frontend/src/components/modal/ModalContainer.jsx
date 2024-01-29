@@ -9,7 +9,7 @@ export default function ModalContainer() {
   });
   return (
     <ModalContext.Provider value={{ modalState: modalState, setModalState: setModalState }}>
-      {state.isOpen && state.children}
+      {modalState.isOpen && modalState.children}
     </ModalContext.Provider>
   );
 }
