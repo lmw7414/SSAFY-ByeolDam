@@ -20,28 +20,28 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 조회
-    @GetMapping("/{articleId}/comments")
+    @GetMapping("/articles/{articleId}")
     public Response<Page<CommentResponse>> search(@PathVariable Long articleId, Pageable pageable) {
         return Response.success(commentService.search(articleId, pageable).map(CommentResponse::fromComment));
     }
 
     // 댓글 생성
     // commentId가 들어오는 경우 - 대댓글, null인 경우 - 댓글
-    @PostMapping("/articles/{articleId}/comments")
+    @PostMapping("/articles/{articleId}")
     public Response<Void> create(@RequestBody CommentCreateRequest request, Authentication authentication) {
         commentService.create(request.getArticleId(), authentication.getName(), request.getContent(), request.getCommentId());
         return Response.success();
     }
 
     // 댓글 수정
-    @PutMapping("/articles/{articleId}/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public Response<Void> modify(@RequestBody CommentModifyRequest request, Authentication authentication) {
         commentService.modify(request.getCommentId(), authentication.getName(), request.getContent());
         return Response.success();
     }
 
     // 댓글 삭제
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/{commentId}")
     public Response<Void> delete(@PathVariable Long commentId, Authentication authentication) {
         commentService.delete(commentId, authentication.getName());
         return Response.success();
