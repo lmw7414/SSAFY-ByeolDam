@@ -1,15 +1,17 @@
 package com.ssafy.star.comment.application;
 
-import com.ssafy.star.article.ArticleEntity;
-import com.ssafy.star.article.ArticleRepository;
+
+import com.ssafy.star.article.dao.ArticleRepository;
+import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.dao.CommentRepository;
 import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.comment.dto.CommentDto;
 import com.ssafy.star.comment.exception.ErrorCode;
 import com.ssafy.star.comment.exception.StarApplicationException;
-import com.ssafy.star.user.UserEntity;
-import com.ssafy.star.user.UserRepository;
+import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final ArticleRepository articleRepositoty;
@@ -31,20 +34,25 @@ public class CommentService {
     }
 
     @Transactional
-    public void create(Long articleId, String nickName, String content, Long parentCommentId) {
+    public void create(Long articleId, String email, String content, Long parentCommentId) {
+        if (parentCommentId != null) {
+            getCommentEntityOrException(parentCommentId);
+        }
+
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(nickName);
-        commentRepository.save(CommentDto.toEntity(userEntity, articleEntity, content, parentCommentId));
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentCommentId));
     }
 
     @Transactional
-    public void modify(Long commentId, String nickName, String content) {
+    public void modify(Long commentId, String email, String content) {
         CommentEntity commentEntity = getCommentEntityOrException(commentId);
-        UserEntity userEntity = getUserEntityOrException(nickName);
+        UserEntity userEntity = getUserEntityOrException(email);
 
         // 수정하려는 사람이 댓글을 작성한 사람인지 확인
         if (commentEntity.getUserEntity() != userEntity) {
-            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", nickName, commentId));
+            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
         }
 
         // 댓글 수정
@@ -52,13 +60,14 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(Long commentId, String nickName) {
+    public void delete(Long commentId, String email) {
+        log.info("commentID: {} email: {}", commentId, email);
         CommentEntity commentEntity = getCommentEntityOrException(commentId);
-        UserEntity userEntity = getUserEntityOrException(nickName);
+        UserEntity userEntity = getUserEntityOrException(email);
 
         // 수정하려는 사람이 댓글을 작성한 사람이거나 게시글 작성자인지 확인
         if (!(commentEntity.getUserEntity() == userEntity || commentEntity.getArticleEntity().getUser() == userEntity)) {
-            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", nickName, commentId));
+            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
         }
 
         commentRepository.delete(commentEntity);
@@ -71,9 +80,9 @@ public class CommentService {
     }
 
     // 유저가 존재하는지
-    private UserEntity getUserEntityOrException(String nickName) {
-        return userRepository.findByNickname(nickName).orElseThrow(() ->
-                new StarApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", nickName)));
+    private UserEntity getUserEntityOrException(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+                new StarApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
     }
 
     // 댓글이 존재하는지
