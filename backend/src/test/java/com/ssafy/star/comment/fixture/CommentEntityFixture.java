@@ -1,8 +1,8 @@
 package com.ssafy.star.comment.fixture;
 
-import com.ssafy.star.article.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.domain.CommentEntity;
-import com.ssafy.star.user.UserEntity;
+import com.ssafy.star.user.domain.UserEntity;
 
 public class CommentEntityFixture {
     public static CommentEntity get(Long id, String content, UserEntity userEntity, ArticleEntity articleEntity) {
