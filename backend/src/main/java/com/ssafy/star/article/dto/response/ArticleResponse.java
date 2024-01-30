@@ -1,11 +1,10 @@
-package com.ssafy.star.article.api.response;
+package com.ssafy.star.article.dto.response;
 
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dto.Article;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +13,6 @@ public class ArticleResponse {
     private Long id;
     private String title;
     private String tag;
-    private String nickname;
 //    private Long constellationId;
 //    private imageResponse image;
     private DisclosureType disclosure;
@@ -29,7 +27,6 @@ public class ArticleResponse {
                 article.getId(),
                 article.getTitle(),
                 article.getTag(),
-                article.getNickname(),
 //                article.getConstellationId(),
 //                ImageResponse.fromImage(Article.getImage()),
                 article.getDisclosure(),

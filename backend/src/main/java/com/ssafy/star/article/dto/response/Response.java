@@ -1,4 +1,4 @@
-package com.ssafy.star.article.api.response;
+package com.ssafy.star.article.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

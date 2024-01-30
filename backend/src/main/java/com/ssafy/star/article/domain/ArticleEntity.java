@@ -1,6 +1,7 @@
 package com.ssafy.star.article.domain;
 
 import com.ssafy.star.article.DisclosureType;
+import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -18,23 +19,20 @@ import java.time.LocalDateTime;
 @Table(name = "\"article\"")
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE \"article\" SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE `article` SET deleted_at = NOW() where id=?")
 @Where(clause = "deleted_at is NULL")
 public class ArticleEntity {
 
     @Id
-    @Column(name = "article_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "article_title", nullable = false, length = 105)
+    @Column(name = "title", nullable = false, length = 105)
     private String title;
 
-    @Column(name = "article_tag", length = 255)
+    @Column(name = "tag", length = 255)
     private String tag;
-
-    @Column(name = "nickname", nullable = false, length = 105)
-    private String nickname;
 
     // TODO : ConstellationId, Image
 
@@ -44,7 +42,7 @@ public class ArticleEntity {
     @Column(name = "description", length = 300)
     private String description;
 
-    @Column(name = "article_disclosure", nullable = false)
+    @Column(name = "disclosure", nullable = false)
     private DisclosureType disclosure;
 
     @Column(name = "created_at")
@@ -84,7 +82,7 @@ public class ArticleEntity {
         this.modifiedAt = LocalDateTime.from(LocalDateTime.now());
     }
 
-    public static ArticleEntity of(String title, String tag, String description, DisclosureType disclosure,UserEntity userEntity){
+    public static ArticleEntity of(String title, String tag, String description, DisclosureType disclosure, UserEntity userEntity){
         ArticleEntity entity = new ArticleEntity();
         entity.setTitle(title);
         entity.setTag(tag);

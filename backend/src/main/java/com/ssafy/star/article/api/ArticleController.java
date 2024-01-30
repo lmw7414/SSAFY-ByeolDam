@@ -1,21 +1,20 @@
 package com.ssafy.star.article.api;
 
 
-import com.ssafy.star.article.api.request.ArticleCreateRequest;
-import com.ssafy.star.article.api.request.ArticleModifyRequest;
-import com.ssafy.star.article.api.response.ArticleResponse;
-import com.ssafy.star.article.api.response.Response;
+import com.ssafy.star.article.dto.request.ArticleCreateRequest;
+import com.ssafy.star.article.dto.request.ArticleModifyRequest;
+import com.ssafy.star.article.dto.response.ArticleResponse;
+import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.dto.Article;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/articles")
 @RequiredArgsConstructor
@@ -26,16 +25,17 @@ public class ArticleController {
     @PostMapping
     public Response<Void> create(@RequestBody ArticleCreateRequest request, Authentication authentication) {
         // TODO : image
-        articleService.create(request.getTitle(), request.getTag(), request.getDescription(),
-                request.getDisclosureType(), authentication.getName());
+        log.info("request 정보 : {}", request);
+        articleService.create(request.title(), request.tag(), request.description(),
+                request.disclosureType(), authentication.getName());
         return Response.success();
     }
 
     @PutMapping("/{articleId}")
     public Response<ArticleResponse> modify(@PathVariable Long articleId, @RequestBody ArticleModifyRequest request, Authentication authentication) {
         // TODO : image
-        Article article = articleService.modify(articleId, request.getTitle(), request.getTag(),
-                request.getDescription(), request.getDisclosureType(), authentication.getName());
+        Article article = articleService.modify(articleId, request.title(), request.tag(), request.description(),
+                request.disclosureType(), authentication.getName());
         return Response.success(ArticleResponse.fromArticle(article));
     }
 

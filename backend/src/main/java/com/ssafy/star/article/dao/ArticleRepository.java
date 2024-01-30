@@ -1,7 +1,7 @@
 package com.ssafy.star.article.dao;
 
 import com.ssafy.star.article.domain.ArticleEntity;
-import com.ssafy.star.article.domain.UserEntity;
+import com.ssafy.star.user.domain.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
