@@ -1,3 +1,4 @@
+version: "3"
 services:
   byeoldam-database:
     container_name: byeoldam-database
@@ -20,3 +21,17 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
+  byeoldam-app:
+    container_name: byeoldam-app
+    build: .
+    depends_on: # DB 실행 후 실행
+      - byeoldam-database
+    image: lmw7414/byeoldam-app
+    environment:
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JWT_SECRET_KEY_CODE=${JWT_SECRET_KEY_CODE}
+    ports:
+      - "80:8080"
+    restart: always
