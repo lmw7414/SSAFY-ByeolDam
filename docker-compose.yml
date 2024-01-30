@@ -4,7 +4,7 @@ services:
     container_name: byeoldam-database
     build:
       dockerfile: Dockerfile
-      context: .backend/database
+      context: ./backend/database
     image: lmw7414/byeoldam-database
     volumes:
       # 설정파일 저장될  위치
