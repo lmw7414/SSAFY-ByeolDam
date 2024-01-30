@@ -1,11 +1,10 @@
 package com.ssafy.star.comment.dto;
 
-import com.ssafy.star.article.ArticleEntity;
 import com.ssafy.star.comment.domain.CommentEntity;
-import com.ssafy.star.user.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public record CommentDto(
         Long id,
@@ -15,22 +14,18 @@ public record CommentDto(
         Long parentCommentId,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        Set<CommentEntity> childrenComments
+        Set<CommentChildrenDto> childrenComments
 ) {
     public static CommentDto from(CommentEntity entity) {
         return new CommentDto(
             entity.getId(),
             entity.getArticleEntity().getId(),
-            entity.getUserEntity().getnickName(),
+            entity.getUserEntity().getNickname(),
             entity.getContent(),
             entity.getParentCommentId(),
             entity.getCreatedAt(),
             entity.getModifiedAt(),
-            entity.getChildrenComments()
+            entity.getChildrenComments().stream().map(CommentChildrenDto::from).collect(Collectors.toSet())
         );
-    }
-
-    public static CommentEntity toEntity(UserEntity userEntity, ArticleEntity articleEntity, String content, Long parentCommentId) {
-        return CommentEntity.of(userEntity, articleEntity, content, parentCommentId);
     }
 }
