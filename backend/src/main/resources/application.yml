@@ -31,7 +31,7 @@ spring:
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.MariaDB
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
     properties:
@@ -53,7 +53,7 @@ spring:
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.MariaDB
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
     properties:
