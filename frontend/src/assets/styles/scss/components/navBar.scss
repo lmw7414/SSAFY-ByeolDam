@@ -1,8 +1,8 @@
-$nav-bar-width: 400px;
+$nav-bar-width: 360px;
 
 .nav-bar-big-container {
   position: absolute;
-  transition: margin-left 0.5s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
+  transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
 }
 
 .nav-bar-container {
@@ -20,12 +20,7 @@ $nav-bar-width: 400px;
 .nav-bar-logo {
   display: flex;
   justify-content: center;
-}
-
-.nav-bar-profile-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin-bottom: 40px;
 }
 
 .nav-bar-logo img {
@@ -42,6 +37,14 @@ $nav-bar-width: 400px;
   overflow: hidden;
   border-radius: 50%; // 반지름이 컨테이너 크기의 50%인 원형으로 만듭니다.
   border: 2px solid $text-primary; // 원 테두리 추가
+  margin-bottom: 40px;
+}
+
+.nav-bar-profile-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
 }
 
 .profile-image {
@@ -52,28 +55,33 @@ $nav-bar-width: 400px;
 
 .nickname {
   color: white;
+  margin-bottom: 40px;
 }
 
 .profile-info {
   display: flex;
+  margin-bottom: 16px;
 }
 
 .profile-info-text {
   color: $text-primary;
   text-align: center;
   width: 100px;
+  margin-right: 20px;
 }
 
 .profile-info-num {
   color: white;
   text-align: center;
   width: 100px;
+  margin-left: 20px;
 }
 
 .nav-bar-menu {
   display: flex;
   margin-left: 40px;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .nav-bar-menu-icon-box {
@@ -88,7 +96,7 @@ $nav-bar-width: 400px;
 
 .nav-bar-menu-text {
   color: $text-primary;
-  margin-left: 40px;
+  margin-left: 30px;
 }
 
 .nav-bar-toggle-container {
