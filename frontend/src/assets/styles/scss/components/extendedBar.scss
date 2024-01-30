@@ -1,0 +1,83 @@
+$extended-bar-width: 480px;
+
+.extended-bar-big-container {
+  position: absolute;
+  transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
+}
+
+.extended-bar-container {
+  height: 100vh;
+  width: $extended-bar-width;
+  z-index: 1;
+  background-color: $modal-background;
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  position: relative;
+  //   display: inline-block;
+}
+
+.extended-bar-logo {
+  margin-bottom: 40px;
+}
+
+.extended-bar-logo img {
+  height: 5rem;
+  margin-left: 5rem;
+}
+
+.search-bar-input {
+  height: 60px;
+  width: 400px;
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 28px;
+}
+
+.extended-bar-menu-box {
+  margin-top: 40px;
+}
+
+.extended-bar-menu {
+  display: flex;
+  margin-left: 40px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.extended-bar-menu-icon-box {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+}
+
+.extended-bar-menu-icon {
+  height: 30px;
+}
+
+.extended-bar-menu-text {
+  color: $text-primary;
+  margin-left: 30px;
+}
+
+.extended-bar-toggle-container {
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  height: 100px;
+  background-color: $modal-background;
+  position: absolute; /* 절대 위치 설정 */
+  top: 50%; /* 상위 부모 중앙으로 이동 */
+  transform: translateY(-50%); /* 세로 중앙 정렬을 위해 사용 */
+  right: -40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggle-button {
+  height: 30px;
+}
+
+.extended-bar-divide-line {
+  width: 300px;
+}

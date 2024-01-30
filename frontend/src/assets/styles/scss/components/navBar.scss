@@ -14,17 +14,15 @@ $nav-bar-width: 360px;
   border-bottom-right-radius: 18px;
   position: relative;
   display: inline-block;
-  align-content: c;
 }
 
 .nav-bar-logo {
-  display: flex;
-  justify-content: center;
   margin-bottom: 40px;
 }
 
 .nav-bar-logo img {
   height: 5rem;
+  margin-left: 5rem;
 }
 
 .profile-image-box {
