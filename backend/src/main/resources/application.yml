@@ -3,9 +3,9 @@ spring:
     active: local #default
     group:
       local:
-        -common
+        - common
       prod:
-        -common
+        - common
 
 
 ---
