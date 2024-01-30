@@ -33,5 +33,5 @@ services:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - JWT_SECRET_KEY_CODE=${JWT_SECRET_KEY_CODE}
     ports:
-      - "8080:8080"
+      - "8081:8081"
     restart: always
