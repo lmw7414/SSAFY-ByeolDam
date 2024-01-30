@@ -1,6 +1,6 @@
 package com.ssafy.star.comment.dao;
 
-import com.ssafy.star.article.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.domain.CommentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

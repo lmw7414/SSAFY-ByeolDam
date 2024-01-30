@@ -1,7 +1,7 @@
 package com.ssafy.star.comment.domain;
 
-import com.ssafy.star.article.ArticleEntity;
-import com.ssafy.star.user.UserEntity;
+import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

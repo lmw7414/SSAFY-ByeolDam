@@ -1,6 +1,6 @@
 package com.ssafy.star.comment.dto.response;
 
-import com.ssafy.star.comment.domain.CommentEntity;
+import com.ssafy.star.comment.dto.CommentChildrenDto;
 import com.ssafy.star.comment.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class CommentResponse {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Long parentCommentId;
-    private Set<CommentEntity> childrenComments;
+    private Set<CommentChildrenDto> childrenComments;
 
     public static CommentResponse fromComment(CommentDto commentDto) {
         return new CommentResponse(
