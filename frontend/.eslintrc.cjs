@@ -4,7 +4,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: ['airbnb'],
+  extends: ['airbnb', 'prettier'],
   overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',

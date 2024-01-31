@@ -4,19 +4,18 @@ import { Image, useCursor } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { easing } from 'maath';
 import getUuid from 'uuid-by-string';
-import { useRoute } from 'wouter';
 
 export default function Constellation({
   id,
   url,
   rotation = new THREE.Euler(0, 0, 0),
   position = [0, 0, 0],
+  selected,
 }) {
   const image = useRef();
   const [hovered, hover] = useState(false);
   const name = getUuid(url + id);
-  const [, params] = useRoute('/home/constellation/:id');
-  const isActive = params?.id === name;
+  const isActive = selected === name;
 
   useCursor(hovered);
 
@@ -33,11 +32,9 @@ export default function Constellation({
       onPointerOver={(e) => {
         e.stopPropagation();
         hover(true);
-        // document.body.classList.add('pointer');
       }}
       onPointerOut={() => {
         hover(false);
-        // document.body.classList.remove('pointer');
       }}
       transparent
     >
