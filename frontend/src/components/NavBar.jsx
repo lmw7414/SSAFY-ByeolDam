@@ -6,6 +6,7 @@ import NavBarMenu from './base/NavBarMenu';
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
+
   const ToggleClick = () => {
     setIsNavBarVisible(!isNavBarVisible);
   };
@@ -19,7 +20,7 @@ export default function NavBar() {
     setBarId(newId);
   };
 
-  console.log(barId);
+  console.log('barId : ', barId);
 
   return (
     <div>
