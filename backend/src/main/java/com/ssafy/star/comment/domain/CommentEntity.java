@@ -19,17 +19,18 @@ import java.util.Set;
 @Getter
 @Setter
 public class CommentEntity {
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private UserEntity userEntity;
-
-    @ManyToOne
-    @JoinColumn(name = "articleId")
-    private ArticleEntity articleEntity;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "article_id")
+    private ArticleEntity articleEntity;
 
     @Column(nullable = false)
     private String content;
@@ -41,10 +42,10 @@ public class CommentEntity {
     private LocalDateTime modifiedAt;
 
     @Column(updatable = false)
-    private Long parentCommentId;
+    private Long parentId;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.ALL)
     private Set<CommentEntity> childrenComments = new LinkedHashSet<>();
 
     @PrePersist
@@ -55,15 +56,15 @@ public class CommentEntity {
 
     protected CommentEntity() {}
 
-    private CommentEntity(UserEntity userEntity, ArticleEntity articleEntity, String content, Long parentCommentId) {
+    private CommentEntity(UserEntity userEntity, ArticleEntity articleEntity, String content, Long parentId) {
         this.userEntity = userEntity;
         this.articleEntity = articleEntity;
         this.content = content;
-        this.parentCommentId = parentCommentId;
+        this.parentId = parentId;
     }
 
-    public static CommentEntity of(UserEntity userEntity, ArticleEntity articleEntity, String content, Long parentCommentId) {
-        return new CommentEntity(userEntity, articleEntity, content, parentCommentId);
+    public static CommentEntity of(UserEntity userEntity, ArticleEntity articleEntity, String content, Long parentId) {
+        return new CommentEntity(userEntity, articleEntity, content, parentId);
     }
 }
 

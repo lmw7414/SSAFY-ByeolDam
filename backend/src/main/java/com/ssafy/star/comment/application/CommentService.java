@@ -3,7 +3,7 @@ package com.ssafy.star.comment.application;
 
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
-import com.ssafy.star.comment.dao.CommentRepository;
+import com.ssafy.star.comment.repository.CommentRepository;
 import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.comment.dto.CommentDto;
 import com.ssafy.star.common.exception.ByeolDamException;
@@ -34,22 +34,22 @@ public class CommentService {
     }
 
     @Transactional
-    public void create(Long articleId, String email, String content, Long parentCommentId) {
-        if (parentCommentId != null) {
-            getCommentEntityOrException(parentCommentId);
+    public CommentDto create(Long articleId, String email, String content, Long parentId) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        if (parentId != null) {
+            getCommentEntityOrException(parentId);
         }
         if (content.isBlank()) {
             throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
         }
 
-        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
-
-        commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentCommentId));
+        return CommentDto.from(commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentId)));
     }
 
     @Transactional
-    public void modify(Long commentId, String email, String content) {
+    public CommentDto modify(Long commentId, String email, String content) {
         CommentEntity commentEntity = getCommentEntityOrException(commentId);
         UserEntity userEntity = getUserEntityOrException(email);
 
@@ -63,6 +63,8 @@ public class CommentService {
 
         // 댓글 수정
         commentEntity.setContent(content);
+
+        return CommentDto.from(commentRepository.saveAndFlush(commentEntity));
     }
 
     @Transactional
