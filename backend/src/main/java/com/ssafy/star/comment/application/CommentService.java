@@ -6,8 +6,8 @@ import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.dao.CommentRepository;
 import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.comment.dto.CommentDto;
-import com.ssafy.star.comment.exception.ErrorCode;
-import com.ssafy.star.comment.exception.StarApplicationException;
+import com.ssafy.star.common.exception.ByeolDamException;
+import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,9 @@ public class CommentService {
         if (parentCommentId != null) {
             getCommentEntityOrException(parentCommentId);
         }
+        if (content.isBlank()) {
+            throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
+        }
 
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         UserEntity userEntity = getUserEntityOrException(email);
@@ -52,7 +55,10 @@ public class CommentService {
 
         // 수정하려는 사람이 댓글을 작성한 사람인지 확인
         if (commentEntity.getUserEntity() != userEntity) {
-            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
+        }
+        if (content.isBlank()) {
+            throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
         }
 
         // 댓글 수정
@@ -67,7 +73,7 @@ public class CommentService {
 
         // 수정하려는 사람이 댓글을 작성한 사람이거나 게시글 작성자인지 확인
         if (!(commentEntity.getUserEntity() == userEntity || commentEntity.getArticleEntity().getUser() == userEntity)) {
-            throw new StarApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
         }
 
         commentRepository.delete(commentEntity);
@@ -76,18 +82,18 @@ public class CommentService {
     // 포스트가 존재하는지
     private ArticleEntity getArticleEntityOrException(Long articleId) {
         return articleRepositoty.findById(articleId).orElseThrow(() ->
-                new StarApplicationException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", articleId)));
+                new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", articleId)));
     }
 
     // 유저가 존재하는지
     private UserEntity getUserEntityOrException(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
-                new StarApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
     }
 
     // 댓글이 존재하는지
     private CommentEntity getCommentEntityOrException(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(() ->
-                new StarApplicationException(ErrorCode.COMMENT_NOT_FOUND, String.format("%d not founded", commentId)));
+                new ByeolDamException(ErrorCode.COMMENT_NOT_FOUND, String.format("%d not founded", commentId)));
     }
 }
