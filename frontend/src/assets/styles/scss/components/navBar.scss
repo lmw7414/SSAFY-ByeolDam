@@ -14,7 +14,7 @@ $nav-bar-width: 360px;
   border-bottom-right-radius: 18px;
   position: relative;
   display: inline-block;
-  text-align: right;
+  align-content: c;
 }
 
 .nav-bar-logo {
@@ -77,6 +77,10 @@ $nav-bar-width: 360px;
   margin-left: 20px;
 }
 
+.nav-bar-menu-box {
+  margin-top: 40px;
+}
+
 .nav-bar-menu {
   display: flex;
   margin-left: 40px;
@@ -120,4 +124,8 @@ $nav-bar-width: 360px;
 
 .hidden {
   margin-left: -$nav-bar-width; /* NavBar의 원하는 너비에 따라이 값을 조절합니다. */
+}
+
+.nav-bar-divide-line {
+  width: 300px;
 }
