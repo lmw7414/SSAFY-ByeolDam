@@ -1,138 +1,91 @@
 import { useState } from 'react';
 import ExtendedBar from './ExtendedBar';
+import ProfileInfo from './base/ProfileInfo';
+import NavBarMenu from './base/NavBarMenu';
 
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
-
   const ToggleClick = () => {
     setIsNavBarVisible(!isNavBarVisible);
   };
-
   const openSearchBar = () => {
     setBarId(1);
   };
-
   const openNotificationBar = () => {
     setBarId(2);
   };
-
   const changeBar = (newId) => {
     setBarId(newId);
   };
+
+  console.log(barId);
 
   return (
     <div>
       {barId ? (
         <ExtendedBar changeBar={changeBar} barId={barId} />
       ) : (
-        <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'hidden'}`}>
+        <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'nav-bar-hidden'}`}>
           <div className="nav-bar-container">
             <div className="nav-bar-logo">
               <img src="/src/assets/images/temporary-logo.png" alt="logo" />
             </div>
 
-            <div className="nav-bar-profile-box">
-              <div className="profile-image-box">
-                <div className="profile-image-container">
-                  <img
-                    className="profile-image"
-                    src="/src/assets/images/space.png"
-                    alt="profile_image"
-                  />
+            <div className="nav-bar-contents">
+              <div className="nav-bar-profile-box">
+                <div className="profile-image-box">
+                  <div className="profile-image-container">
+                    <img
+                      className="profile-image"
+                      src="/src/assets/images/space.png"
+                      alt="profile_image"
+                    />
+                  </div>
+                </div>
+                <div className="nickname title">
+                  <p>상당히느긋한사람</p>
+                </div>
+                <div className="profile-info-box">
+                  <ProfileInfo text={'별'} num={26} />
+                  <ProfileInfo text={'별자리'} num={4} />
+                  <ProfileInfo text={'팔로워'} num={144} />
+                  <ProfileInfo text={'팔로잉'} num={132} />
                 </div>
               </div>
-              <div className="nickname title">
-                <p>상당히느긋한사람</p>
-              </div>
-              <div className="profile-info-box">
-                <div className="profile-info">
-                  <div className="profile-info-text button-light">
-                    <p>별</p>
-                  </div>
-                  <div className="profile-info-num button-bold">
-                    <p>24</p>
-                  </div>
-                </div>
-                <div className="profile-info">
-                  <div className="profile-info-text button-light">
-                    <p>별자리</p>
-                  </div>
-                  <div className="profile-info-num button-bold">
-                    <p>24</p>
-                  </div>
-                </div>
-                <div className="profile-info">
-                  <div className="profile-info-text button-light">
-                    <p>팔로워</p>
-                  </div>
-                  <div className="profile-info-num button-bold">
-                    <p>24</p>
-                  </div>
-                </div>
-                <div className="profile-info">
-                  <div className="profile-info-text button-light">
-                    <p>팔로잉</p>
-                  </div>
-                  <div className="profile-info-num button-bold">
-                    <p>24</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <hr className="nav-bar-divide-line" />
+              <div className="nav-bar-divide-line-box">
+                <hr className="nav-bar-divide-line" />
+              </div>
 
-            <div className="nav-bar-menu-box">
-              <div className="nav-bar-menu" onClick={openSearchBar}>
-                <div className="nav-bar-menu-icon-box">
-                  <img
-                    className="nav-bar-menu-icon"
-                    src="/src/assets/images/nav-bar-menu-icons/search.png"
-                    alt="search_icon"
-                  />
-                </div>
-                <p className="nav-bar-menu-text button-light">검색</p>
-              </div>
-              <div className="nav-bar-menu">
-                <div className="nav-bar-menu-icon-box">
-                  <img
-                    className="nav-bar-menu-icon"
-                    src="/src/assets/images/nav-bar-menu-icons/feed.png"
-                    alt="feed_icon"
-                  />
-                </div>
-                <p className="nav-bar-menu-text button-light">피드</p>
-              </div>
-              <div className="nav-bar-menu" onClick={openNotificationBar}>
-                <div className="nav-bar-menu-icon-box">
-                  <img
-                    className="nav-bar-menu-icon"
-                    src="/src/assets/images/nav-bar-menu-icons/notification.png"
-                    alt="notification_icon"
-                  />
-                </div>
-                <p className="nav-bar-menu-text button-light">알림</p>
-              </div>
-              <div className="nav-bar-menu">
-                <div className="nav-bar-menu-icon-box">
-                  <img
-                    className="nav-bar-menu-icon"
-                    src="/src/assets/images/nav-bar-menu-icons/settings.png"
-                    alt="settings_icon"
-                  />
-                </div>
-                <p className="nav-bar-menu-text button-light">설정</p>
-              </div>
-              <div className="nav-bar-menu">
-                <div className="nav-bar-menu-icon-box">
-                  <img
-                    className="nav-bar-menu-icon"
-                    src="/src/assets/images/nav-bar-menu-icons/logout.png"
-                    alt="logout_icon"
-                  />
-                </div>
-                <p className="nav-bar-menu-text button-light">로그아웃</p>
+              <div className="nav-bar-menu-box">
+                <NavBarMenu
+                  text={'검색'}
+                  src={'/src/assets/images/nav-bar-menu-icons/search.png'}
+                  alt={'search'}
+                  onClick={openSearchBar}
+                />
+                <NavBarMenu
+                  text={'피드'}
+                  src={'/src/assets/images/nav-bar-menu-icons/feed.png'}
+                  alt={'feed'}
+                />
+                <NavBarMenu
+                  text={'알림'}
+                  src={'/src/assets/images/nav-bar-menu-icons/notifications.png'}
+                  alt={'notifications'}
+                  onClick={openNotificationBar}
+                />
+                <NavBarMenu
+                  text={'설정'}
+                  src={'/src/assets/images/nav-bar-menu-icons/settings.png'}
+                  alt={'settings'}
+                />
+                <NavBarMenu
+                  text={'로그아웃'}
+                  src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
+                  alt={'logout'}
+                />
               </div>
             </div>
 
