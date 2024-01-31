@@ -9,8 +9,8 @@ public class UserEntityFixture {
         return entity;
     }
 
-    public static UserEntity get(String nickname) {
-        UserEntity entity = UserEntity.of(null, null, null, nickname);
+    public static UserEntity get(String email) {
+        UserEntity entity = UserEntity.of(email, null, null, null);
         return entity;
     }
 }
