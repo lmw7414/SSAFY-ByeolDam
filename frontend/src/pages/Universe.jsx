@@ -24,7 +24,6 @@ export default function Universe() {
           camera={camera.current}
           reverseOrbit
           target={new THREE.Vector3(0, 0.03, 0)}
-          // target={new THREE.Vector3(1, 1, 1)}
           maxPolarAngle={(Math.PI / 180) * 120}
           minPolarAngle={(Math.PI / 180) * 90}
           rotateSpeed={0.2}
