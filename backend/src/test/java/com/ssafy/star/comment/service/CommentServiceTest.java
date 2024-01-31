@@ -6,9 +6,9 @@ import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.application.CommentService;
 import com.ssafy.star.comment.dao.CommentRepository;
 import com.ssafy.star.comment.domain.CommentEntity;
-import com.ssafy.star.comment.exception.ErrorCode;
-import com.ssafy.star.comment.exception.StarApplicationException;
 import com.ssafy.star.comment.fixture.CommentEntityFixture;
+import com.ssafy.star.common.exception.ByeolDamException;
+import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.user.application.fixture.UserEntityFixture;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.repository.UserRepository;
@@ -60,7 +60,7 @@ class CommentServiceTest {
         when(articleRepository.findById(articleId)).thenReturn(Optional.empty());
         when(commentRepository.findAllByArticleEntity(articleEntity, pageable)).thenReturn(Page.empty());
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.search(articleId, pageable));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.search(articleId, pageable));
         Assertions.assertEquals(ErrorCode.ARTICLE_NOT_FOUND, result.getErrorCode());
     }
 
@@ -87,7 +87,7 @@ class CommentServiceTest {
         when(articleRepository.findById(articleId)).thenReturn(Optional.of(mock(ArticleEntity.class)));
         when(commentRepository.save(any())).thenReturn(mock(CommentEntity.class));
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.create(articleId, nickName, content, null));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.create(articleId, nickName, content, null));
         Assertions.assertEquals(ErrorCode.USER_NOT_FOUND, result.getErrorCode());
     }
 
@@ -101,7 +101,7 @@ class CommentServiceTest {
         when(articleRepository.findById(articleId)).thenReturn(Optional.empty());
         when(commentRepository.save(any())).thenReturn(mock(CommentEntity.class));
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.create(articleId, nickName, content, null));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.create(articleId, nickName, content, null));
         Assertions.assertEquals(ErrorCode.ARTICLE_NOT_FOUND, result.getErrorCode());
     }
 
@@ -136,7 +136,7 @@ class CommentServiceTest {
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
         when(commentRepository.saveAndFlush(any())).thenReturn(commentEntity);
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.modify(commentId, nickName, content));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.modify(commentId, nickName, content));
         Assertions.assertEquals(ErrorCode.COMMENT_NOT_FOUND, result.getErrorCode());
     }
 
@@ -155,7 +155,7 @@ class CommentServiceTest {
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(mock(CommentEntity.class)));
         when(commentRepository.saveAndFlush(any())).thenReturn(commentEntity);
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.modify(commentId, nickName, content));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.modify(commentId, nickName, content));
         Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, result.getErrorCode());
     }
 
@@ -184,7 +184,7 @@ class CommentServiceTest {
         when(userRepository.findByNickname(nickName)).thenReturn(Optional.of(mockUserEntity));
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.delete(commentId, nickName));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.delete(commentId, nickName));
         Assertions.assertEquals(ErrorCode.COMMENT_NOT_FOUND, result.getErrorCode());
     }
 
@@ -201,7 +201,7 @@ class CommentServiceTest {
         when(userRepository.findByNickname(nickName)).thenReturn(Optional.of(userEntity2));
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(commentEntity));
 
-        StarApplicationException result = Assertions.assertThrows(StarApplicationException.class, () -> commentService.delete(commentId, nickName));
+        ByeolDamException result = Assertions.assertThrows(ByeolDamException.class, () -> commentService.delete(commentId, nickName));
         Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, result.getErrorCode());
     }
 }
