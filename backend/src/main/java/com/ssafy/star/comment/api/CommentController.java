@@ -29,19 +29,19 @@ public class CommentController {
     // 댓글 생성
     // commentId가 들어오는 경우 - 대댓글, null인 경우 - 댓글
     @PostMapping("/articles/{articleId}/comments")
-    public Response<Void> create(@RequestBody CommentCreateRequest request, Authentication authentication) {
-        commentService.create(request.getArticleId(), authentication.getName(), request.getContent(), request.getCommentId());
+    public Response<CommentDto> create(Authentication authentication, @PathVariable Long articleId, @RequestBody CommentCreateRequest request) {
+        return Response.success(commentService.create(articleId, authentication.getName(), request.content(), request.parentId()));
     }
 
     // 댓글 수정
     @PutMapping("/comments/{commentId}")
-    public Response<Void> modify(@RequestBody CommentModifyRequest request, Authentication authentication) {
-        commentService.modify(request.getCommentId(), authentication.getName(), request.getContent());
+    public Response<CommentDto> modify(Authentication authentication, @PathVariable Long commentId, @RequestBody CommentModifyRequest request) {
+        return Response.success(commentService.modify(commentId, authentication.getName(), request.content()));
     }
 
     // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
-    public Response<Void> delete(@PathVariable Long commentId, Authentication authentication) {
+    public Response<Void> delete(Authentication authentication, @PathVariable Long commentId) {
         commentService.delete(commentId, authentication.getName());
         return Response.success();
     }
