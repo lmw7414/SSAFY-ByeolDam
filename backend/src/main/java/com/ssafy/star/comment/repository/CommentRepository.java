@@ -1,4 +1,4 @@
-package com.ssafy.star.comment.dao;
+package com.ssafy.star.comment.repository;
 
 import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.comment.domain.CommentEntity;

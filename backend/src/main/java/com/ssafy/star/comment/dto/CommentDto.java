@@ -11,7 +11,7 @@ public record CommentDto(
         Long articleId,
         String nickName,
         String content,
-        Long parentCommentId,
+        Long parentId,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         Set<CommentChildrenDto> childrenComments
@@ -22,7 +22,7 @@ public record CommentDto(
             entity.getArticleEntity().getId(),
             entity.getUserEntity().getNickname(),
             entity.getContent(),
-            entity.getParentCommentId(),
+            entity.getParentId(),
             entity.getCreatedAt(),
             entity.getModifiedAt(),
             entity.getChildrenComments().stream().map(CommentChildrenDto::from).collect(Collectors.toSet())
