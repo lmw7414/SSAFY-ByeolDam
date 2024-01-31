@@ -39,7 +39,7 @@
             Long articleId = 1L;
             when(commentService.search(anyLong(), any())).thenReturn(Page.empty());
 
-            mockMvc.perform(get("/api/v1/comments/{articleId}/comments", articleId)
+            mockMvc.perform(get("/api/v1/articles/{articleId}/comments", articleId)
                             .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
                 .andExpect(status().isOk());
@@ -51,10 +51,10 @@
             Long articleId = 1L;
             String content = "content";
 
-            mockMvc.perform(post("/api/v1/comments/articles/{articleId}/comments", articleId)
+            mockMvc.perform(post("/api/v1/articles/{articleId}/comments", articleId)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(new CommentCreateRequest(articleId, content, null)))
+                    .content(objectMapper.writeValueAsBytes(new CommentCreateRequest(content, null)))
             ).andDo(print())
                 .andExpect(status().isOk());
         }
@@ -65,10 +65,10 @@
             Long commentId = 1L;
             String content = "content";
 
-            mockMvc.perform(put("/api/v1/comments/articles/{articleId}/comments/{commentId}", 1L, commentId)
+            mockMvc.perform(put("/api/v1/comments/{commentId}", commentId)
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsBytes(new CommentModifyRequest(commentId, content)))
+                            .content(objectMapper.writeValueAsBytes(new CommentModifyRequest(content)))
                     ).andDo(print())
                     .andExpect(status().isOk());
         }
@@ -78,7 +78,7 @@
         void 댓글삭제() throws Exception {
             Long commentId = 1L;
 
-            mockMvc.perform(delete("/api/v1/comments/comments/{commentId}", commentId)
+            mockMvc.perform(delete("/api/v1/comments/{commentId}", commentId)
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(commentId))
