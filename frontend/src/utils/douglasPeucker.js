@@ -1,5 +1,4 @@
 export default function douglasPeucker(points, epsilon) {
-  console.log(points);
   // 최대 거리를 찾는 함수
   function findPerpendicularDistance(point, lineStart, lineEnd) {
     var dx = lineEnd.x - lineStart.x;
