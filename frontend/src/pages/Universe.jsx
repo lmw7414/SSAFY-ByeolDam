@@ -24,14 +24,17 @@ export default function Universe() {
           camera={camera.current}
           reverseOrbit
           target={new THREE.Vector3(0, 0.03, 0)}
+          // target={new THREE.Vector3(1, 1, 1)}
           maxPolarAngle={(Math.PI / 180) * 120}
           minPolarAngle={(Math.PI / 180) * 90}
           rotateSpeed={0.2}
+          zoomSpeed={5}
+          panSpeed={5}
         />
         <Suspense fallback={null}>
           <Land />
-          <Stars factor={10} fade />
-          <Stars saturation={2} factor={20} speed={1.2} fade />
+          <Stars saturation={1} speed={0.7} fade />
+          <Stars saturation={2} speed={1.2} fade />
           <ConstellationControls controller={controller} constellationList={constellationList} />
         </Suspense>
       </Canvas>

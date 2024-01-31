@@ -1,52 +1,83 @@
+import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { useRef, useState, useEffect } from 'react';
-import { Image, useCursor } from '@react-three/drei';
+import Star from './Star';
 import { useFrame } from '@react-three/fiber';
+import { Line, useCursor } from '@react-three/drei';
 import { easing } from 'maath';
-import getUuid from 'uuid-by-string';
+import getUuidByString from 'uuid-by-string';
 
-export default function Constellation({
-  id,
-  url,
-  rotation = new THREE.Euler(0, 0, 0),
-  position = [0, 0, 0],
-  selected,
-}) {
-  const image = useRef();
+export default function Constellation({ position = [5, 1.5, 5], name, selected }) {
+  const group = useRef();
+  const [target, setTarget] = useState(true);
   const [hovered, hover] = useState(false);
-  const name = getUuid(url + id);
-  const isActive = selected === name;
-
+  const [pointList, setPointList] = useState([]);
+  const uuid = getUuidByString('' + name);
   useCursor(hovered);
 
+  const isActive = selected === name;
+
   useEffect(() => {
-    image.current.lookAt(new THREE.Vector3(0, 0, 0));
-  });
+    group.current.lookAt(new THREE.Vector3(0, 0.03, 0));
+    window.addEventListener('keydown', ({ key }) => {
+      if (key == 'a') setTarget(!target);
+    });
+
+    fetch('./src/assets/data/dog.json')
+      .then((data) => data.json())
+      .then((data) => {
+        const [lx, rx] = data.shapes[0].points.reduce(
+          (prev, now) => [Math.min(now[0], prev[0]), Math.max(now[0], prev[1])],
+          [data.imageWidth, 0],
+        );
+
+        const [dy, uy] = data.shapes[0].points.reduce(
+          (prev, now) => [Math.min(now[1], prev[0]), Math.max(now[1], prev[1])],
+          [data.imageHeight, 0],
+        );
+
+        const width = rx - lx;
+        const height = uy - dy;
+        const size = Math.max(width, height);
+
+        const points = data.shapes[0].points.map(([x, y]) => {
+          const X = (x - lx + (size - width) / 2) / size - 1 / 2;
+          const Y = (y - dy + (size - height) / 2) / size + 1 / 2;
+
+          return [X * 80, (1 - Y) * 80, 0];
+        });
+
+        setPointList(points);
+      });
+  }, []);
 
   useFrame((state, dt) => {
-    if (isActive) easing.damp3(image.current.scale, 5, dt);
-    else easing.damp3(image.current.scale, hovered ? 2.5 : 2, 0.1, dt);
+    if (isActive) easing.damp3(group.current.scale, 0.2, dt);
+    else easing.damp3(group.current.scale, 0.1, dt);
   });
+
   return (
-    <mesh
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        hover(true);
-      }}
-      onPointerOut={() => {
-        hover(false);
-      }}
-      transparent
-    >
-      <Image
+    <group ref={group} position={position} scale={0.1} name={uuid}>
+      <mesh
+        scale={[82, 82, 0.1]}
+        position={[0, 0, -1]}
         name={name}
-        ref={image}
-        position={position}
-        url={url}
-        rotation={rotation}
-        scale={2}
-        transparent
-      />
-    </mesh>
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          hover(true);
+        }}
+        onPointerOut={() => {
+          hover(false);
+        }}
+      >
+        <boxGeometry />
+        <meshPhongMaterial opacity={0} transparent />
+      </mesh>
+      {pointList.map(([x, y, _], i) => (
+        <Star key={'' + name + i} position={[x, y, 0]} scale={1.5} name={name} id={i} />
+      ))}
+      {pointList.length > 0 && (
+        <Line points={[...pointList, pointList[0]]} color={'white'} linewidth={2} />
+      )}
+    </group>
   );
 }
