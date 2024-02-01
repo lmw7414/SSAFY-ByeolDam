@@ -7,3 +7,17 @@
   padding: 0;
   overflow: hidden;
 }
+
+.main_buttons_box {
+  position: absolute;
+  z-index: 1;
+  bottom: 5%;
+  left: 60%;
+  transform: translate(-60%, -10%);
+  display: flex;
+  justify-content: space-between;
+}
+
+.main-button {
+  height: 8rem;
+}

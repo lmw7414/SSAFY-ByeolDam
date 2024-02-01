@@ -8,7 +8,6 @@ import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
-import ConstellationListModal from './components/modal/ConstellationListModal';
 
 export default function App() {
   const [location] = useLocation();
@@ -18,22 +17,13 @@ export default function App() {
     title: '',
   });
 
-  // 한번만 실행
-  useEffect(() => {
-    setModalState({
-      isOpen: true,
-      title: '별자리 리스트',
-      children: <ConstellationListModal />,
-    });
-  }, []);
-
   return (
     <div className="App">
-      <ModalContext.Provider value={{ modalState, setModalState }}>
+      <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
         {location === '/' ? null : <NavBar />}
+        <ModalContainer modalState={modalState} />
         <Route path="/" component={Member} />
         <Route path="/home" component={Universe} />
-        <ModalContainer modalState={modalState} />
       </ModalContext.Provider>
     </div>
   );
