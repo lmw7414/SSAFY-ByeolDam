@@ -5,7 +5,7 @@ import com.ssafy.star.comment.dto.CommentChildrenDto;
 import com.ssafy.star.comment.dto.CommentDto;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 public record CommentResponse (
         Long id,
@@ -15,7 +15,7 @@ public record CommentResponse (
         LocalDateTime modifiedAt,
         Long parentId,
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        Set<CommentChildrenDto> childrenComments
+        List<CommentChildrenDto> childrenComments
 ) {
     public static CommentResponse fromComment(CommentDto commentDto) {
         return new CommentResponse(

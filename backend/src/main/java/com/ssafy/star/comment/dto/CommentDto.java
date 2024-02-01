@@ -3,7 +3,8 @@ package com.ssafy.star.comment.dto;
 import com.ssafy.star.comment.domain.CommentEntity;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public record CommentDto(
@@ -14,7 +15,7 @@ public record CommentDto(
         Long parentId,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        Set<CommentChildrenDto> childrenComments
+        List<CommentChildrenDto> childrenComments
 ) {
     public static CommentDto from(CommentEntity entity) {
         return new CommentDto(
@@ -25,7 +26,10 @@ public record CommentDto(
             entity.getParentId(),
             entity.getCreatedAt(),
             entity.getModifiedAt(),
-            entity.getChildrenComments().stream().map(CommentChildrenDto::from).collect(Collectors.toSet())
+            entity.getChildrenComments().stream()
+                    .map(CommentChildrenDto::from)
+                    .sorted(Comparator.comparing(CommentChildrenDto::createdAt))
+                    .collect(Collectors.toList())
         );
     }
 }
