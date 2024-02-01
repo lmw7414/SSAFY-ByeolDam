@@ -7,10 +7,16 @@ import com.ssafy.star.article.dto.request.ArticleCreateRequest;
 import com.ssafy.star.article.dto.request.ArticleModifyRequest;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import com.ssafy.star.comment.application.CommentService;
+import com.ssafy.star.comment.dto.response.CommentResponse;
+import com.ssafy.star.user.domain.UserEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -67,7 +73,8 @@ public class ArticleController {
     )
     @GetMapping
     public Response<Page<ArticleResponse>> list(Pageable pageable, Authentication authentication) {
-        return Response.success(articleService.list(pageable).map(ArticleResponse::fromArticle));
+        String email = authentication.getName();
+        return Response.success(articleService.list(email, pageable).map(ArticleResponse::fromArticle));
     }
 
     @Operation(
@@ -90,7 +97,9 @@ public class ArticleController {
             }
     )
     @GetMapping("/{articleId}")
-    public Response<ArticleResponse> read(@PathVariable Long articleId, Authentication authentication) {
-        return Response.success(ArticleResponse.fromArticle(articleService.detail(articleId)));
+    public Response<ArticleResponse> read(@PathVariable Long articleId, Authentication authentication, Pageable pageable) {
+        String email = authentication.getName();
+
+        return Response.success(ArticleResponse.fromArticle(articleService.detail(articleId, email)));
     }
 }
