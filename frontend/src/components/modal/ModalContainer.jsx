@@ -1,15 +1,31 @@
-import { createContext, useState } from 'react';
+import useModal from '../../hooks/useModal';
 
-export const ModalContext = createContext(null);
-
-export default function ModalContainer() {
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    children: null,
-  });
+export default function ModalContainer({ modalState }) {
+  const [currentModalState, setModalState] = useModal();
+  const closeModal = () => {
+    setModalState({
+      isOpen: false,
+      title: '',
+      children: null,
+    });
+  };
   return (
-    <ModalContext.Provider value={{ modalState: modalState, setModalState: setModalState }}>
-      {modalState.isOpen && modalState.children}
-    </ModalContext.Provider>
+    <>
+      {currentModalState.isOpen && (
+        <div className="modal-container">
+          <div className="modal-header">
+            <h1 className="modal-title">{currentModalState.title}</h1>
+            <img
+              src="/src/assets/images/close-button.png"
+              alt="modal-close"
+              className="modal-close"
+              onClick={closeModal}
+            />
+          </div>
+          <hr />
+          {currentModalState.children}
+        </div>
+      )}
+    </>
   );
 }
