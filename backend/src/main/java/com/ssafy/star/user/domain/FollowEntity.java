@@ -27,6 +27,7 @@ public class FollowEntity {
 
     private LocalDateTime requestDate;
 
+    @Setter
     private LocalDateTime acceptDate;
 
     @Setter
