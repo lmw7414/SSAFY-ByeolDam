@@ -1,7 +1,11 @@
-import { useContext } from 'react';
-import { ModalContext } from '../components/modal/ModalContainer';
+import { useContext, createContext } from 'react';
 
-const { modalState, setModalState } = useContext(ModalContext);
+export const ModalContext = createContext({
+  modalState: null,
+  setModalState: () => {},
+});
+
 export default function useModal() {
-  return [modalState, setModalState];
+  const modalContext = useContext(ModalContext);
+  return [modalContext?.modalState, modalContext?.setModalState];
 }
