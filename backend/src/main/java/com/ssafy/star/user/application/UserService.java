@@ -86,6 +86,7 @@ public class UserService {
     //회원정보 수정
     @Transactional
     public User updateMyProfile(
+            String email,
             String password,
             String name,
             String nickname,
@@ -93,8 +94,8 @@ public class UserService {
             DisclosureType disclosureType,
             LocalDate birthday) {
 
-        UserEntity userEntity = userRepository.findByNickname(nickname).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", nickname)));
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         //닉네임 중복체크
         if (nickname != null) {
             if(!userEntity.getNickname().equals(nickname)) {
@@ -102,7 +103,7 @@ public class UserService {
                             throw new ByeolDamException(ErrorCode.DUPLICATED_USER_NICKNAME, String.format("%s is duplcated", nickname));
                         }
                 );
-                userEntity.setName(nickname);
+                userEntity.setNickname(nickname);
             }
         }
         if (password != null) {
@@ -123,6 +124,7 @@ public class UserService {
     }
 
     //회원 탈퇴
+    //TODO : 팔로우/팔로워도 최신화해줘야함
     @Transactional
     public void delete(String email) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));

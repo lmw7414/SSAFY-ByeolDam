@@ -8,9 +8,9 @@ services:
     image: lmw7414/byeoldam-database
     volumes:
       # 설정파일 저장될  위치
-      - ./database/config:/etc/mysql/conf.d
+      - ./backend/database/config:/etc/mysql/conf.d
       # DB 데이터 저장 디렉토리
-      - ./database/data:/var/lib/mysql
+      - ./backend/database/data:/var/lib/mysql
     environment:
       - MARIADB_DATABASE=byeol_dam
       - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
@@ -21,6 +21,20 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
+  byeoldam-app:
+    container_name: byeoldam-app
+    build: ./backend
+    depends_on: # DB 실행 후 실행
+      - byeoldam-database
+    image: lmw7414/byeoldam-app
+    environment:
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JWT_SECRET_KEY_CODE=${JWT_SECRET_KEY_CODE}
+    ports:
+      - "8081:8081"
+    restart: always
 
   byeoldam-frontend:
     container_name: "byeoldam-frontend"

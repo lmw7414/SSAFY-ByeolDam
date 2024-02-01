@@ -10,6 +10,8 @@
   margin-top: auto;
   margin-bottom: auto;
   margin-left: 50%;
+  top: 50%; /* 상위 부모 중앙으로 이동 */
+  transform: translateY(50%); /* 세로 중앙 정렬을 위해 사용 */
   // margin: auto;
 }
 
