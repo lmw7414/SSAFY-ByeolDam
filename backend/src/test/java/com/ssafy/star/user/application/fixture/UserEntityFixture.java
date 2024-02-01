@@ -8,4 +8,9 @@ public class UserEntityFixture {
         UserEntity entity = UserEntity.of(email, password, name, nickname);
         return entity;
     }
+
+    public static UserEntity get(String email) {
+        UserEntity entity = UserEntity.of(email, null, null, null);
+        return entity;
+    }
 }

@@ -14,7 +14,9 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not founded"),
+    INVALID_CONTENT(HttpStatus.BAD_REQUEST, "Content type is invalid");
 
     private HttpStatus status;
     private String message;
