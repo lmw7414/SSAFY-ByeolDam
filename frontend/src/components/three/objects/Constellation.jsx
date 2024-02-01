@@ -56,11 +56,11 @@ export default function Constellation({ position = [5, 1.5, 5], name, selected }
   });
 
   return (
-    <group ref={group} position={position} scale={0.1} name={uuid}>
+    <group ref={group} position={position} scale={0.1}>
       <mesh
         scale={[82, 82, 0.1]}
         position={[0, 0, -1]}
-        name={name}
+        name={uuid}
         onPointerOver={(e) => {
           e.stopPropagation();
           hover(true);
