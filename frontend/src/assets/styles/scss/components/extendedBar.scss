@@ -1,0 +1,85 @@
+$extended-bar-width: 480px;
+
+.extended-bar-big-container {
+  position: absolute;
+  transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
+}
+
+.extended-bar-container {
+  height: 100vh;
+  width: $extended-bar-width;
+  z-index: 1;
+  background-color: $modal-background;
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.extended-bar-logo {
+  margin-bottom: 40px;
+}
+
+.extended-bar-logo img {
+  height: 5rem;
+  position: absolute;
+  margin-left: 2rem;
+}
+
+.extended-bar-contents {
+  margin-top: 100px;
+  width: $extended-bar-width - 80px;
+}
+
+.search-bar-input {
+  height: 60px;
+  width: 400px;
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 28px;
+}
+
+.search-bar-bottom-contents {
+  display: flex;
+  height: 100%;
+}
+
+.extended-bar-column-divide-line {
+  height: 100%;
+}
+
+.extended-bar-side-menu-box {
+  margin-right: 20px;
+}
+
+.search-bar-filter-box {
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.extended-bar-icon-frame {
+  margin-top: 24px;
+}
+
+.extended-bar-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.extended-bar-menu-box {
+  position: absolute;
+  bottom: 100px;
+}
+
+.extended-bar-menu {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.extended-bar-divide-line {
+  width: 100%;
+}
