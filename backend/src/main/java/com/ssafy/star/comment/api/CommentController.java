@@ -34,14 +34,14 @@ public class CommentController {
     }
 
     // 댓글 수정
-    @PutMapping("/comments/{commentId}")
-    public Response<CommentDto> modify(Authentication authentication, @PathVariable Long commentId, @RequestBody CommentModifyRequest request) {
+    @PutMapping("/articles/{articleId}/comments/{commentId}")
+    public Response<CommentDto> modify(Authentication authentication, @PathVariable Long articleId, @PathVariable Long commentId, @RequestBody CommentModifyRequest request) {
         return Response.success(commentService.modify(commentId, authentication.getName(), request.content()));
     }
 
     // 댓글 삭제
-    @DeleteMapping("/comments/{commentId}")
-    public Response<Void> delete(Authentication authentication, @PathVariable Long commentId) {
+    @DeleteMapping("/articles/{articleId}/comments/{commentId}")
+    public Response<Void> delete(Authentication authentication, @PathVariable Long articleId, @PathVariable Long commentId) {
         commentService.delete(commentId, authentication.getName());
         return Response.success();
     }

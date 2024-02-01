@@ -1,5 +1,6 @@
 package com.ssafy.star.comment.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ssafy.star.comment.dto.CommentChildrenDto;
 import com.ssafy.star.comment.dto.CommentDto;
 
@@ -13,6 +14,7 @@ public record CommentResponse (
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         Long parentId,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         Set<CommentChildrenDto> childrenComments
 ) {
     public static CommentResponse fromComment(CommentDto commentDto) {

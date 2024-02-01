@@ -30,7 +30,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public Page<CommentDto> search(Long articleId, Pageable pageable) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        return commentRepository.findAllByArticleEntity(articleEntity, pageable).map(CommentDto::from);
+        return commentRepository.findByArticleEntityAndParentId(articleEntity, pageable).map(CommentDto::from);
     }
 
     @Transactional

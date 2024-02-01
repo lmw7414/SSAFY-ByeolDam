@@ -1,12 +1,12 @@
 package com.ssafy.star.article.api;
 
 
+import com.ssafy.star.article.application.ArticleService;
+import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.article.dto.request.ArticleCreateRequest;
 import com.ssafy.star.article.dto.request.ArticleModifyRequest;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
-import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.dto.Article;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -65,7 +65,7 @@ public class ArticleController {
     /**
      * 게시물 상세 조회
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{articleId}")
     public Response<ArticleResponse> read(@PathVariable Long articleId, Authentication authentication) {
         return Response.success(ArticleResponse.fromArticle(articleService.detail(articleId)));
     }
