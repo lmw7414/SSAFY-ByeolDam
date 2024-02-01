@@ -10,7 +10,7 @@ import Camera from '../components/three/objects/Camera';
 import Land from '../components/three/objects/Land';
 import useModal from '../hooks/useModal';
 
-import ConstellationListModal from '../components/modal/ConstellationListModal';
+import ConstellationModal from '../components/modal/ConstellationModal/ConstellationModal.jsx';
 export default function Universe() {
   const controller = useRef();
   const camera = useRef();
@@ -20,7 +20,7 @@ export default function Universe() {
     setModalState({
       isOpen: true,
       title: '별자리 리스트',
-      children: <ConstellationListModal />,
+      children: <ConstellationModal />,
     });
   };
 
