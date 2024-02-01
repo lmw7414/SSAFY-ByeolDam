@@ -27,20 +27,23 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
+    // 댓글 조회
     @Transactional(readOnly = true)
     public Page<CommentDto> search(Long articleId, Pageable pageable) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         return commentRepository.findByArticleEntityAndParentId(articleEntity, pageable).map(CommentDto::from);
     }
 
+    // 댓글 생성
     @Transactional
     public CommentDto create(Long articleId, String email, String content, Long parentId) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         UserEntity userEntity = getUserEntityOrException(email);
-
+        // 대댓글인 경우, 부모댓글이 존재하는지 확인
         if (parentId != null) {
             getCommentEntityOrException(parentId);
         }
+        // 내용이 빈 문자열인지 확인
         if (content.isBlank()) {
             throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
         }
@@ -48,6 +51,7 @@ public class CommentService {
         return CommentDto.from(commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentId)));
     }
 
+    // 댓글 수정
     @Transactional
     public CommentDto modify(Long commentId, String email, String content) {
         CommentEntity commentEntity = getCommentEntityOrException(commentId);
@@ -57,16 +61,17 @@ public class CommentService {
         if (commentEntity.getUserEntity() != userEntity) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, commentId));
         }
+        // 내용이 빈 문자열인지 확인
         if (content.isBlank()) {
             throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
         }
 
-        // 댓글 수정
         commentEntity.setContent(content);
 
         return CommentDto.from(commentRepository.saveAndFlush(commentEntity));
     }
 
+    // 댓글 삭제
     @Transactional
     public void delete(Long commentId, String email) {
         log.info("commentID: {} email: {}", commentId, email);
