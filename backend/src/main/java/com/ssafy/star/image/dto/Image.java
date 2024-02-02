@@ -5,16 +5,13 @@ import com.ssafy.star.image.domain.ImageEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class Image {
-
-    private Long id;
-    private String name;
-    private String url;
-    private String thumbnailUrl;
-    private ImageType imageType;
-
+public record Image(
+        Long id,
+        String name,
+        String url,
+        String thumbnailUrl,
+        ImageType imageType
+) {
     public static Image fromEntity(ImageEntity imageEntity){
         return new Image(
                 imageEntity.getId(),
@@ -27,7 +24,6 @@ public class Image {
 
     public ImageEntity toEntity(){
         return ImageEntity.of(
-                this.id,
                 this.name,
                 this.url,
                 this.thumbnailUrl,
