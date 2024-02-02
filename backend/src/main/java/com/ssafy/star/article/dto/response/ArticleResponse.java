@@ -2,10 +2,13 @@ package com.ssafy.star.article.dto.response;
 
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.comment.domain.CommentEntity;
+import com.ssafy.star.comment.dto.response.CommentResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -18,6 +21,7 @@ public class ArticleResponse {
     private DisclosureType disclosure;
     private long hits;
     private String description;
+    private List<CommentEntity> commentEntities;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private LocalDateTime deletedAt;
@@ -32,6 +36,7 @@ public class ArticleResponse {
                 article.getDisclosure(),
                 article.getHits(),
                 article.getDescription(),
+                article.getCommentEntities(),
                 article.getCreatedAt(),
                 article.getModifiedAt(),
                 article.getDeletedAt()

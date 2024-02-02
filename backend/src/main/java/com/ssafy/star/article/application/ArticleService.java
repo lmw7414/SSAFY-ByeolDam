@@ -67,8 +67,10 @@ public class ArticleService {
 
     // 게시물 전체 조회
     @Transactional(readOnly = true)
-    public Page<Article> list(Pageable pageable) {
-        return articleRepository.findAll(pageable).map(Article::fromEntity);
+    public Page<Article> list(String email, Pageable pageable) {
+        UserEntity userEntity = getUserEntityOrException(email);
+        // DisclosureType이 VISIBLE인 ArticleEntity, 자신의 게시물 보여주기
+        return articleRepository.findArticlesForUser(userEntity, pageable).map(Article::fromEntity);
     }
 
     // 내 게시물 전체 조회
@@ -80,9 +82,17 @@ public class ArticleService {
 
     // 게시물 상세 조회
     @Transactional(readOnly = true)
-    public Article detail(Long articleId) {
+    public Article detail(Long articleId, String email) {
+        // 해당 article이 없을 경우 예외처리
         ArticleEntity articleEntity = articleRepository.findById(articleId).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", articleId)));
+
+        // DisclosureType 예외처리
+        UserEntity userEntity = getUserEntityOrException(email);
+        if (articleEntity.getUser() != userEntity && articleEntity.getDisclosure() != DisclosureType.VISIBLE) {
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", email, articleId));
+        }
+
         articleEntity.setHits(articleEntity.getHits() + 1);
 
         return Article.fromEntity(articleRepository.save(articleEntity));
