@@ -13,6 +13,7 @@ spring:
   config:
     activate:
       on-profile: common
+    import: aws.properties
 jwt:
   secret-key: ${JWT_SECRET_KEY_CODE}
   #30 days
