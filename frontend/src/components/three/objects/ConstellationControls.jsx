@@ -28,8 +28,11 @@ export default function ConstellationControls({ controller, constellationList })
         isDone: false,
       });
     } else {
+      if (controllerRef.current.target.distanceTo(new THREE.Vector3(0, 0, 0)) < 0.00001) {
+        controllerRef.current.target = new THREE.Vector3(0, 0.001, 0);
+      }
       const lastTarget = lastCameraState.target;
-      const origin = new THREE.Vector3(0, 0.03, 0);
+      const origin = new THREE.Vector3(0, 0.01, 0);
 
       const dist = lastCameraState.target.distanceTo(origin);
       if (dist < 0.00000001) return;
@@ -48,14 +51,14 @@ export default function ConstellationControls({ controller, constellationList })
   }, [selected]);
 
   useFrame((state, dt) => {
+    // console.log(state.camera.position, controllerRef.current.object.position, lastCameraState);
     if (!lastCameraState.isDone) {
       if (!lastCameraState.prev) {
         easing.damp3(controllerRef.current.target, lastCameraState.target, 0.2, dt);
         easing.damp3(controllerRef.current.object.position, lastCameraState.position, 0.2, dt);
       } else {
-        const ease = (x) => 0.0041 * x * x - 0.0137 * x + 0.1857;
-        const smoothTime =
-          ease(controllerRef.current.target.distanceTo(lastCameraState.target)) / 15;
+        const ease = (x) => (0.0041 * x * x - 0.0137 * x + 0.1857) / 5;
+        const smoothTime = ease(controllerRef.current.target.distanceTo(lastCameraState.target));
         easing.damp3(controllerRef.current.target, lastCameraState.target, smoothTime, dt);
         easing.damp3(
           controllerRef.current.object.position,
@@ -88,7 +91,6 @@ export default function ConstellationControls({ controller, constellationList })
       ref={ref}
       onClick={(e) => {
         e.stopPropagation();
-        console.log(e);
         if (!lastCameraState.isDone || !e.object || !e.object.name) return;
         controllerRef.current.enableRotate = false;
         controllerRef.current.enableDamping = false;
@@ -96,8 +98,15 @@ export default function ConstellationControls({ controller, constellationList })
         setSelected(clicked.current === e.object ? 'none' : e.object.name);
       }}
     >
-      {constellationList.map(({ id, url, position }) => (
-        <Constellation key={id} url={url} name={id} position={position} selected={selected} />
+      {constellationList.map(({ id, url, position, thumbnail }) => (
+        <Constellation
+          key={id}
+          url={url}
+          name={id}
+          position={position}
+          selected={selected}
+          thumbnail={thumbnail}
+        />
       ))}
     </group>
   );
