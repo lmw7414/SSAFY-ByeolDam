@@ -1,6 +1,7 @@
 package com.ssafy.star.article.domain;
 
 import com.ssafy.star.article.DisclosureType;
+import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,9 +15,10 @@ import org.hibernate.annotations.Where;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "\"article\"")
+@Table(name = "article")
 @Getter
 @Setter
 @SQLDelete(sql = "UPDATE `article` SET deleted_at = NOW() where id=?")
@@ -42,6 +44,7 @@ public class ArticleEntity {
     @Column(name = "description", length = 300)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "disclosure", nullable = false)
     private DisclosureType disclosure;
 
@@ -71,6 +74,9 @@ public class ArticleEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @OneToMany(mappedBy = "articleEntity", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<CommentEntity> commentEntities;
 
     @PrePersist
     void createdAt() {
