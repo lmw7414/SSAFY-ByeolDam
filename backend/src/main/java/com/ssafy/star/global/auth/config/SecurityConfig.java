@@ -48,8 +48,11 @@ public class SecurityConfig {
             CorsConfiguration corsConfiguration = new CorsConfiguration();
             corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173", "http://i10b309.p.ssafy.io:5173"));
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-            corsConfiguration.setAllowedHeaders(List.of("*"));
             corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization-refresh", "Cache-Control", "Content-Type"));
+
+            /* 응답 헤더 설정 추가*/
+            corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-refresh"));
             corsConfiguration.setMaxAge(3600L); //preflight 결과를 1시간동안 캐시에 저장
             return corsConfiguration;
         };
