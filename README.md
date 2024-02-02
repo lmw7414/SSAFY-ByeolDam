@@ -1,4 +1,8 @@
 <details>
+<summary><h1>서비스 소개</h1></summary>
+<h2>별을 담다</h2>
+![서비스소개.PNG](./서비스소개.PNG)
+
 <summary><h1>역할</h1></summary>
     <table>
         <thead>
