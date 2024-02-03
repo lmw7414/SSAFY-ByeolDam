@@ -58,6 +58,8 @@ spring:
   data:
     redis:
       url: redis://localhost:6379
+      repositories:
+        enabled: false
 
 ---
 
@@ -82,7 +84,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   data:
     redis:
-      port: 6379
-      host: byeoldam-redis
+      url: redis://byeoldam-redis:6379
+      repositories:
+        enabled: false
 server:
   port: 8081
