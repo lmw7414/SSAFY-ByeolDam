@@ -4,11 +4,13 @@ import Member from './pages/member/Member';
 import Universe from './pages/Universe';
 import NavBar from './components/NavBar';
 import Settings from './pages/settings/Settings';
+import SignupTest from './pages/member/Signuptest';
 
 import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
+import { getComments } from './apis/comments';
 
 export default function App() {
   return (
@@ -17,6 +19,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Member />} />
           <Route path="/*" element={<NavApp />} />
+          <Route path="/signup" element={<SignupTest />} />
         </Routes>
       </Router>
     </div>
