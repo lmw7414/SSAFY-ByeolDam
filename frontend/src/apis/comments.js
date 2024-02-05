@@ -1,7 +1,7 @@
 import axios from './axios';
 
 export const getComments = async (articleId) => {
-  const { data } = await axios.get(`comments/articles/${articleId}`);
+  const { data } = await axios.get(`/articles/${articleId}/comments`);
 
   return { resultCode: data.resultCode, data: data.result.content };
 };
