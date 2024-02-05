@@ -9,6 +9,10 @@ import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dto.Article;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 
 @Slf4j
@@ -27,28 +30,15 @@ import java.io.IOException;
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final S3uploader s3uploader;
-    private final ImageService imageService;
 
 
     @PostMapping
     public Response<Void> create(@RequestPart ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) throws IOException {
         // TODO : image
         log.info("request 정보 : {}", request);
-        String url = "";
-        String thumbnailUrl = "";
         if(imageFile != null){
             articleService.create(request.title(), request.tag(), request.description(),
-                    request.disclosureType(), authentication.getName());
-
-            //현재 우리는 한 사진에 대해 리사이징하고 업로드, thumbnail로 리사이징하고 업로드 해야하는데
-            //하나하나는 되는데 2개를 모두 하려고 하니 안되는 현상이 발생
-
-            url = s3uploader.upload(imageFile, "articles");
-            thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
-            System.out.println("imageFile 이름 : "+imageFile.getOriginalFilename());
-            imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, request.imageType());
-            System.out.println("fileName: " + url);
+                    request.disclosureType(), authentication.getName(), imageFile, request.imageType());
         }
 
         return Response.success();

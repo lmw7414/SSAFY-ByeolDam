@@ -15,24 +15,34 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    private static final int TARGET_HEIGHT = 256;
+    private static final int TARGET_HEIGHT = 1024;
 
     //이미지 리사이징
     public static BufferedImage resizeImage(MultipartFile multipartFile) throws IOException {
 
         BufferedImage sourceImage = turnImage(multipartFile);
 
-        //만약 크기가 TARGET_HEIGHT인 1024보다 작거나 같다면 sourceImage를 그대로 반환한다.
-        if (sourceImage.getHeight() <= TARGET_HEIGHT) {
-            return sourceImage;
+        int newWidth, newHeight;
+
+        if(sourceImage.getWidth() > TARGET_HEIGHT || sourceImage.getHeight() > TARGET_HEIGHT){
+            // 가로가 세로보다 큰 경우
+            if (sourceImage.getWidth() >= sourceImage.getHeight()) {
+                newWidth = TARGET_HEIGHT;
+//                newHeight = (int) (TARGET_HEIGHT * ((double) sourceImage.getHeight() / sourceImage.getWidth()));
+                newHeight = TARGET_HEIGHT;
+            } else { // 세로가 가로보다 큰 경우
+//                newWidth = (int) (TARGET_HEIGHT * ((double) sourceImage.getWidth() / sourceImage.getHeight()));
+                newWidth = TARGET_HEIGHT;
+                newHeight = TARGET_HEIGHT;
+            }
+        } else {
+            newWidth = TARGET_HEIGHT;
+            newHeight = TARGET_HEIGHT;
         }
 
-        double sourceImageRatio = (double) sourceImage.getWidth() / sourceImage.getHeight();
-
-        int resizedWidth = (int) (TARGET_HEIGHT * sourceImageRatio);
-
-        return Scalr.resize(sourceImage, resizedWidth, TARGET_HEIGHT);
+        return Scalr.resize(sourceImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, newWidth, newHeight);
     }
+
 
     //썸네일 리사이징
     public static BufferedImage resizeThumbnail(MultipartFile multipartFile) throws IOException {
