@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import AccountSettings from './AccountSettings';
+import AccountSettings from './Account/AccountSettings';
 import NotificationSettings from './NotificationSettings';
 import UseGuide from './UseGuide';
 

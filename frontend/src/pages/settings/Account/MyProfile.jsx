@@ -1,4 +1,7 @@
 export default function MyProfile({ profileData, changePage }) {
+  // if (!profileData) {
+  //   return null; // 또는 로딩 상태를 나타내는 다른 JSX를 반환할 수 있습니다.
+  // }
   const toEdit = () => {
     changePage(1);
   };
@@ -13,6 +16,12 @@ export default function MyProfile({ profileData, changePage }) {
           <label>
             닉네임
             <p className="nickname">{profileData.nickname}</p>
+          </label>
+        </div>
+        <div>
+          <label>
+            이메일
+            <p className="nickname">{profileData.email}</p>
           </label>
         </div>
         <div>
