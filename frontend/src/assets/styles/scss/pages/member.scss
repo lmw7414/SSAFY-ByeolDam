@@ -1,0 +1,53 @@
+.member-box {
+  height: 400px;
+  width: 400px;
+  background-color: $modal-background;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // background-image: ;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 50%;
+  top: 50%; /* 상위 부모 중앙으로 이동 */
+  transform: translateY(50%); /* 세로 중앙 정렬을 위해 사용 */
+  // margin: auto;
+}
+
+.member-logo-box {
+  margin-top: 1rem;
+}
+
+.member-socials-box {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// .social-logos {
+// }
+
+.member-button-box {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.member-box-logo {
+  height: 80px;
+}
+
+.social-logo {
+  height: 50px;
+  margin: 0 0.5rem;
+}
+
+.member-button {
+  background-color: $secondary;
+  border: none;
+  border-radius: 12px;
+  height: 50px;
+  width: 300px;
+}

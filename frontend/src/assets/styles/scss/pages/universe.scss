@@ -1,0 +1,23 @@
+.canvas-container {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(180deg, rgba(2, 0, 36, 1) 0%, rgba(101, 44, 196, 1) 100%);
+  width: 100vw;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.main_buttons_box {
+  position: absolute;
+  z-index: 1;
+  bottom: 5%;
+  left: 60%;
+  transform: translate(-60%, -10%);
+  display: flex;
+  justify-content: space-between;
+}
+
+.main-button {
+  height: 8rem;
+}
