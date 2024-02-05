@@ -6,7 +6,10 @@ import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.like.dao.ArticleLikeRepository;
+import com.ssafy.star.like.domain.ArticleLikeEntity;
 import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,7 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final ArticleLikeRepository articleLikeRepository;
 
     // 게시물 등록
     @Transactional
@@ -86,6 +92,50 @@ public class ArticleService {
         articleEntity.setHits(articleEntity.getHits() + 1);
 
         return Article.fromEntity(articleRepository.save(articleEntity));
+    }
+
+    //게시물 좋아요 요청
+    @Transactional
+    public void like(Long articleId, String email) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        // 좋아요 상태인지 확인
+        articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
+                articleLikeRepository::delete,
+                () -> articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity))
+        );
+    }
+
+    //게시물 좋아요 상태 확인
+    @Transactional
+    public Boolean checkLike(Long articleId, String email) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        //좋아요 상태인지 확인
+        return articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).isPresent();
+    }
+
+    //게시물 좋아요 갯수 확인
+    @Transactional
+    public Integer likeCount(Long articleId) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+
+        //좋아요 갯수 확인
+        return articleLikeRepository.countByArticleEntity(articleEntity);
+    }
+
+    //게시물 좋아요한 사람들의 목록 확인
+    @Transactional
+    public List<User> likeList(Long articleId) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        //목록 확인
+        return articleLikeRepository.findAllByArticleEntity(articleEntity)
+                .stream()
+                .map(ArticleLikeEntity::getUserEntity)
+                .map(User::fromEntity)
+                .toList();
     }
 
     // 포스트가 존재하는지

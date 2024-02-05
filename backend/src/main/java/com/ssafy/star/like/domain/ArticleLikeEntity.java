@@ -1,10 +1,13 @@
 package com.ssafy.star.like.domain;
 
-import com.ssafy.star.article.ArticleEntity;
-import com.ssafy.star.user.UserEntity;
+
+import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "articleLike")
@@ -23,6 +26,12 @@ public class ArticleLikeEntity {
     @ManyToOne
     @JoinColumn(name = "articleId", nullable = false)
     private ArticleEntity articleEntity;
+
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    void createdAt() { this.createdAt = LocalDateTime.from(LocalDateTime.now()); }
 
     protected ArticleLikeEntity() {}
 
