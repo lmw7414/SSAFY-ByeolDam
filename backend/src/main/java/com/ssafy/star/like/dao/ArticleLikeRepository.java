@@ -20,4 +20,5 @@ public interface ArticleLikeRepository extends JpaRepository<ArticleLikeEntity, 
     Integer countByArticleEntity(ArticleEntity articleEntity);
 
     List<ArticleLikeEntity> findAllByArticleEntity(ArticleEntity articleEntity);
+    Page<ArticleLikeEntity> findAllByUserEntityOrderByCreatedAtDesc(UserEntity userEntity, Pageable pageable);
 }

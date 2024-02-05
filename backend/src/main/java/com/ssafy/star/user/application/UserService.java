@@ -1,14 +1,19 @@
 package com.ssafy.star.user.application;
 
+import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
-import com.ssafy.star.global.auth.util.JwtTokenUtils;
 import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.global.auth.util.JwtTokenUtils;
+import com.ssafy.star.like.dao.ArticleLikeRepository;
+import com.ssafy.star.like.domain.ArticleLikeEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +25,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ArticleLikeRepository articleLikeRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -98,7 +104,7 @@ public class UserService {
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         //닉네임 중복체크
         if (nickname != null) {
-            if(!userEntity.getNickname().equals(nickname)) {
+            if (!userEntity.getNickname().equals(nickname)) {
                 userRepository.findByNickname(nickname).ifPresent(it -> {
                             throw new ByeolDamException(ErrorCode.DUPLICATED_USER_NICKNAME, String.format("%s is duplcated", nickname));
                         }
@@ -131,4 +137,12 @@ public class UserService {
         userRepository.delete(userEntity);
     }
 
+    //좋아요한 게시물 목록 확인
+    @Transactional
+    public Page<Article> likeArticleList(String email, Pageable pageable) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+        return articleLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
+                .map(ArticleLikeEntity::getArticleEntity)
+                .map(Article::fromEntity);
+    }
 }
