@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import axios from '/src/apis/axios';
+import useModal from '../hooks/useModal';
+
 import ExtendedBar from './ExtendedBar';
 import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
-import { Link } from 'react-router-dom';
+import FollowContainer from './modal/Follow/FollowContainer';
 
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
+  const [following, setFollowing] = useState(0);
+  const [follower, setFollower] = useState(0);
+  const [modalState, setModalState] = useModal();
 
   const closeNavBar = () => {
     setIsNavBarVisible(!isNavBarVisible);
@@ -25,6 +33,41 @@ export default function NavBar() {
     setBarId(4);
   };
   console.log('barId : ', barId);
+
+  const readFollowing = async () => {
+    const data = await axios.get('immigrant_co/count-followings');
+    return data.data.result;
+  };
+
+  const readFollower = async () => {
+    const data = await axios.get('immigrant_co/count-followers');
+    return data.data.result;
+  };
+
+  useEffect(() => {
+    readFollower().then((result) => {
+      setFollower(result);
+    });
+    readFollowing().then((result) => {
+      setFollowing(result);
+    });
+  }, []);
+
+  const openFollowerModal = () => {
+    setModalState({
+      isOpen: true,
+      title: '팔로워',
+      children: <FollowContainer followSubject={'follower'} />,
+    });
+  };
+
+  const openFollowingModal = () => {
+    setModalState({
+      isOpen: true,
+      title: '팔로잉',
+      children: <FollowContainer followSubject={'following'} />,
+    });
+  };
 
   return (
     <div>
@@ -55,9 +98,12 @@ export default function NavBar() {
                 </div>
                 <div className="profile-info-box">
                   <ProfileInfo text={'별'} num={26} />
+
                   <ProfileInfo text={'별자리'} num={4} />
-                  <ProfileInfo text={'팔로워'} num={144} />
-                  <ProfileInfo text={'팔로잉'} num={132} />
+
+                  <ProfileInfo text={'팔로워'} num={following} onClick={openFollowerModal} />
+
+                  <ProfileInfo text={'팔로잉'} num={follower} onClick={openFollowingModal} />
                 </div>
               </div>
 
