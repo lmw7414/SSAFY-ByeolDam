@@ -1,14 +1,14 @@
 package com.ssafy.star.article.api;
 
 
+import com.ssafy.star.article.application.ArticleService;
+import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.article.dto.request.ArticleCreateRequest;
 import com.ssafy.star.article.dto.request.ArticleModifyRequest;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dto.Article;
-import com.ssafy.star.common.infra.S3.S3uploader;
-import com.ssafy.star.image.application.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,6 +29,7 @@ public class ArticleController {
     private final ArticleService articleService;
     private final S3uploader s3uploader;
     private final ImageService imageService;
+
 
     @PostMapping
     public Response<Void> create(@RequestPart ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) throws IOException {
@@ -53,6 +54,13 @@ public class ArticleController {
         return Response.success();
     }
 
+    @Operation(
+            summary = "게시물 수정",
+            description = "게시물 수정입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 수정 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
     @PutMapping("/{articleId}")
     public Response<ArticleResponse> modify(@PathVariable Long articleId, @RequestBody ArticleModifyRequest request, Authentication authentication) {
         // TODO : image
@@ -67,28 +75,43 @@ public class ArticleController {
         return Response.success();
     }
 
-    /**
-     * 게시글 전체 조회
-     * : 검색 시 전체 조회 필요할듯
-     */
+    // TODO: 검색 시 전체 조회 필요할듯
+    @Operation(
+            summary = "게시물 전체 조회",
+            description = "게시물 전체 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
     @GetMapping
     public Response<Page<ArticleResponse>> list(Pageable pageable, Authentication authentication) {
-        return Response.success(articleService.list(pageable).map(ArticleResponse::fromArticle));
+        String email = authentication.getName();
+        return Response.success(articleService.list(email, pageable).map(ArticleResponse::fromArticle));
     }
 
-    /**
-     * 내 게시물 전체 조회
-     */
+    @Operation(
+            summary = "내 게시물 전체 조회",
+            description = "내 게시물 전체 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
     @GetMapping("/my")
     public Response<Page<ArticleResponse>> my(Pageable pageable, Authentication authentication) {
         return Response.success(articleService.my(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
     }
 
-    /**
-     * 게시물 상세 조회
-     */
-    @GetMapping("/{id}")
-    public Response<ArticleResponse> read(@PathVariable Long articleId, Authentication authentication) {
-        return Response.success(ArticleResponse.fromArticle(articleService.detail(articleId)));
+    @Operation(
+            summary = "게시물 상세 조회",
+            description = "게시물 상세 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/{articleId}")
+    public Response<ArticleResponse> read(@PathVariable Long articleId, Authentication authentication, Pageable pageable) {
+        String email = authentication.getName();
+
+        return Response.success(ArticleResponse.fromArticle(articleService.detail(articleId, email)));
     }
 }
