@@ -66,6 +66,12 @@ export default function ContoursEditor({
         e.evt.preventDefault();
       }}
       onClick={globalClickHandler}
+      onMouseEnter={() => {
+        editor.current.container().style.cursor = 'pointer';
+      }}
+      onMouseLeave={() => {
+        editor.current.container().style.cursor = 'auto';
+      }}
     >
       <Layer>
         <KonvaImage
@@ -99,12 +105,6 @@ export default function ContoursEditor({
             strokeWidth={1}
             onDragEnd={({ target }) => {
               movePoint(target.attrs.x, target.attrs.y, target.attrs.index);
-            }}
-            onMouseEnter={() => {
-              editor.current.container().style.cursor = 'pointer';
-            }}
-            onMouseLeave={() => {
-              editor.current.container().style.cursor = 'auto';
             }}
             onClick={(e) => {
               if (e.evt.button === 2) deletePoint(e.target.attrs.index);
