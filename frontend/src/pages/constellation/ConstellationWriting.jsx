@@ -43,8 +43,6 @@ export default function ConstellationWriting() {
     img.onload = () => {
       setImage(img);
     };
-
-    window.addEventListener('keydown', (e) => {});
   }, []);
 
   useEffect(() => {
