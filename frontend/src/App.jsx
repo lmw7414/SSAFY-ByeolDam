@@ -5,12 +5,14 @@ import Universe from './pages/Universe';
 import NavBar from './components/NavBar';
 import Settings from './pages/settings/Settings';
 import SignupTest from './pages/member/Signuptest';
-import LoginTest from './pages/member/LoginTest';
 
 import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
+
+import ConstellationWriting from './pages/constellation/ConstellationWriting';
+
 import { getComments } from './apis/comments';
 
 export default function App() {
@@ -21,7 +23,6 @@ export default function App() {
           <Route path="/" element={<Member />} />
           <Route path="/*" element={<NavApp />} />
           <Route path="/signup" element={<SignupTest />} />
-          <Route path="/login" element={<LoginTest />} />
         </Routes>
       </Router>
     </div>
@@ -41,6 +42,7 @@ function NavApp() {
       <Routes>
         <Route path="/home" element={<Universe />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/constellation" element={<ConstellationWriting />} />
       </Routes>
       <ModalContainer modalState={modalState} />
     </ModalContext.Provider>
