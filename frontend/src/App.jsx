@@ -9,6 +9,7 @@ import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
+import ConstellationWriting from './pages/constellation/ConstellationWriting';
 
 export default function App() {
   const [location] = useLocation();
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/" component={Member} />
         <Route path="/home" component={Universe} />
         <Route path="/settings" component={Settings} />
+        <Route path="/constellation" component={ConstellationWriting} />
       </ModalContext.Provider>
     </div>
   );
