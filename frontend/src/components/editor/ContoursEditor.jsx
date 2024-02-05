@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Layer, Stage, Image as KonvaImage, Line, Circle } from 'react-konva';
 import getUuidByString from 'uuid-by-string';
 import getSegmentDistance from '../../utils/getSegmentDistance';
+import saveClippedImage from '../../utils/saveClippedImage';
 
 export default function ContoursEditor({
   image,
@@ -35,19 +36,6 @@ export default function ContoursEditor({
     setPoints([...points.slice(0, index + 1), [x, y], ...points.slice(index + 1)]);
   };
 
-  const saveClippedImage = () => {
-    imageRef.current.clipFunc((ctx) => {
-      ctx.beginPath();
-      ctx.moveTo(points[0][0], points[0][1]);
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i][0], points[i][1]);
-      }
-      ctx.closePath();
-    });
-
-    editor.draw();
-  };
-
   const globalClickHandler = (e) => {
     if (e.evt.button === 0) {
       const x = e.evt.offsetX;
@@ -65,7 +53,7 @@ export default function ContoursEditor({
 
       if (nearestLineIdx > 0 && nearestLineIdx < points.length) addPoint(x, y, nearestLineIdx);
     } else if (e.evt.button === 1) {
-      saveClippedImage();
+      saveClippedImage(image, points, width, height);
     }
   };
 
@@ -80,7 +68,15 @@ export default function ContoursEditor({
       onClick={globalClickHandler}
     >
       <Layer>
-        <KonvaImage image={image} opacity={0.6} x={0} y={0} width={width} height={height} />
+        <KonvaImage
+          ref={imageRef}
+          image={image}
+          opacity={0.6}
+          x={0}
+          y={0}
+          width={width}
+          height={height}
+        />
         {points.map(([x, y], i) => (
           <Line
             key={getUuidByPosition(x, y)}
@@ -88,7 +84,6 @@ export default function ContoursEditor({
             points={[x, y, ...points[(i + 1) % points.length]]}
             stroke={'red'}
             strokeWidth={4}
-            closed={true}
           />
         ))}
 

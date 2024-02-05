@@ -20,6 +20,7 @@ export default function ContoursPreview({ width, height, selected, hovered, poin
             stroke={generateColor(hovered > -1 ? hovered : selected, pointList.length)}
             strokeWidth={4}
             closed={true}
+            tension={0.005}
           />
         )}
         {selected < pointList.length &&

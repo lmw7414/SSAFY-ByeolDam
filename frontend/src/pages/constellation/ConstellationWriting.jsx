@@ -101,6 +101,7 @@ export default function ConstellationWriting() {
           points={points}
         />
       </div>
+      <div id={'save-image'} style={{ display: 'none' }} />
     </div>
   );
 }
