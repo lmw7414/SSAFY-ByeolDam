@@ -15,14 +15,14 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
-
-@require_POST
-@csrf_exempt
 from matplotlib import pyplot as plt
 import pandas as pd
 from shapely.geometry import Polygon
 import time
 from rest_framework.decorators import api_view
+
+@require_POST
+@csrf_exempt
 def getImage(request):
     if request.method == 'POST':
         url = request.POST.get('url').strip('{}')
@@ -56,7 +56,7 @@ def runAI(request):
     setup_logger()
 
     start = time.time()
-    imageFileName = getImage(request)
+    imageFileName = getImage(request)["image_url"]
     image = cv2.imread(imageFileName)
 
     if image is None:
@@ -68,7 +68,7 @@ def runAI(request):
     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
     predictor = DefaultPredictor(cfg)
-    outputs = predictor(im)
+    outputs = predictor(image)
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 
     boxes = (outputs["instances"].pred_boxes.tensor.cpu().numpy())
