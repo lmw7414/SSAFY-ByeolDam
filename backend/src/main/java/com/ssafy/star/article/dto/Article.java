@@ -2,12 +2,14 @@ package com.ssafy.star.article.dto;
 
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.user.dto.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -22,6 +24,7 @@ public class Article {
     private String description;
     private DisclosureType disclosure;
     private User user;
+    private List<CommentEntity> commentEntities;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private LocalDateTime deletedAt;
@@ -38,6 +41,7 @@ public class Article {
                 entity.getDescription(),
                 entity.getDisclosure(),
                 User.fromEntity(entity.getUser()),
+                entity.getCommentEntities(),
                 entity.getCreatedAt(),
                 entity.getModifiedAt(),
                 entity.getDeletedAt()
