@@ -1,11 +1,15 @@
 import axios from '../../apis/axios';
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+import { checkEmail, checkNickname } from '../../apis/member';
 
 export default function SignupTest() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
+  const [isNickNameDuplicated, setIsNickNameDuplicated] = useState(false);
+  const [isEmailDuplicated, setIsEmailDuplicated] = useState(false);
 
   const signUp = async (event) => {
     event.preventDefault();
@@ -22,6 +26,22 @@ export default function SignupTest() {
     }
   };
 
+  useEffect(() => {
+    if (!nickname?.trim()) return;
+    checkNickname(nickname).then(({ data }) => {
+      console.log(data);
+      setIsNickNameDuplicated(!data.result);
+    });
+  }, [nickname]);
+
+  useEffect(() => {
+    if (!email?.trim()) return;
+    checkEmail(email).then(({ data }) => {
+      console.log(data);
+      setIsEmailDuplicated(!data.result);
+    });
+  }, [email]);
+
   return (
     <div>
       <h1 className="signupText">회원가입</h1>
@@ -32,6 +52,7 @@ export default function SignupTest() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {isEmailDuplicated && <div>이미 가입한 이메일입니다.</div>}
         <input
           type="password"
           placeholder="비밀번호"
@@ -50,6 +71,7 @@ export default function SignupTest() {
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
         />
+        {isNickNameDuplicated && <div>중복된 닉네임입니다</div>}
         <button type="submit">회원가입</button>
       </form>
     </div>
