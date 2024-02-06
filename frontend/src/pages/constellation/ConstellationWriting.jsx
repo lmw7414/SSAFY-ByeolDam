@@ -15,7 +15,7 @@ export default function ConstellationWriting() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch('./src/assets/data/test.json')
+    fetch('./src/assets/data/local.json')
       .then((data) => data.json())
       .then((data) => {
         setPointList(
@@ -25,11 +25,11 @@ export default function ConstellationWriting() {
               const width = dt.image_width;
 
               const zipped = douglasPeucker(
-                dt.contours.map(([point]) => {
+                dt.contours.map((point) => {
                   const [x, y] = point;
                   return { x, y };
                 }),
-                3,
+                5,
               );
 
               return zipped.map(({ x, y }) => [(x * 1200) / width, (y * 1200) / height]);
@@ -39,7 +39,7 @@ export default function ConstellationWriting() {
       });
 
     const img = new Image();
-    img.src = './src/assets/images/sample/test.jpg';
+    img.src = './src/assets/images/sample/animals.jpg';
     img.onload = () => {
       setImage(img);
     };
@@ -99,8 +99,10 @@ export default function ConstellationWriting() {
           hovered={hovered}
           pointList={pointList}
           points={points}
+          image={image}
         />
       </div>
+      <div id={'save-image'} style={{ display: 'none' }} />
     </div>
   );
 }
