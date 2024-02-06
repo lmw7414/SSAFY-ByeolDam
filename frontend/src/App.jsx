@@ -1,4 +1,4 @@
-import { Route, useLocation } from 'wouter';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import Member from './pages/member/Member';
 import Universe from './pages/Universe';
@@ -9,9 +9,22 @@ import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
+import ConstellationWriting from './pages/constellation/ConstellationWriting';
 
 export default function App() {
-  const [location] = useLocation();
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/" element={<Member />} />
+          <Route path="/*" element={<NavApp />} />
+        </Routes>
+      </Router>
+    </div>
+  );
+}
+
+function NavApp() {
   const [modalState, setModalState] = useState({
     isOpen: false,
     children: null,
@@ -19,14 +32,14 @@ export default function App() {
   });
 
   return (
-    <div className="App">
-      <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
-        {location === '/' ? null : <NavBar />}
-        <ModalContainer modalState={modalState} />
-        <Route path="/" component={Member} />
-        <Route path="/home" component={Universe} />
-        <Route path="/settings" component={Settings} />
-      </ModalContext.Provider>
-    </div>
+    <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
+      <NavBar />
+      <Routes>
+        <Route path="/home" element={<Universe />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/constellation" element={<ConstellationWriting />} />
+      </Routes>
+      <ModalContainer modalState={modalState} />
+    </ModalContext.Provider>
   );
 }
