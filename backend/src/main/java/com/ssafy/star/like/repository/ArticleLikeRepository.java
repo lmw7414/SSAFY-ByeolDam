@@ -1,4 +1,4 @@
-package com.ssafy.star.like.dao;
+package com.ssafy.star.like.repository;
 
 import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.like.domain.ArticleLikeEntity;

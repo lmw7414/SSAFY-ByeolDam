@@ -6,7 +6,7 @@ import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
-import com.ssafy.star.like.dao.ArticleLikeRepository;
+import com.ssafy.star.like.repository.ArticleLikeRepository;
 import com.ssafy.star.like.domain.ArticleLikeEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;

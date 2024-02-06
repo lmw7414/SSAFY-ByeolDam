@@ -5,7 +5,7 @@ import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.global.auth.util.JwtTokenUtils;
-import com.ssafy.star.like.dao.ArticleLikeRepository;
+import com.ssafy.star.like.repository.ArticleLikeRepository;
 import com.ssafy.star.like.domain.ArticleLikeEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
