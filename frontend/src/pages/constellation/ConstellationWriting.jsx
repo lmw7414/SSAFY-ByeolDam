@@ -15,7 +15,7 @@ export default function ConstellationWriting() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch('./src/assets/data/animals.json')
+    fetch('./src/assets/data/local.json')
       .then((data) => data.json())
       .then((data) => {
         setPointList(
@@ -25,7 +25,7 @@ export default function ConstellationWriting() {
               const width = dt.image_width;
 
               const zipped = douglasPeucker(
-                dt.contours.map(([point]) => {
+                dt.contours.map((point) => {
                   const [x, y] = point;
                   return { x, y };
                 }),
