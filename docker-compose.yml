@@ -51,6 +51,5 @@ services:
     build:
       context: "./frontend"
       dockerfile: "Dockerfile"
-    command: "npm run dev"
     ports:
-      - "5173:5173"
+      - "80:80"
