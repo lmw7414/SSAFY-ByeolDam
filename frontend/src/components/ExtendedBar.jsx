@@ -1,27 +1,29 @@
 import { Link } from 'react-router-dom';
 import ExtendedBarIcon from './base/ExtendedBarIcon';
-export default function ExtendedBar({ changeBar, barId }) {
+export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHome }) {
   const closeExtendedBar = () => {
     changeBar(0);
+    changeExNav(0);
   };
   const openSearchBar = () => {
     changeBar(1);
+    changeExNav(1);
   };
   const openNotificationBar = () => {
     changeBar(3);
+    changeExNav(1);
   };
   const openSettingsPage = () => {
     changeBar(4);
+    changeExNav(1);
   };
 
   return (
     <div className="extended-bar-big-container">
       <div className="extended-bar-container">
-        <Link to={'/home'}>
-          <div className="extended-bar-logo">
-            <img src="/src/assets/images/temporary-logo.png" alt="logo" />
-          </div>
-        </Link>
+        <div className="nav-bar-logo" onClick={goHome}>
+          <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+        </div>
 
         <div className="extended-bar-contents">
           {barId === 1 ? (

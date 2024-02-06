@@ -4,8 +4,6 @@ import Member from './pages/member/Member';
 import Universe from './pages/Universe';
 import NavBar from './components/NavBar';
 import Settings from './pages/settings/Settings';
-import SignupTest from './pages/member/Signuptest';
-import LoginTest from './pages/member/LoginTest';
 
 import './assets/styles/scss/main.scss';
 import ModalContainer from './components/modal/ModalContainer';
@@ -20,8 +18,6 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Member />} />
           <Route path="/*" element={<NavApp />} />
-          <Route path="/signup" element={<SignupTest />} />
-          <Route path="/login" element={<LoginTest />} />
         </Routes>
       </Router>
     </div>

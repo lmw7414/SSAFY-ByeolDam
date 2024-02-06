@@ -26,6 +26,7 @@ $nav-bar-width: 360px;
   height: 5rem;
   position: absolute;
   margin-left: 2rem;
+  cursor: pointer;
 }
 
 .profile-image-box {
@@ -91,7 +92,12 @@ $nav-bar-width: 360px;
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
   cursor: pointer;
+  &:hover {
+    background-color: $selected-menu;
+  }
 }
 
 .nav-bar-menu-icon-frame {
@@ -107,6 +113,11 @@ $nav-bar-width: 360px;
 
 .nav-bar-menu-text {
   color: $text-primary;
+  margin-left: 2rem;
+}
+
+.nav-bar-menu-text-selected {
+  color: white;
   margin-left: 2rem;
 }
 
