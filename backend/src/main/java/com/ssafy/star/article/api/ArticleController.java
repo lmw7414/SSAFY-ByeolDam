@@ -7,22 +7,21 @@ import com.ssafy.star.article.dto.request.ArticleCreateRequest;
 import com.ssafy.star.article.dto.request.ArticleModifyRequest;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
-
+import com.ssafy.star.article.application.ArticleService;
+import com.ssafy.star.article.dto.Article;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import com.ssafy.star.comment.application.CommentService;
-import com.ssafy.star.comment.dto.response.CommentResponse;
-import com.ssafy.star.user.domain.UserEntity;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -34,11 +33,14 @@ public class ArticleController {
 
 
     @PostMapping
-    public Response<Void> create(@RequestBody ArticleCreateRequest request, Authentication authentication) {
+    public Response<Void> create(@RequestPart ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) throws IOException {
         // TODO : image
         log.info("request 정보 : {}", request);
-        articleService.create(request.title(), request.tag(), request.description(),
-                request.disclosureType(), authentication.getName());
+        if(imageFile != null){
+            articleService.create(request.title(), request.tag(), request.description(),
+                    request.disclosureType(), authentication.getName(), imageFile, request.imageType());
+        }
+
         return Response.success();
     }
 

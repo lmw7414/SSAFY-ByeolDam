@@ -25,20 +25,20 @@ public class ImageEntity {
     private String thumbnailUrl;
 
     @Column(name = "image_type", nullable = false, length = 255)
+    @Enumerated(EnumType.STRING)
     private ImageType imageType;
 
     protected ImageEntity() {}
 
-    private ImageEntity(Long id, String name, String url, String thumbnailUrl, ImageType imageType){
-        this.id = id;
+    private ImageEntity(String name, String url, String thumbnailUrl, ImageType imageType){
         this.name = name;
         this.url = url;
         this.thumbnailUrl = thumbnailUrl;
         this.imageType = imageType;
     }
 
-    public static ImageEntity of(Long id, String name, String url, String thumbnailUrl, ImageType imageType){
-        return new ImageEntity(id, name, url, thumbnailUrl, imageType);
+    public static ImageEntity of(String name, String url, String thumbnailUrl, ImageType imageType){
+        return new ImageEntity(name, url, thumbnailUrl, imageType);
     }
 
 }
