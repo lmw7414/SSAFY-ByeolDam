@@ -44,8 +44,8 @@ export default function NavBar() {
   const openSettingsPage = () => {
     setBarId(4);
   };
-  console.log('barId : ', barId);
-  console.log('navEx : ', navEx);
+  // console.log('barId : ', barId);
+  // console.log('navEx : ', navEx);
 
   const readFollowing = async () => {
     const data = await axios.get('immigrant_co/count-followings');
@@ -70,7 +70,7 @@ export default function NavBar() {
     setModalState({
       isOpen: true,
       title: '팔로워',
-      children: <FollowContainer followSubject={'follower'} />,
+      children: <FollowContainer followSubject={'follower'} modalState={modalState} />,
     });
   };
 
@@ -78,7 +78,7 @@ export default function NavBar() {
     setModalState({
       isOpen: true,
       title: '팔로잉',
-      children: <FollowContainer followSubject={'following'} />,
+      children: <FollowContainer followSubject={'following'} modalState={modalState} />,
     });
   };
 
