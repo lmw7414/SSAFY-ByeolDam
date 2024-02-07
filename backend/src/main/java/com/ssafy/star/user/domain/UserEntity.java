@@ -6,6 +6,7 @@ import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -26,7 +27,6 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE user_account SET deleted_at = NOW() where id=?")
 @Where(clause = "deleted_at is NULL")
 public class UserEntity {
-    //TODO: 사진 프로필 추가 필요
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,10 +88,8 @@ public class UserEntity {
 
     private LocalDateTime deletedAt;
 
-    //Image(사진) Table의 FK
-    //1:1관계
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Image")
+    @JoinColumn(name = "image")
     private ImageEntity imageEntity;
 
     @PrePersist
@@ -116,7 +114,8 @@ public class UserEntity {
             String nickname,
             String memo,
             DisclosureType disclosureType,
-            LocalDate birthday
+            LocalDate birthday,
+            ImageEntity imageEntity
     ) {
         this.email = email;
         this.providerType = providerType;
@@ -127,14 +126,19 @@ public class UserEntity {
         this.memo = memo;
         this.disclosureType = disclosureType;
         this.birthday = birthday;
+        this.imageEntity = imageEntity;
     }
 
     public static UserEntity of(String email, ProviderType providerType, String password, String name, String nickname) {
-        return of(email, providerType, RoleType.USER, password, name, nickname, null, DisclosureType.VISIBLE, null);
+        return of(email, providerType, RoleType.USER, password, name, nickname, null, DisclosureType.VISIBLE, null, null);
     }
 
-    public static UserEntity of(String email, ProviderType providerType, RoleType roleType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday) {
-        return new UserEntity(email, providerType, roleType, password, name, nickname, memo, disclosureType, birthday);
+    public static UserEntity of(String email, ProviderType providerType, String password, String name, String nickname, ImageEntity imageEntity) {
+        return of(email, providerType, RoleType.USER, password, name, nickname, null, DisclosureType.VISIBLE, null, imageEntity);
+    }
+
+    public static UserEntity of(String email, ProviderType providerType, RoleType roleType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, ImageEntity imageEntity) {
+        return new UserEntity(email, providerType, roleType, password, name, nickname, memo, disclosureType, birthday, imageEntity);
     }
 
 }

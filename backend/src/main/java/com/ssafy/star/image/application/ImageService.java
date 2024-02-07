@@ -32,4 +32,11 @@ public class ImageService {
         return Image.fromEntity(imageEntity);
     }
 
+    @Transactional
+    public void deleteImage(Image image){
+        imageRepository.deleteById(image.id());
+    }
+
+
+
 }

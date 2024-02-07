@@ -8,7 +8,6 @@ import com.ssafy.star.user.dto.User;
 import java.time.LocalDate;
 
 public record UserResponse(
-        //TODO: 사진, 팔로워, 팔로잉 추가
         String imageUrl,
         String email,
         ProviderType providerType,
@@ -22,6 +21,6 @@ public record UserResponse(
 ) {
 
     public static UserResponse fromUser(User dto) {
-        return new UserResponse("imageUrl", dto.email(), dto.providerType(), dto.roleType(), dto.name(), dto.nickname(), dto.memo(), dto.disclosureType(), dto.birthday());
+        return new UserResponse(dto.image().url(), dto.email(), dto.providerType(), dto.roleType(), dto.name(), dto.nickname(), dto.memo(), dto.disclosureType(), dto.birthday());
     }
 }

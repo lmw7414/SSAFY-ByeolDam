@@ -15,6 +15,8 @@ import com.ssafy.star.global.oauth.util.HeaderUtils;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.dao.ImageRepository;
+import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
@@ -54,18 +56,12 @@ public class UserService {
     private final UserCacheRepository userCacheRepository;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final EmailCacheRepository emailCacheRepository;
-    private final FollowRepository followRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
     private final ImageService imageService;
     private final S3uploader s3uploader;
-    private final ImageRepository imageRepository;
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
 
-    @Value("${jwt.token.expired-time-ms}")
-    private Long expiredTimeMs;
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
 
@@ -73,6 +69,8 @@ public class UserService {
     private Long mailExpiredMs;
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
+    private final String DEFAULT_PROFILE_URL = "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfile.png";
+    private final ImageRepository imageRepository;
 
     //TODO : 로그인 시 응답 -> 유저 리스폰스 + 토큰 값
 
@@ -245,7 +243,8 @@ public class UserService {
         validateEmailPattern(email);
         checkEmailExistenceOrException(email);
         if (satisfyNickname(nickname)) {
-            UserEntity userEntity = UserEntity.of(email, ProviderType.LOCAL, encoder.encode(password), name, nickname);
+            ImageEntity imageEntity = imageRepository.findByUrl(DEFAULT_PROFILE_URL).orElse(null);
+            UserEntity userEntity = UserEntity.of(email, ProviderType.LOCAL, encoder.encode(password), name, nickname, imageEntity);
             return User.fromEntity(userRepository.save(userEntity));
         }
         throw new ByeolDamException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -305,16 +304,37 @@ public class UserService {
         userRepository.saveAndFlush(userEntity);
     }
 
+    /**
+     * 1. user의 entity를 가져온다.
+     * 2. S3에 수정한 profile 사진을 저장한다.
+     * 3. userEntity의 id를 가지고 imageService의 getImageUrl 함수를 이용하여 Image Dto를 가져온다.
+     * 4. image Table에 수정한 이미지 정보를 저장한다.
+     * 5. image Table에서 가져왔던 Image Dto를 이용해 해당하는 부분을 삭제한다.
+     * 6. Image Dto에 저장되어있던 url을 이용하여 S3에서 해당하는 이미지 경로를 삭제한다.
+     */
     @Transactional
-    public void updateProfileImage(MultipartFile multipartFile, ImageType imageType, Authentication authentication){
+    public void updateProfileImage(String email, MultipartFile multipartFile, ImageType imageType){
         String profileUrl = "";
         try{
 
-            Optional<UserEntity> userEntity = userRepository.findByEmail(authentication.getName());
+            // user의 entity를 가져온다.
+            UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
+                    () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", email))
+            );
+            ImageEntity oldImgEntity = userEntity.getImageEntity();
+            // S3에 수정한 profile 사진을 저장한다.
             profileUrl = s3uploader.uploadProfile(multipartFile, "profiles");
-//            Image image = imageService.getImageUrl();
 
-            imageService.saveProfileImage(multipartFile.getOriginalFilename(), profileUrl, imageType);
+            // 기본 이미지가 아니라면
+            if(!oldImgEntity.getUrl().equals(DEFAULT_PROFILE_URL)){
+                //S3에서 삭제
+                s3uploader.deleteImageFromS3(oldImgEntity.getUrl());
+            }
+
+            //기본 이미지라면 값 바꿔주고
+            oldImgEntity.setName(multipartFile.getOriginalFilename());
+            oldImgEntity.setUrl(profileUrl);
+            oldImgEntity.setImageType(imageType);
         }catch (IOException e){
             s3uploader.deleteImageFromS3(profileUrl);
         }

@@ -130,8 +130,8 @@ public class UserController {
     }
 
     @PutMapping("/users/profile-image")   //여기 바꿔줘야하나
-    public Response<Void> updateProfileImage(@RequestParam MultipartFile multipartFile, Authentication authentication) {
-        userService.updateProfileImage(multipartFile, ImageType.PROFILE, authentication);
+    public Response<Void> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
+        userService.updateProfileImage(authentication.getName(), multipartFile, ImageType.PROFILE);
         return Response.success();
     }
 

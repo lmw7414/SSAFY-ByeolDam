@@ -7,4 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ImageRepository extends JpaRepository<ImageEntity, Long> {}
+public interface ImageRepository extends JpaRepository<ImageEntity, Long> {
+
+    String defaultProfileUrl = "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfile.png";
+
+    Optional<ImageEntity> findByUrl(String defaultProfileUrl);
+
+}
