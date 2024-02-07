@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.global.oauth.domain.ProviderType;
+import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 
 import java.time.LocalDate;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 public record User(
         Long id,
         String email,
+        ProviderType providerType,
+        RoleType roleType,
         String password,
         String name,
         String nickname,
@@ -32,10 +36,12 @@ public record User(
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime deletedAt
 ) {
-    public static User of(Long id, String email, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
+    public static User of(Long id, String email, ProviderType providerType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
         return new User(
                 id,
                 email,
+                providerType,
+                RoleType.USER,
                 password,
                 name,
                 nickname,
@@ -52,6 +58,8 @@ public record User(
         return new User(
                 entity.getId(),
                 entity.getEmail(),
+                entity.getProviderType(),
+                entity.getRoleType(),
                 entity.getPassword(),
                 entity.getName(),
                 entity.getNickname(),
@@ -67,6 +75,8 @@ public record User(
     public UserEntity toEntity() {
         return UserEntity.of(
                 email,
+                providerType,
+                roleType,
                 name,
                 password,
                 nickname,

@@ -6,7 +6,7 @@ import { addArticle } from '../../../apis/articles';
 
 export default function ArticleWritingModal({ nickName }) {
   const [step, setStep] = useState(1);
-  const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);
   const [details, setDetails] = useState({
     description: '',
     tags: '',
@@ -18,8 +18,6 @@ export default function ArticleWritingModal({ nickName }) {
 
   const writeArticle = async () => {
     if (!image || !details.description?.trim()) return;
-
-    console.log({ nickName, image, settings, details });
 
     const { resultCode } = addArticle({
       nickName,
@@ -34,7 +32,7 @@ export default function ArticleWritingModal({ nickName }) {
 
   return (
     <div>
-      {step == 1 && <ImageUpload setStep={setStep} setImage={setImage} />}
+      {step == 1 && <ImageUpload setStep={setStep} setFile={setFile} />}
       {step == 2 && (
         <AddDescription setStep={setStep} setDetails={setDetails} details={details} image={image} />
       )}

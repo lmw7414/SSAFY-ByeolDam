@@ -5,6 +5,7 @@ const client = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
+    Authorization: `Bearer ${sessionStorage.token}`,
   },
 });
 
