@@ -47,24 +47,24 @@ export default function NavBar() {
   // console.log('barId : ', barId);
   // console.log('navEx : ', navEx);
 
-  const readFollowing = async () => {
-    const data = await axios.get('immigrant_co/count-followings');
-    return data.data.result;
-  };
+  // const readFollowing = async () => {
+  //   const data = await axios.get('immigrant_co/count-followings');
+  //   return data.data.result;
+  // };
 
-  const readFollower = async () => {
-    const data = await axios.get('immigrant_co/count-followers');
-    return data.data.result;
-  };
+  // const readFollower = async () => {
+  //   const data = await axios.get('immigrant_co/count-followers');
+  //   return data.data.result;
+  // };
 
-  useEffect(() => {
-    readFollower().then((result) => {
-      setFollower(result);
-    });
-    readFollowing().then((result) => {
-      setFollowing(result);
-    });
-  }, []);
+  // useEffect(() => {
+  //   readFollower().then((result) => {
+  //     setFollower(result);
+  //   });
+  //   readFollowing().then((result) => {
+  //     setFollowing(result);
+  //   });
+  // }, []);
 
   const openFollowerModal = () => {
     setModalState({
