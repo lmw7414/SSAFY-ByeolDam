@@ -13,6 +13,7 @@ export default function LoginTest() {
     login({ email, password })
       .then(() => {
         setIsLogin(true);
+        sessionStorage.setItem('userInfo', JSON.stringify({ nickname: 'test123' }));
       })
       .catch((e) => {
         alert('아이디 또는 비밀번호가 일치하지 않거나 존재하지 않는 아이디입니다.');
