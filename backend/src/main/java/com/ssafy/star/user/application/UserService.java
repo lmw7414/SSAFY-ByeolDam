@@ -1,17 +1,29 @@
 package com.ssafy.star.user.application;
 
+import com.ssafy.star.common.config.properties.AppProperties;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.types.DisclosureType;
-import com.ssafy.star.global.auth.util.JwtTokenUtils;
+import com.ssafy.star.global.auth.util.AuthToken;
+import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
 import com.ssafy.star.global.email.application.EmailService;
+import com.ssafy.star.global.oauth.domain.ProviderType;
+import com.ssafy.star.global.oauth.util.CookieUtils;
+import com.ssafy.star.global.oauth.util.HeaderUtils;
 import com.ssafy.star.user.domain.FollowEntity;
+import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.domain.UserRefreshToken;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserCacheRepository;
+import com.ssafy.star.user.repository.UserRefreshTokenRepository;
 import com.ssafy.star.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -34,19 +47,20 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserRepository userRepository;
     private final UserCacheRepository userCacheRepository;
+    private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final EmailCacheRepository emailCacheRepository;
     private final FollowRepository followRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
-
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-
-    @Value("${jwt.token.expired-time-ms}")
-    private Long expiredTimeMs;
+    private final AuthTokenProvider tokenProvider;
+    private final AppProperties appProperties;
 
     @Value("${mail.auth-code-expired-ms}")
     private Long mailExpiredMs;
+    private final static long THREE_DAYS_MSEC = 259200000;
+    private final static String REFRESH_TOKEN = "refresh_token";
+
+    //TODO : 로그인 시 응답 -> 유저 리스폰스 + 토큰 값
 
     public Optional<User> loadUserByEmail(String email) {
         return Optional.ofNullable(userCacheRepository.getUser(email)
@@ -65,20 +79,10 @@ public class UserService {
     public void sendCodeByEmail(String email) {
         validateEmailPattern(email);
         checkEmailExistenceOrException(email);
-        String title = "[별을담다] 안녕하세요. 이메일 인증 코드입니다.";
         String authCode = generateMailCode();  // 코드 생성
-        String content = "[별을 담다]서비스에 방문해주셔서 감사합니다." +
-                "\n\n" +
-                "인증번호는 " + authCode +
-                "입니다." +
-                "\n" +
-                "5분안에 입력해주세요." +
-                "\n\n" +
-                "감사합니다." +
-                "\n\n" +
-                "- 별을 담다 서비스팀 -";
-        emailService.sendEmail(email, title, content);  // 메일 보내기
-        emailCacheRepository.setEmailCode(email, authCode, expiredTimeMs);  // 레디스에 저장
+
+        emailService.sendEmail(email, authCode);  // 메일 보내기
+        emailCacheRepository.setEmailCode(email, authCode, mailExpiredMs);  // 레디스에 저장
     }
 
     // 이메일 인증코드 검증
@@ -105,7 +109,7 @@ public class UserService {
     }
 
     // 로그인
-    public String login(String email, String password) {
+    public String login(HttpServletRequest request, HttpServletResponse response, String email, String password) {
         // 회원가입 여부 체크
         User user = loadUserByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email))
@@ -116,18 +120,126 @@ public class UserService {
         if (!encoder.matches(password, user.password())) {
             throw new ByeolDamException(ErrorCode.INVALID_PASSWORD);
         }
+
+        /**
+         * 1. JWT 토큰 생성
+         * 2. 리프레시 토큰 생성
+         * 3. 유저 - 리프레시 토큰이 있는지 확인
+         * 4. 없으면 새로 등록
+         * 5. 있으면 DB에 업데이트
+         * 6. 기존 쿠키 삭제하고 새로 추가
+         * 7. JWT 토큰 리턴
+         */
+        AuthToken accessToken = tokenProvider.createAuthToken(email, user.roleType().getCode(), appProperties.getAuth().getTokenExpiry());
+
+        long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
+        AuthToken refreshToken = tokenProvider.createAuthToken(appProperties.getAuth().getTokenSecret(), refreshTokenExpiry);
+
+        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(email);
+        if (userRefreshToken == null) { // 토큰이 없는 경우. 새로 등록
+            userRefreshToken = new UserRefreshToken(email, refreshToken.getToken());
+            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+        } else {  // 토큰 발견 -> 리프레시 토큰 업데이트
+            userRefreshToken.setRefreshToken(refreshToken.getToken());
+        }
+
+        int cookieMaxAge = (int) refreshTokenExpiry / 60;
+        CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
+
         // 토큰 생성 후 리턴
-        String token = JwtTokenUtils.generateToken(email, user.nickname(), secretKey, expiredTimeMs);
-        return token;
+        return accessToken.getToken();
     }
 
-    // 회원가입
+    // 리프레시 토큰
+
+    /**
+     * 1. 액세스 토큰 기존 헤더에서 가져오기
+     * 2. 액세스 토큰 (String)-> (Token)으로 변환
+     * 3. 유효한 토큰인지 검증
+     * 4. 만료된 토큰인지 검증
+     * 5. claims에서 이메일 가져오기
+     * 6. Claims에서 role타입 가져오기
+     * 7. 프론트로 부터 쿠키에서 리프레시 토큰 가져오기
+     * 8. 유효한지 확인
+     * 9. 유저-리프레시 레포에서 토큰 가져오기 - 없을 경우 에러 - 로그인할 때 만들어지기 때문에 없을리 없음
+     * 10. 새로운 액세스 토큰 발급
+     * 11. 리프레시 토큰이 3일 이하로 남았을 경우 리프레시 토큰 갱신
+     * 12. DB에 업데이트
+     * 13. 액세스 토큰 리턴
+     */
+
+    public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = HeaderUtils.getAccessToken(request);
+        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+
+        if (!authToken.validate()) {
+            throw new ByeolDamException(ErrorCode.INVALID_TOKEN);
+        }
+
+        Claims claims = authToken.getExpiredClaims();
+        if (claims == null) {
+            return accessToken;  // 아직 만료 안됨
+        }
+
+        String email = claims.getSubject();
+        RoleType roleType = RoleType.of(claims.get("role", String.class));
+
+        //refresh token
+        String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
+                .map(Cookie::getValue)
+                .orElse(null);
+        AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
+
+        if (authRefreshToken.validate()) {
+            throw new ByeolDamException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // DB 확인
+        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserIdAndRefreshToken(email, refreshToken);
+        if (userRefreshToken == null) {
+            throw new ByeolDamException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        Date now = new Date();
+        AuthToken newAccessToken = tokenProvider.createAuthToken(email, roleType.getCode(), appProperties.getAuth().getTokenExpiry());
+
+        long validTime = authRefreshToken.extractClaims().getExpiration().getTime() - now.getTime();
+
+        //refresh 토큰 기간이 3일 이하일 경우 새로 갱신
+        if (validTime <= THREE_DAYS_MSEC) {
+            authRefreshToken = tokenProvider.createAuthToken(
+                    appProperties.getAuth().getTokenSecret(),
+                    appProperties.getAuth().getRefreshTokenExpiry()
+            );
+
+            userRefreshToken.setRefreshToken(authRefreshToken.getToken());
+
+            int cookieMaxAge = (int) appProperties.getAuth().getRefreshTokenExpiry() / 60;
+            CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
+            CookieUtils.addCookie(response, REFRESH_TOKEN, authRefreshToken.getToken(), cookieMaxAge);
+        }
+        return newAccessToken.getToken();
+    }
+
+    // 회원가입 - 이메일 인증
     @Transactional
     public User join(String email, String password, String name, String nickname) {
         validateEmailPattern(email);
         checkEmailExistenceOrException(email);
         if (satisfyNickname(nickname)) {
-            UserEntity userEntity = UserEntity.of(email, encoder.encode(password), name, nickname, null, DisclosureType.VISIBLE, null);
+            UserEntity userEntity = UserEntity.of(email, ProviderType.LOCAL, encoder.encode(password), name, nickname);
+            return User.fromEntity(userRepository.save(userEntity));
+        }
+        throw new ByeolDamException(ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    // 회원가입 - 소셜로그인
+    @Transactional
+    public User join(String email, ProviderType providerType, String password, String name, String nickname) {
+        checkEmailExistenceOrException(email);
+        if (satisfyNickname(nickname)) {
+            UserEntity userEntity = UserEntity.of(email, providerType, password, name, nickname);
             return User.fromEntity(userRepository.save(userEntity));
         }
         throw new ByeolDamException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -215,7 +327,7 @@ public class UserService {
         Pattern regex = Pattern.compile(REGEX);
         Matcher matcher = regex.matcher(email);
 
-        if(!matcher.matches()) {
+        if (!matcher.matches()) {
             throw new ByeolDamException(ErrorCode.UNSUITABLE_EMAIL, String.format("%s doesn't meet the conditions", email));
         }
     }

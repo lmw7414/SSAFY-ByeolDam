@@ -1,11 +1,10 @@
-package com.ssafy.star.global.auth.config;
+package com.ssafy.star.common.config.security;
 
 import com.ssafy.star.common.exception.CustomAuthenticationEntryPoint;
-import com.ssafy.star.global.auth.config.filter.JwtTokenFilter;
-import com.ssafy.star.user.application.UserService;
+import com.ssafy.star.global.auth.config.AuthenticationConfig;
+import com.ssafy.star.global.oauth.service.CustomOAuth2UserService;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,18 +12,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-
-import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final UserService userService;
-    @Value("${jwt.secret-key}")
-    private String key;
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final AuthenticationConfig authenticationConfig;
 
     private static final String[] AUTH_WHITELIST = {
             "/graphiql", "/graphql",
@@ -43,38 +36,41 @@ public class SecurityConfig {
             "/api/*/{nickname}/count-followings"
     };
 
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        return request -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedHeaders(Collections.singletonList("*"));
-            config.setAllowedMethods(Collections.singletonList("*"));
-            config.setAllowedMethods(Collections.singletonList("*"));
-            config.setAllowedOriginPatterns(Collections.singletonList("http://localhost:5173")); // 허용할 origin
-            config.setAllowCredentials(true);
-            return config;
-        };
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(authenticationConfig.corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers(OPEN_API_URLS).permitAll()
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                 .requestMatchers("/api/**").authenticated()
-                ).sessionManagement(session ->
+                )
+                .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).addFilterBefore(new JwtTokenFilter(key, userService), UsernamePasswordAuthenticationFilter.class)
+                )
+                .oauth2Login(configure -> configure
+                        .authorizationEndpoint(config -> config
+                                .authorizationRequestRepository(authenticationConfig.oAuth2AuthorizationRequestBasedOnCookieRepository())
+                                .baseUri("/oauth2/authorization")
+                        )
+                        .userInfoEndpoint(config -> config.userService(oAuth2UserService))
+                        .redirectionEndpoint(config -> config.baseUri("/*/oauth2/code/*"))
+                        .successHandler(authenticationConfig.oAuth2AuthenticationSuccessHandler())
+                        .failureHandler(authenticationConfig.oAuth2AuthenticationFailureHandler())
+                )
                 .exceptionHandling(exceptionManager ->
                         exceptionManager.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                )
+                .addFilterBefore(authenticationConfig.tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .logout(config -> config
+                        .logoutUrl("/logout")
+                        .addLogoutHandler(authenticationConfig.logoutSuccessHandler())
+                        .deleteCookies("refresh_token")
                 );
 
         return http.build();
-
     }
+
 }

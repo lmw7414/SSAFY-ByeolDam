@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +35,7 @@ public class UserController {
             description = "email의 정보를 받아 현재 DB에 저장되어 있지 않은 메일인지 체크 후 인증 코드를 해당 메일로 보냄"
     )
     @PostMapping("/email/verification-request")
-    public Response<Void> sendMessage(@RequestBody EmailRequest request){
+    public Response<Void> sendMessage(@RequestBody EmailRequest request) {
         userService.sendCodeByEmail(request.email());
         return Response.success();
     }
@@ -69,8 +71,14 @@ public class UserController {
             }
     )
     @PostMapping("/users/login")
-    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
-        String token = userService.login(request.email(), request.password());
+    public Response<UserLoginResponse> login(HttpServletRequest request, HttpServletResponse response, @RequestBody UserLoginRequest userLoginRequest) {
+        String token = userService.login(request, response, userLoginRequest.email(), userLoginRequest.password());
+        return Response.success(new UserLoginResponse(token));
+    }
+
+    @GetMapping("/users/refresh")
+    public Response<UserLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String token = userService.refreshToken(request, response);
         return Response.success(new UserLoginResponse(token));
     }
 
