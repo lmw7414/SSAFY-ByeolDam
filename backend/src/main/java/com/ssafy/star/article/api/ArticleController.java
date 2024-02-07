@@ -9,6 +9,7 @@ import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.image.ImageType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,7 +39,7 @@ public class ArticleController {
         log.info("request 정보 : {}", request);
         if(imageFile != null){
             articleService.create(request.title(), request.tag(), request.description(),
-                    request.disclosureType(), authentication.getName(), imageFile, request.imageType());
+                    request.disclosureType(), authentication.getName(), imageFile, ImageType.ARTICLE);
         }
 
         return Response.success();

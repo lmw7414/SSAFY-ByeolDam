@@ -37,8 +37,18 @@ public class ImageEntity {
         this.imageType = imageType;
     }
 
+    private ImageEntity(String name, String url, ImageType imageType){
+        this.name = name;
+        this.url = url;
+        this.imageType = imageType;
+    }
+
     public static ImageEntity of(String name, String url, String thumbnailUrl, ImageType imageType){
         return new ImageEntity(name, url, thumbnailUrl, imageType);
+    }
+
+    public static ImageEntity of(String name, String url, ImageType imageType){
+        return new ImageEntity(name, url, imageType);
     }
 
 }

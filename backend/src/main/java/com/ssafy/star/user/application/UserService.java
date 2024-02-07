@@ -2,10 +2,15 @@ package com.ssafy.star.user.application;
 
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.global.auth.util.JwtTokenUtils;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
 import com.ssafy.star.global.email.application.EmailService;
+import com.ssafy.star.image.ImageType;
+import com.ssafy.star.image.application.ImageService;
+import com.ssafy.star.image.dao.ImageRepository;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
@@ -15,10 +20,13 @@ import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -38,6 +46,9 @@ public class UserService {
     private final FollowRepository followRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
+    private final ImageService imageService;
+    private final S3uploader s3uploader;
+    private final ImageRepository imageRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -174,6 +185,21 @@ public class UserService {
         userEntity.setMemo(memo);
 
         userRepository.saveAndFlush(userEntity);
+    }
+
+    @Transactional
+    public void updateProfileImage(MultipartFile multipartFile, ImageType imageType, Authentication authentication){
+        String profileUrl = "";
+        try{
+
+            Optional<UserEntity> userEntity = userRepository.findByEmail(authentication.getName());
+            profileUrl = s3uploader.uploadProfile(multipartFile, "profiles");
+//            Image image = imageService.getImageUrl();
+
+            imageService.saveProfileImage(multipartFile.getOriginalFilename(), profileUrl, imageType);
+        }catch (IOException e){
+            s3uploader.deleteImageFromS3(profileUrl);
+        }
     }
 
     //회원 탈퇴

@@ -1,6 +1,7 @@
 package com.ssafy.star.user.domain;
 
 import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.image.domain.ImageEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +56,12 @@ public class UserEntity {
     private LocalDateTime modifiedAt;
 
     private LocalDateTime deletedAt;
+
+    //Image(사진) Table의 FK
+    //1:1관계
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Image")
+    private ImageEntity imageEntity;
 
     @PrePersist
     void createdAt() {

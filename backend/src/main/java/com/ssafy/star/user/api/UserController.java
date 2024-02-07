@@ -1,6 +1,7 @@
 package com.ssafy.star.user.api;
 
 import com.ssafy.star.common.response.Response;
+import com.ssafy.star.image.ImageType;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -111,6 +113,12 @@ public class UserController {
     @PutMapping("/users")
     public Response<Void> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
         userService.updateMyProfile(authentication.getName(), request.password(), request.name(), request.nickname(), request.memo(), request.disclosureType(), request.birthday());
+        return Response.success();
+    }
+
+    @PutMapping("/users/profile-image")   //여기 바꿔줘야하나
+    public Response<Void> updateProfileImage(@RequestParam MultipartFile multipartFile, Authentication authentication) {
+        userService.updateProfileImage(multipartFile, ImageType.PROFILE, authentication);
         return Response.success();
     }
 
