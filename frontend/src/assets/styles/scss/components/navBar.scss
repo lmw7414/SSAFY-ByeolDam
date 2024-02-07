@@ -9,7 +9,7 @@ $nav-bar-width: 360px;
 .nav-bar-container {
   height: 100%;
   width: $nav-bar-width;
-  z-index: 1;
+  z-index: 9999999;
   background-color: $modal-background;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
