@@ -1,6 +1,9 @@
 package com.ssafy.star.user.api;
 
+import com.ssafy.star.common.exception.ByeolDamException;
+import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.response.Response;
+import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
@@ -72,14 +75,17 @@ public class UserController {
     )
     @PostMapping("/users/login")
     public Response<UserLoginResponse> login(HttpServletRequest request, HttpServletResponse response, @RequestBody UserLoginRequest userLoginRequest) {
+        UserResponse userResponse = UserResponse.fromUser(userService.loadUserByEmail(userLoginRequest.email()).orElseThrow(
+                () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND)
+        ));
         String token = userService.login(request, response, userLoginRequest.email(), userLoginRequest.password());
-        return Response.success(new UserLoginResponse(token));
+        return Response.success(new UserLoginResponse(userResponse, token));
     }
 
     @GetMapping("/users/refresh")
     public Response<UserLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         String token = userService.refreshToken(request, response);
-        return Response.success(new UserLoginResponse(token));
+        return Response.success(new UserLoginResponse(null, token));
     }
 
     @Operation(
