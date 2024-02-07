@@ -1,6 +1,6 @@
-export default function ProfileInfo({ text, num }) {
+export default function ProfileInfo({ text, num, onClick }) {
   return (
-    <div className="profile-info">
+    <div className="profile-info" onClick={onClick}>
       <div className="profile-info-text button-light">
         <p>{text}</p>
       </div>

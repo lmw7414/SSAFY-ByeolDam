@@ -25,8 +25,15 @@ from rest_framework.decorators import api_view
 @csrf_exempt
 def getImage(request):
     if request.method == 'POST':
-        url = request.POST.get('url').strip('{}')
+        # url = request.POST.get('url')
 
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            url = data.get('url')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+        print("url: ", url)
         # URL에서 이미지 다운로드
         response = requests.get(url)
         if response.status_code == 200:

@@ -10,7 +10,7 @@ services:
       # 설정파일 저장될  위치
       - ./backend/database/config:/etc/mysql/conf.d
       # DB 데이터 저장 디렉토리
-      - ./backend/database/data:/var/lib/mysql
+      - /home/ubuntu/database/data:/var/lib/mysql
     environment:
       - MARIADB_DATABASE=byeol_dam
       - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
@@ -41,7 +41,14 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - JWT_SECRET_KEY_CODE=${JWT_SECRET_KEY_CODE}
+      - JWT_TOKEN_SECRET=${JWT_TOKEN_SECRET}
       - EMAIL_APP_PASSWORD=${EMAIL_APP_PASSWORD}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+      - KAKAO_OAUTH_CLIENT_ID=${KAKAO_OAUTH_CLIENT_ID}
+      - KAKAO_OAUTH_CLIENT_SECRET=${KAKAO_OAUTH_CLIENT_SECRET}
+      - NAVER_OAUTH_CLIENT_ID=${NAVER_OAUTH_CLIENT_ID}
+      - NAVER_OAUTH_CLIENT_SECRET=${NAVER_OAUTH_CLIENT_SECRET}
     ports:
       - "8081:8081"
     restart: always
@@ -51,6 +58,5 @@ services:
     build:
       context: "./frontend"
       dockerfile: "Dockerfile"
-    command: "npm run dev"
     ports:
       - "5173:5173"

@@ -14,15 +14,17 @@
     "@react-three/fiber": "^8.15.14",
     "@react-three/postprocessing": "^2.15.12",
     "axios": "^1.6.6",
+    "color-thief-node": "^1.0.4",
     "eslint-config-airbnb": "^19.0.4",
+    "image-js": "^0.35.5",
     "konva": "^9.3.2",
     "lodash": "^4.17.21",
     "maath": "^0.10.7",
     "postprocessing": "^6.34.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
     "react-konva": "^18.2.10",
+    "react-router-dom": "^6.22.0",
     "three": "^0.160.0",
     "three-rounded-box": "^0.1.1",
     "uuid-by-string": "^4.0.0"
@@ -38,5 +40,8 @@
     "prettier": "^3.2.4",
     "sass": "^1.70.0",
     "vite": "^5.0.8"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   }
 }
