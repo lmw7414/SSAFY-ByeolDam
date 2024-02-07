@@ -16,6 +16,7 @@ export default function NavBar() {
   const [following, setFollowing] = useState(0);
   const [follower, setFollower] = useState(0);
   const [modalState, setModalState] = useModal();
+  const [nickname, setNickname] = useState('');
 
   const navigate = useNavigate();
   const goHome = () => {
@@ -44,6 +45,19 @@ export default function NavBar() {
   const openSettingsPage = () => {
     setBarId(4);
   };
+
+  const readNickname = async () => {
+    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
+    return nickname;
+  };
+
+  useEffect(() => {
+    readNickname().then((result) => {
+      // console.log(result);
+      setNickname(result);
+    });
+  }, []);
+
   // console.log('barId : ', barId);
   // console.log('navEx : ', navEx);
 
@@ -111,7 +125,7 @@ export default function NavBar() {
                   </div>
                 </div>
                 <div className="nickname title">
-                  <p>상당히느긋한사람</p>
+                  <p>{nickname}</p>
                 </div>
                 <div className="profile-info-box">
                   <ProfileInfo text={'별'} num={26} />
