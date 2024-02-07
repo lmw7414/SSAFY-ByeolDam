@@ -8,13 +8,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final AuthenticationConfig authenticationConfig;
@@ -35,6 +42,23 @@ public class SecurityConfig {
             "/api/*/{nickname}/count-followers",
             "/api/*/{nickname}/count-followings"
     };
+
+    @Bean
+    public CorsConfigurationSource configurationSource() {
+        return request -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173", "http://i10b309.p.ssafy.io:5173"));
+            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization-refresh", "Cache-Control", "Content-Type"));
+
+            /* 응답 헤더 설정 추가*/
+            corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-refresh"));
+            corsConfiguration.setMaxAge(3600L); //preflight 결과를 1시간동안 캐시에 저장
+            return corsConfiguration;
+        };
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

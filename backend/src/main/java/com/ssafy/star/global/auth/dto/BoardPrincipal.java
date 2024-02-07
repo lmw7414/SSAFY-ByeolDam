@@ -1,6 +1,5 @@
 package com.ssafy.star.global.auth.dto;
 
-import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.dto.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +10,6 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -19,48 +17,35 @@ import java.util.Map;
 public record BoardPrincipal(
         String email,
         String password,
-        String name,
         String nickname,
-        ProviderType providerType,
-        RoleType roleType,
         Collection<? extends GrantedAuthority> authorities,
-        Map<String, Object> attributes,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt,
-        LocalDateTime deletedAt
-
+        Map<String, Object> attributes
 ) implements UserDetails, OAuth2User, OidcUser {
 
-    public static BoardPrincipal of(String email, String password, String name, String nickname, ProviderType providerType, RoleType roleType, Map<String, Object> attributes, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
+    public static BoardPrincipal of(String email, String password, String nickname, Map<String, Object> attributes) {
         return new BoardPrincipal(
                 email,
                 password,
-                name,
                 nickname,
-                providerType,
-                roleType,
                 Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode())),
-                attributes,
-                createdAt,
-                modifiedAt,
-                deletedAt);
+                attributes
+
+        );
     }
 
-    public static BoardPrincipal of(String email, String password, String name, String nickname, ProviderType providerType, RoleType roleType, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
-        return of(email, password, name, nickname, providerType, roleType, Map.of(), createdAt, modifiedAt, deletedAt);
+    public static BoardPrincipal of(String email, String nickname, String password, Collection<? extends GrantedAuthority> authorities) {
+        return new BoardPrincipal(email, password, nickname, authorities, Map.of());
+    }
+
+    public static BoardPrincipal of(String email, String password, String nickname) {
+        return of(email, password, nickname, Map.of());
     }
 
     public static BoardPrincipal from(User dto) {
         return of(
                 dto.email(),
                 dto.password(),
-                dto.name(),
-                dto.nickname(),
-                dto.providerType(),
-                dto.roleType(),
-                dto.createdAt(),
-                dto.modifiedAt(),
-                dto.deletedAt()
+                dto.nickname()
         );
     }
 
@@ -68,14 +53,8 @@ public record BoardPrincipal(
         return of(
                 dto.email(),
                 dto.password(),
-                dto.name(),
                 dto.nickname(),
-                dto.providerType(),
-                dto.roleType(),
-                attributes,
-                dto.createdAt(),
-                dto.modifiedAt(),
-                dto.deletedAt()
+                attributes
         );
     }
 
@@ -101,27 +80,27 @@ public record BoardPrincipal(
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.deletedAt == null;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.deletedAt == null;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.deletedAt == null;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.deletedAt == null;
+        return true;
     }
 
     @Override
     public String getName() {
-        return email;
+        return nickname;
     }
 
     @Override

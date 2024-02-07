@@ -1,5 +1,6 @@
 package com.ssafy.star.global.auth.util;
 
+import com.ssafy.star.global.auth.dto.BoardPrincipal;
 import com.ssafy.star.global.oauth.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,9 +17,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class AuthTokenProvider {
     private final String key;
-    //private final long expiry;
     private static final String AUTHORITIES_KEY = "role";
-//    private final UserService userService;
 
     // 리프레시 토큰
     public AuthToken createAuthToken(String id, long expiry) {
@@ -27,8 +25,8 @@ public class AuthTokenProvider {
     }
 
     // 액세스 토큰
-    public AuthToken createAuthToken(String id, String role, long expiry) {
-        return new AuthToken(id, role, key, expiry);
+    public AuthToken createAuthToken(String id, String nickname, String role, long expiry) {
+        return new AuthToken(id, nickname, role, key, expiry);
     }
 
     public AuthToken convertAuthToken(String token) {
@@ -44,8 +42,7 @@ public class AuthTokenProvider {
                             })
                             .map(SimpleGrantedAuthority::new)
                             .toList();
-            log.debug("claims subject : [{}]", claims.getSubject());
-            User principal = new User(claims.getSubject(), null, authorities);
+            BoardPrincipal principal = BoardPrincipal.of(authToken.getUserEmail(), authToken.getUserNickname(), null, authorities);
             return new UsernamePasswordAuthenticationToken(principal, authToken, authorities);
         } else {
             throw new TokenValidFailedException();

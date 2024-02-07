@@ -80,7 +80,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         log.debug("Oauth2 접근 유저 OAuth2UserInfo : {}", userInfo.getAttributes());
         RoleType roleType = hasAuthority(authorities, RoleType.ADMIN.getCode()) ? RoleType.ADMIN : RoleType.USER;
 
-        AuthToken accessToken = tokenProvider.createAuthToken(userInfo.getEmail(), roleType.getCode(), appProperties.getAuth().getTokenExpiry());
+        AuthToken accessToken = tokenProvider.createAuthToken(userInfo.getEmail(), user.nickname(),roleType.getCode(), appProperties.getAuth().getTokenExpiry());
 
         // Refresh 토큰 설정
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();

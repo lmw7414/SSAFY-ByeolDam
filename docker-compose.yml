@@ -10,7 +10,7 @@ services:
       # 설정파일 저장될  위치
       - ./backend/database/config:/etc/mysql/conf.d
       # DB 데이터 저장 디렉토리
-      - ./backend/database/data:/var/lib/mysql
+      - /home/ubuntu/database/data:/var/lib/mysql
     environment:
       - MARIADB_DATABASE=byeol_dam
       - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
@@ -51,6 +51,5 @@ services:
     build:
       context: "./frontend"
       dockerfile: "Dockerfile"
-    command: "npm run dev"
     ports:
       - "5173:5173"
