@@ -180,8 +180,6 @@ public class UserService {
     @Transactional
     public void delete(String email) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
-        List<FollowEntity> my = followRepository.findByFromUserOrToUser(userEntity, userEntity);
-        followRepository.deleteAllInBatch(my);
         userRepository.delete(userEntity);
     }
 

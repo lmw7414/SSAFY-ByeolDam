@@ -47,8 +47,6 @@ public class ArticleController {
     )
     @PostMapping("/articles")
     public Response<Void> create(@RequestBody ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
-        // TODO : image
-
         log.info("request 정보 : {}", request);
         if(imageFile != null){
             articleService.create(request.title(), request.tag(), request.description(),
@@ -67,7 +65,6 @@ public class ArticleController {
     )
     @PutMapping("/articles/{articleId}")
     public Response<ArticleResponse> modify(@PathVariable Long articleId, @RequestBody ArticleModifyRequest request, Authentication authentication) {
-        // TODO : image
         Article article = articleService.modify(articleId, request.title(), request.tag(), request.description(),
                 request.disclosureType(), authentication.getName());
         return Response.success(ArticleResponse.fromArticle(article));
@@ -86,7 +83,20 @@ public class ArticleController {
         return Response.success();
     }
 
-    // TODO : 팔로우 피드
+    @Operation(
+            summary = "팔로우 피드",
+            description = "팔로워들의 게시물을 최신순으로 정렬하여 페이지로 반환합니다",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/articles/follow")
+    public Response<Page<ArticleResponse>> followFeed(Authentication authentication, Pageable pageable) {
+        String email = authentication.getName();
+        return Response.success(articleService.followFeed(email,pageable).map(ArticleResponse::fromArticle));
+    }
+
+
     @Operation(
             summary = "게시물 전체 조회",
             description = "게시물 전체 조회입니다.",

@@ -1,5 +1,6 @@
 package com.ssafy.star.user.domain;
 
+import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import jakarta.persistence.*;
@@ -51,8 +52,16 @@ public class UserEntity {
     private DisclosureType disclosureType = DisclosureType.VISIBLE;
 
     @ToString.Exclude
+    @OneToMany(mappedBy = "fromUser", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FollowEntity> followEntities = new ArrayList<>();
+
+    @ToString.Exclude
     @OneToMany(mappedBy = "userEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ConstellationUserEntity> constellationUserEntities = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "ownerEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ArticleEntity> articleEntities = new ArrayList<>();
 
     @Setter
     private LocalDate birthday;

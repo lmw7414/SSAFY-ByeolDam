@@ -12,12 +12,16 @@ import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
+import com.ssafy.star.user.domain.ApprovalStatus;
+import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -132,6 +137,41 @@ public class ArticleService {
         }
 
         return Article.fromEntity(articleEntity);
+    }
+
+    /**
+     * 팔로우 피드
+     */
+    // 팔로우한 사람들의 게시물들을 최신순으로 나열해서 보여준다
+    @Transactional(readOnly = true)
+    public Page<Article> followFeed(String email, Pageable pageable) {
+        UserEntity userEntity = getUserEntityOrException(email);
+        Set<UserEntity> userEntitySet = userEntity.getFollowEntities().stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
+
+        List<ArticleEntity> articleEntityList = new ArrayList<>();
+        // ID별 모든 게시글 가져오기
+        for(UserEntity tmpUserEntity : userEntitySet) {
+            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities();
+            articleEntityList.addAll(tmpArticleEntities);
+        }
+
+        // 최신순 정렬
+        Collections.sort(articleEntityList, new Comparator<ArticleEntity>() {
+            @Override
+            public int compare(ArticleEntity a1, ArticleEntity a2) {
+                return a2.getCreatedAt().compareTo(a1.getCreatedAt());
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), articleEntityList.size());
+        List<Article> dtoList = articleEntityList.subList(start, end)
+                .stream()
+                .map(Article::fromEntity)
+                .collect(Collectors.toList());
+
+        // 페이징처리
+        return new PageImpl<>(dtoList, pageable, articleEntityList.size());
     }
 
     /**
