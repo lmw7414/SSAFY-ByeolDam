@@ -16,31 +16,21 @@ export default function AccountSettings() {
     password: '',
   });
 
-  const readProfile = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    const { data } = await axios.get(`/users/${nickname}`);
-    sessionStorage.setItem('userInfo', data);
-    return data;
-  };
-
   const changePage = (newId) => {
     setAccountSettingsId(newId);
     console.log(accountSettingsId);
   };
 
-  // 테스트용 객체
-  // const profileData = {
-  //   password: '1234',
-  //   name: '뽱정민',
-  //   nickname: '상느사',
-  //   memo: '나는 자연인이다.',
-  //   disclosureType: 'VISIBLE',
-  //   birthday: '2024-02-05',
-  // };
+  const readProfile = async () => {
+    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
+    const { data } = await axios.get(`/users/${nickname}`);
+    console.log(nickname);
+    sessionStorage.setItem('userInfo', data);
+    return data;
+  };
 
   useEffect(() => {
     readProfile().then(({ result }) => {
-      // console.log(result);
       setProfileData(result);
     });
   }, []);
