@@ -6,8 +6,8 @@ export const getComments = async (articleId) => {
   return { resultCode: data.resultCode, data: data.result.content };
 };
 
-export const addComments = async ({ parentCommentId, articleId, content }) => {
-  const { data } = axios.post(`comments/articles/${articleId}`, {
+export const addComments = async ({ parentCommentId = null, articleId, content }) => {
+  const { data } = axios.post(`articles/${articleId}/comments`, {
     parentCommentId,
     content,
   });
@@ -16,16 +16,15 @@ export const addComments = async ({ parentCommentId, articleId, content }) => {
 };
 
 export const editComments = async ({ articleId, commentId, content }) => {
-  const { data } = axios.put(`comments/${commentId}`, {
-    articleId,
+  const { data } = axios.put(`articles/${articleId}/comments/${commentId}`, {
     content,
   });
 
   return { resultCode: data.resultCode };
 };
 
-export const deleteComments = async ({ commentId }) => {
-  const { data } = axios.delete(`comments/${commentId}`);
+export const deleteComments = async ({ articleId, commentId }) => {
+  const { data } = axios.delete(`articles/${articleId}/comments/${commentId}`);
 
   return { resultCode: data.resultCode };
 };
