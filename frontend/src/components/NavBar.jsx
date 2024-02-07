@@ -7,7 +7,7 @@ import useModal from '../hooks/useModal';
 import ExtendedBar from './ExtendedBar';
 import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
-import FollowContainer from './modal/Follow/FollowContainer';
+import FollowModal from './modal/Follow/FollowModal';
 
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
@@ -70,7 +70,7 @@ export default function NavBar() {
     setModalState({
       isOpen: true,
       title: '팔로워',
-      children: <FollowContainer followSubject={'follower'} modalState={modalState} />,
+      children: <FollowModal followSubject={'follower'} modalState={modalState} />,
     });
   };
 
@@ -78,7 +78,7 @@ export default function NavBar() {
     setModalState({
       isOpen: true,
       title: '팔로잉',
-      children: <FollowContainer followSubject={'following'} modalState={modalState} />,
+      children: <FollowModal followSubject={'following'} modalState={modalState} />,
     });
   };
 
