@@ -94,11 +94,10 @@ export default function NavBar() {
         />
       ) : (
         <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'nav-bar-hidden'}`}>
+          <div className="nav-bar-logo" onClick={goHome}>
+            <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+          </div>
           <div className="nav-bar-container">
-            <div className="nav-bar-logo" onClick={goHome}>
-              <img src="/src/assets/images/temporary-logo.png" alt="logo" />
-            </div>
-
             <div className="nav-bar-contents">
               <div className="nav-bar-profile-box">
                 <div className="profile-image-box">
@@ -166,19 +165,19 @@ export default function NavBar() {
                 />
               </div>
             </div>
+          </div>
 
-            <div className="nav-bar-toggle-container" onClick={closeNavBar}>
-              <div className="nav-bar-menu-icon-box">
-                <img
-                  src={
-                    isNavBarVisible
-                      ? '/src/assets/images/nav-bar-toggle-button/close.png'
-                      : '/src/assets/images/nav-bar-toggle-button/open.png'
-                  }
-                  alt="toggle_button"
-                  className="toggle-button"
-                />
-              </div>
+          <div className="nav-bar-toggle-container" onClick={closeNavBar}>
+            <div className="nav-bar-menu-icon-box">
+              <img
+                src={
+                  isNavBarVisible
+                    ? '/src/assets/images/nav-bar-toggle-button/close.png'
+                    : '/src/assets/images/nav-bar-toggle-button/open.png'
+                }
+                alt="toggle_button"
+                className="toggle-button"
+              />
             </div>
           </div>
         </div>

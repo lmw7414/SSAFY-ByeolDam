@@ -1,49 +1,60 @@
-$nav-bar-width: 360px;
+$nav-bar-width: 320px;
+$nav-menu-font-size: 1.7rem;
 
 .nav-bar-big-container {
   position: absolute;
-  transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
+  transition: margin-left 0.7s;
   height: 100%;
-}
-
-.nav-bar-container {
-  height: 100%;
-  width: $nav-bar-width;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  z-index: 999999999;
   background-color: $modal-background;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
+}
+
+.nav-bar-container {
+  flex-grow: 1;
+  width: $nav-bar-width;
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .nav-bar-logo {
-  margin-bottom: 40px;
+  width: $nav-bar-width;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-bar-logo img {
   height: 5rem;
-  position: absolute;
-  margin-left: 2rem;
   cursor: pointer;
 }
 
 .profile-image-box {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
 }
 
 .profile-image-container {
-  width: 10rem;
-  height: 10rem;
+  width: 128px;
+  height: 128px;
   overflow: hidden;
   border-radius: 50%; // 반지름이 컨테이너 크기의 50%인 원형으로 만듭니다.
   border: 2px solid $text-primary; // 원 테두리 추가
-  margin-bottom: 40px;
+  margin-bottom: 2rem;
 }
 
 .nav-bar-contents {
-  margin-top: 6rem;
+  margin-top: 2rem;
+  flex-grow: 1;
   width: $nav-bar-width - 80px;
 }
 
@@ -51,7 +62,7 @@ $nav-bar-width: 360px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .profile-image {
@@ -85,14 +96,19 @@ $nav-bar-width: 360px;
 }
 
 .nav-bar-menu-box {
-  margin-top: 3rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
 }
 
 .nav-bar-menu {
+  width: 17rem;
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-  padding: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 1rem 2rem;
   border-radius: 1rem;
   cursor: pointer;
   &:hover {
@@ -101,17 +117,18 @@ $nav-bar-width: 360px;
 }
 
 .nav-bar-menu-icon-frame {
-  width: 3rem;
+  width: $nav-menu-font-size;
   display: flex;
   justify-content: start;
 }
 
 .nav-bar-menu-icon {
-  width: 2rem;
-  height: 2rem;
+  width: $nav-menu-font-size;
+  height: $nav-menu-font-size;
 }
 
 .nav-bar-menu-text {
+  font-size: $nav-menu-font-size;
   color: $text-primary;
   margin-left: 2rem;
 }
@@ -134,6 +151,7 @@ $nav-bar-width: 360px;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .toggle-button {
@@ -150,7 +168,7 @@ $nav-bar-width: 360px;
 }
 
 .nav-bar-divide-line {
-  width: 100%;
+  width: 90%;
 }
 
 .link-setting {
