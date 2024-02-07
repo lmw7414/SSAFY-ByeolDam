@@ -15,7 +15,7 @@ import java.util.Optional;
 public class UserCacheRepository {
 
     private final RedisTemplate<String, User> userRedisTemplate;
-    private final static Duration USER_CACHE_TTL =Duration.ofDays(3);
+    private final static Duration USER_CACHE_TTL =Duration.ofMillis(1800000); //30분
 
     public void setUser(User user) {
         String key = getKey(user.email());
@@ -29,6 +29,13 @@ public class UserCacheRepository {
         log.debug("Get User from Redis {}, {}", key, user);
         return Optional.ofNullable(user);
     }
+
+    public void deleteUser(String email) {
+        String key = getKey(email);
+        log.info("Delete User to Redis {}", key);
+        userRedisTemplate.delete(key);
+    }
+
 
     private String getKey(String email) {
         return "USER:" + email;

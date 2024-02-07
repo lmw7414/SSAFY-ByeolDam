@@ -1,4 +1,4 @@
-package com.ssafy.star.global.auth.config;
+package com.ssafy.star.common.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

@@ -16,13 +16,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailService {
     private final JavaMailSender emailSender;
 
-    public void sendEmail(String toEmail, String title, String text) {
-        SimpleMailMessage emailForm = createEmailForm(toEmail, title, text);
+    public void sendEmail(String toEmail, String authCode) {
+        String title = "[별을담다] 안녕하세요. 이메일 인증 코드입니다.";
+        String content = "[별을 담다]서비스에 방문해주셔서 감사합니다." +
+                "\n\n" +
+                "인증번호는 " + authCode +
+                "입니다." +
+                "\n" +
+                "5분안에 입력해주세요." +
+                "\n\n" +
+                "감사합니다." +
+                "\n\n" +
+                "- 별을 담다 서비스팀 -";
+        SimpleMailMessage emailForm = createEmailForm(toEmail, title, content);
 
         try {
             emailSender.send(emailForm);
         } catch (RuntimeException e) {
-            log.debug("MailService.sendEmail exception occur toEmail: {}, title: {}, text: {}", toEmail, title, text);
+            log.debug("MailService.sendEmail exception occur toEmail: {}, title: {}, text: {}", toEmail, title, content);
             throw new ByeolDamException(ErrorCode.UNABLE_TO_SEND_EMAIL);
         }
     }
