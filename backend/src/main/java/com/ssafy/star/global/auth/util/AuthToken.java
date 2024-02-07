@@ -49,9 +49,11 @@ public class AuthToken {
 
     public Claims extractClaims() {
         try {
-
-            return Jwts.parserBuilder().setSigningKey(getKey(key))
-                    .build().parseClaimsJws(token).getBody();
+            return Jwts.parserBuilder()
+                    .setSigningKey(getKey(key))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (SecurityException e) {
             log.info("Invalid JWT signature.");
         } catch (MalformedJwtException e) {
@@ -64,14 +66,11 @@ public class AuthToken {
             log.info("JWT token compact of handler are invalid.");
         }
         return null;
-
     }
 
     public String generateToken(String id, String key, long expiredTimeMs) {
-        Claims claims = Jwts.claims();
-        claims.put("email", id);
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs))
                 .signWith(getKey(key), SignatureAlgorithm.HS256)

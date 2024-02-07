@@ -88,7 +88,7 @@ cors:
 
 app:
   auth:
-    tokenSecret: ${JWT_SECRET_KEY_CODE}
+    tokenSecret: ${JWT_TOKEN_SECRET}
     tokenExpiry: 1800000 #30분
     refreshTokenExpiry: 604800000 #7일
   oauth2:

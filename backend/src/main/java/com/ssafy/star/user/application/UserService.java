@@ -169,20 +169,24 @@ public class UserService {
      */
 
     public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        // 1. 헤더로 부터 액세스 토큰 가져오기
         String accessToken = HeaderUtils.getAccessToken(request);
         AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
 
-        if (!authToken.validate()) {
-            throw new ByeolDamException(ErrorCode.INVALID_TOKEN);
+        // 2-1. 토큰이 유효한지 체크
+        if (authToken.validate()) {   // 유효하다면 지금 토큰 그대로 반환
+            return authToken.getToken();
         }
 
-        Claims claims = authToken.getExpiredClaims();
+        // 2-2. 토큰이 유효하지 않다면 리프레시 토큰이 있는지 확인하자
+
+        Claims claims = authToken.getExpiredClaims();  // 만료되었을 경우 만료 토큰을 가져옴.
         if (claims == null) {
             return accessToken;  // 아직 만료 안됨
         }
 
-        String email = authToken.getUserEmail();
-        String nickname = authToken.getUserNickname();
+        String email = claims.get("email", String.class);
+        String nickname = claims.get("nickname", String.class);
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
         //refresh token
@@ -191,7 +195,7 @@ public class UserService {
                 .orElse(null);
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
-        if (authRefreshToken.validate()) {
+        if (!authRefreshToken.validate()) {
             throw new ByeolDamException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
@@ -212,7 +216,6 @@ public class UserService {
                     appProperties.getAuth().getTokenSecret(),
                     appProperties.getAuth().getRefreshTokenExpiry()
             );
-
             userRefreshToken.setRefreshToken(authRefreshToken.getToken());
 
             int cookieMaxAge = (int) appProperties.getAuth().getRefreshTokenExpiry() / 60;
