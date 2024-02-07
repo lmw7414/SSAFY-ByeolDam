@@ -17,7 +17,9 @@ export default function AccountSettings() {
   });
 
   const readProfile = async () => {
-    const { data } = await axios.get('/users/immigrant_co');
+    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
+    const { data } = await axios.get(`/users/${nickname}`);
+    sessionStorage.setItem('userInfo', data);
     return data;
   };
 
