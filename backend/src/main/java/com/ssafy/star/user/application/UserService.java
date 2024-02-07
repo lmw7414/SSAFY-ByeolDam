@@ -130,8 +130,7 @@ public class UserService {
          * 6. 기존 쿠키 삭제하고 새로 추가
          * 7. JWT 토큰 리턴
          */
-        AuthToken accessToken = tokenProvider.createAuthToken(email, user.roleType().getCode(), appProperties.getAuth().getTokenExpiry());
-
+        AuthToken accessToken = tokenProvider.createAuthToken(email, user.nickname(), user.roleType().getCode(), appProperties.getAuth().getTokenExpiry());
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = tokenProvider.createAuthToken(appProperties.getAuth().getTokenSecret(), refreshTokenExpiry);
 
@@ -182,7 +181,8 @@ public class UserService {
             return accessToken;  // 아직 만료 안됨
         }
 
-        String email = claims.getSubject();
+        String email = authToken.getUserEmail();
+        String nickname = authToken.getUserNickname();
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
         //refresh token
@@ -202,7 +202,7 @@ public class UserService {
         }
 
         Date now = new Date();
-        AuthToken newAccessToken = tokenProvider.createAuthToken(email, roleType.getCode(), appProperties.getAuth().getTokenExpiry());
+        AuthToken newAccessToken = tokenProvider.createAuthToken(email, nickname, roleType.getCode(), appProperties.getAuth().getTokenExpiry());
 
         long validTime = authRefreshToken.extractClaims().getExpiration().getTime() - now.getTime();
 
