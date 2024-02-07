@@ -46,7 +46,7 @@ public class ArticleController {
             }
     )
     @PostMapping("/articles")
-    public Response<Void> create(@RequestBody ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
+    public Response<Void> create(@RequestPart ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
         log.info("request 정보 : {}", request);
         if(imageFile != null){
             articleService.create(request.title(), request.tag(), request.description(),

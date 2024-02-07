@@ -26,8 +26,8 @@ public class AuthToken {
         this.key = key;
     }
 
-    AuthToken(String id, String role, String key, long expiry) {
-        this.token = generateToken(id, role, key, expiry);
+    AuthToken(String id, String nickname ,String role, String key, long expiry) {
+        this.token = generateToken(id, nickname, role, key, expiry);
         this.key = key;
     }
 
@@ -35,7 +35,9 @@ public class AuthToken {
     public String getUserEmail() {
         return Objects.requireNonNull(extractClaims()).get("email", String.class);
     }
-
+    public String getUserNickname() {
+        return Objects.requireNonNull(extractClaims()).get("nickname", String.class);
+    }
     public boolean isExpired() {
         Date expiredDate = Objects.requireNonNull(extractClaims()).getExpiration();
         return expiredDate.before(new Date());
@@ -47,6 +49,7 @@ public class AuthToken {
 
     public Claims extractClaims() {
         try {
+
             return Jwts.parserBuilder().setSigningKey(getKey(key))
                     .build().parseClaimsJws(token).getBody();
         } catch (SecurityException e) {
@@ -65,18 +68,23 @@ public class AuthToken {
     }
 
     public String generateToken(String id, String key, long expiredTimeMs) {
+        Claims claims = Jwts.claims();
+        claims.put("email", id);
         return Jwts.builder()
-                .setSubject(id)
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs))
                 .signWith(getKey(key), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateToken(String id, String role, String key, long expiredTimeMs) {
+    public String generateToken(String id, String nickname, String role, String key, long expiredTimeMs) {
+        Claims claims = Jwts.claims();
+        claims.put("email", id);
+        claims.put("nickname", nickname);
+        claims.put(AUTHORITIES_KEY, role);
         return Jwts.builder()
-                .setSubject(id)
-                .claim(AUTHORITIES_KEY, role)
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs))
                 .signWith(getKey(key), SignatureAlgorithm.HS256)
