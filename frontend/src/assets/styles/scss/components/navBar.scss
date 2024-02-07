@@ -8,6 +8,12 @@ $nav-menu-font-size: 1.7rem;
   display: flex;
   flex-direction: column;
   z-index: 999999999;
+}
+
+.nav-bar-container {
+  height: 100%;
+  width: $nav-bar-width;
+  z-index: 9999999;
   background-color: $modal-background;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
