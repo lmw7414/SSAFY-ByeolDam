@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import UserBox from './UserBox';
 import axios from '/src/apis/axios';
 
-export default function FollowingFollower({ followSubject, modalState }) {
+export default function FollowModal({ followSubject, modalState }) {
   const [array, setArray] = useState([]);
 
   const readFollowings = async () => {
