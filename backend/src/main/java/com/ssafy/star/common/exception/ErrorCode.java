@@ -19,6 +19,8 @@ public enum ErrorCode {
     CONSTELLATION_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "ConstellationUser not founded"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh Token is invalid"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Token is expired"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not founded"),
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "Content type is invalid"),

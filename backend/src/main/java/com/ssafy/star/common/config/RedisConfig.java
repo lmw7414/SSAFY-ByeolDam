@@ -1,4 +1,4 @@
-package com.ssafy.star.global.auth.config;
+package com.ssafy.star.common.config;
 
 import com.ssafy.star.user.dto.User;
 import io.lettuce.core.RedisURI;
@@ -19,7 +19,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
