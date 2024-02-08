@@ -6,6 +6,7 @@ import EditMyProfile from './EditMyProfile';
 
 export default function AccountSettings() {
   const [accountSettingsId, setAccountSettingsId] = useState(0);
+  const [profileUpdate, setProfileupdate] = useState(0);
   const [profileData, setProfileData] = useState({
     nickname: '',
     email: '',
@@ -16,39 +17,36 @@ export default function AccountSettings() {
     password: '',
   });
 
-  const readProfile = async () => {
-    const { data } = await axios.get('/users/immigrant_co');
-    return data;
-  };
-
   const changePage = (newId) => {
     setAccountSettingsId(newId);
     console.log(accountSettingsId);
   };
 
-  // 테스트용 객체
-  // const profileData = {
-  //   password: '1234',
-  //   name: '뽱정민',
-  //   nickname: '상느사',
-  //   memo: '나는 자연인이다.',
-  //   disclosureType: 'VISIBLE',
-  //   birthday: '2024-02-05',
-  // };
+  const readProfile = async () => {
+    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
+    const { data } = await axios.get(`/users/${nickname}`);
+    console.log(nickname);
+    sessionStorage.setItem('userInfo', data);
+    return data;
+  };
 
   useEffect(() => {
     readProfile().then(({ result }) => {
-      // console.log(result);
       setProfileData(result);
+      setProfileupdate(0);
     });
-  }, []);
+  }, [profileUpdate]);
 
   return (
     <div className="account-settings-container">
       <h1 className="nickname">계정</h1>
       <div className="content-container">
         {accountSettingsId ? (
-          <EditMyProfile profileData={profileData} changePage={changePage} />
+          <EditMyProfile
+            profileData={profileData}
+            changePage={changePage}
+            setProfileupdate={setProfileupdate}
+          />
         ) : (
           <MyProfile profileData={profileData} changePage={changePage} />
         )}
