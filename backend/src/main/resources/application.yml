@@ -93,7 +93,7 @@ app:
     refreshTokenExpiry: 604800000 #7일
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth/redirect
+      - http://localhost:5173/oauth/redirect
 
 ---
 spring:
@@ -142,7 +142,7 @@ spring:
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.MariaDB
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
     properties:
