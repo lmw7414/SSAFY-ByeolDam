@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from '../../../apis/axios';
+import axios from '/src/apis/axios';
 
-export default function EditMyProfile({ profileData, changePage }) {
+export default function EditMyProfile({ profileData, changePage, setProfileupdate }) {
   const [editedProfile, setEditedProfile] = useState({ ...profileData });
 
   const handleChange = (e) => {
@@ -14,6 +14,7 @@ export default function EditMyProfile({ profileData, changePage }) {
 
     try {
       const response = await axios.put('/users', editedProfile);
+      setProfileupdate(1);
       console.log('내 정보 수정 성공');
       changePage(0);
     } catch (error) {
