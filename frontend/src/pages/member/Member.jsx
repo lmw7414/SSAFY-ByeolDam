@@ -1,11 +1,15 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { FirstPersonControls, Stars } from '@react-three/drei';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useNavigate } from 'react-router-dom';
 
 import { login } from '../../apis/member';
+import { googleLogin, naverLogin, kakaoLogin } from '../../apis/social';
 import ConstellationGenerator from '../../components/three/objects/ConstellationGenerator';
+import Logo from '../../assets/images/temporary-logo.png';
+import Naver from '../../assets/images/socials/naver.png';
+import Kakao from '../../assets/images/socials/kakao.png';
+import Gooogle from '../../assets/images/socials/google.png';
 
 export default function Member() {
   const controller = useRef();
@@ -32,7 +36,7 @@ export default function Member() {
     <div className="member-container">
       <div className="member-box">
         <div className="member-logo-box">
-          <img src="/src/assets/images/temporary-logo.png" className="member-box-logo" alt="logo" />
+          <img src={Logo} className="member-box-logo" alt="logo" />
         </div>
         <form className="member-login-box" onSubmit={userLogin}>
           <input
@@ -61,9 +65,9 @@ export default function Member() {
             <div className="member-separator" />
           </div>
           <div className="social-logos">
-            <img className="social-logo" src="/src/assets/images/socials/naver.png" alt="" />
-            <img className="social-logo" src="/src/assets/images/socials/kakao.png" alt="" />
-            <img className="social-logo" src="/src/assets/images/socials/google.png" alt="" />
+            <img className="social-logo" src={Naver} alt="" onClick={naverLogin} />
+            <img className="social-logo" src={Kakao} alt="" onClick={kakaoLogin} />
+            <img className="social-logo" src={Gooogle} alt="" onClick={googleLogin} />
           </div>
         </div>
       </div>
