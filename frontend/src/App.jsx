@@ -11,7 +11,7 @@ import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
 import ConstellationWriting from './pages/constellation/ConstellationWriting';
 import LoginTest from './pages/member/LoginTest';
-import SignupTest from './pages/member/Signuptest';
+import SignupTest from './pages/member/SignupTest';
 
 export default function App() {
   return (
