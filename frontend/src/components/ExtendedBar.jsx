@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom';
 import ExtendedBarIcon from './base/ExtendedBarIcon';
+import { useState } from 'react';
+
 export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHome }) {
+  const [isClose, setIsClosed] = useState(false);
+
   const closeExtendedBar = () => {
-    changeBar(0);
-    changeExNav(0);
+    setIsClosed(true);
+
+    setTimeout(() => {
+      changeBar(0);
+      changeExNav(0);
+    }, 400);
   };
   const openSearchBar = () => {
     changeBar(1);
@@ -19,18 +27,15 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
   };
 
   return (
-    <div className="extended-bar-big-container">
-      <div className="extended-bar-container">
-        <div className="nav-bar-logo" onClick={goHome}>
-          <img src="/src/assets/images/temporary-logo.png" alt="logo" />
-        </div>
-
+    <div className={isClose ? 'extended-bar-closed' : 'extended-bar-big-container'}>
+      <div className="nav-bar-logo" onClick={goHome}>
+        <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+      </div>
+      <div className={isClose ? 'extended-bar-container-closed' : 'extended-bar-container'}>
         <div className="extended-bar-contents">
           {barId === 1 ? (
             <input type="text" placeholder="검색" className="search-bar-input" />
           ) : null}
-
-          <hr className="extended-bar-divide-line" />
 
           <div className="search-bar-bottom-contents">
             <div className="extended-bar-side-menu-box">
@@ -94,24 +99,19 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
               </div>
             </div>
 
-            <div>
-              <hr className="extended-bar-column-divide-line" />
-            </div>
-
             <div className="extended-bar-main-contents-box">
               <p className="title nickname">texts</p>
             </div>
           </div>
         </div>
-
-        <div className="nav-bar-toggle-container" onClick={closeExtendedBar}>
-          <div className="nav-bar-menu-icon-box">
-            <img
-              src="/src/assets/images/nav-bar-toggle-button/close.png"
-              alt="toggle_button"
-              className="toggle-button"
-            />
-          </div>
+      </div>
+      <div className="nav-bar-toggle-container" onClick={closeExtendedBar}>
+        <div className="nav-bar-menu-icon-box">
+          <img
+            src="/src/assets/images/nav-bar-toggle-button/close.png"
+            alt="toggle_button"
+            className="toggle-button"
+          />
         </div>
       </div>
     </div>

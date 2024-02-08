@@ -5,6 +5,8 @@
   left: 70%;
   transform: translate(-70%, -50%);
   z-index: 2;
+  padding: 2rem;
+  border-radius: 12px;
 }
 
 .modal-header {
@@ -17,4 +19,8 @@
 .modal-title {
   color: white;
   margin: 0;
+}
+
+.modal-close {
+  width: 2rem;
 }
