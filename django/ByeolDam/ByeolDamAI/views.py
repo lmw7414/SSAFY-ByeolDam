@@ -97,7 +97,6 @@ def runAI(filename):
         data = {}
         data["image_height"] = outputs["instances"].image_size[0]
         data["image_width"] = outputs["instances"].image_size[1]
-        data["bounding_box"] = box.tolist()
         data["contours"] = contours[i].tolist()
         data["id"] = f"id_{counter_box}"
         counter_box += 1
