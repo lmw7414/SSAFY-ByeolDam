@@ -34,7 +34,7 @@ public class ConstellationUserEntity {
     @Column(name = "constellation_user_role")
     private ConstellationUserRole constellationUserRole;
 
-    public ConstellationUserEntity(ConstellationEntity constellationEntity, UserEntity userEntity, ConstellationUserRole constellationUserRole) {
+    private ConstellationUserEntity(ConstellationEntity constellationEntity, UserEntity userEntity, ConstellationUserRole constellationUserRole) {
         this.constellationEntity = constellationEntity;
         this.userEntity = userEntity;
         this.constellationUserRole = constellationUserRole;
@@ -47,9 +47,5 @@ public class ConstellationUserEntity {
 
     public void updateConstellationEntity(ConstellationEntity constellationEntity) {
         this.constellationEntity = constellationEntity;
-    }
-
-    public void updateUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
     }
 }

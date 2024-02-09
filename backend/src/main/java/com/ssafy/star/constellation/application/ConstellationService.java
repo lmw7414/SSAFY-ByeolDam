@@ -111,7 +111,7 @@ public class ConstellationService {
         );
 
         // ConstellationUserEntity 생성 및 연결
-        ConstellationUserEntity constellationUserEntity = new ConstellationUserEntity(
+        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(
                 constellationEntity,
                 userEntity,
                 ConstellationUserRole.ADMIN
@@ -170,7 +170,7 @@ public class ConstellationService {
         }
 
         // 별자리에 공유할 유저 추가, 권한은 유저로
-        ConstellationUserEntity constellationUserEntity = new ConstellationUserEntity(constellationEntity, userEntity, USER);
+        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(constellationEntity, userEntity, USER);
         constellationEntity.addUser(constellationUserEntity);
 
         constellationUserRepository.saveAndFlush(constellationUserEntity);

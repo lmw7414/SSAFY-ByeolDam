@@ -2,92 +2,52 @@ package com.ssafy.star.article.dto;
 
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.domain.ArticleEntity;
-import com.ssafy.star.comment.domain.CommentEntity;
-import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.user.domain.UserEntity;
-import com.ssafy.star.user.dto.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.ssafy.star.article.domain.ArticleHashtagEntity;
+import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
+import com.ssafy.star.comment.dto.CommentDto;
+import com.ssafy.star.image.dto.Image;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public record Article (
-
-    Long id,
+        Long id,
     String title,
-    String tag,
 //    private imageResponse image;
     long hits,
+
     String description,
     DisclosureType disclosure,
-    ConstellationEntity constellationEntity,
-    UserEntity ownerEntity,
-    List<CommentEntity> commentEntities,
+    Set<String> articleHashtags,
+    String constellationEntityName,
+    String ownerEntityNickname,
+    List<CommentDto> commentList,
     LocalDateTime createdAt,
     LocalDateTime modifiedAt,
-    LocalDateTime deletedAt
+    Image image
 
     ) {
-    public static Article of(
-        Long id,
-        String title,
-        String tag,
-//    private imageResponse image;
-        long hits,
-        String description,
-        DisclosureType disclosure,
-        ConstellationEntity constellationEntity,
-        UserEntity ownerEntity,
-        List<CommentEntity> commentEntities,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt,
-        LocalDateTime deletedAt
-) {
-    return new Article(
-            id,
-            title,
-            tag,
-            hits,
-            description,
-            disclosure,
-            constellationEntity,
-            ownerEntity,
-            commentEntities,
-            createdAt,
-            modifiedAt,
-            deletedAt
-    );
-}
-
     public static Article fromEntity(ArticleEntity entity){
         return new Article(
                 entity.getId(),
                 entity.getTitle(),
-                entity.getTag(),
-                // entity.getOutline(),
                 entity.getHits(),
                 entity.getDescription(),
                 entity.getDisclosure(),
-                entity.getConstellationEntity(),
-                entity.getOwnerEntity(),
-                entity.getCommentEntities(),
+                (Set<String>) entity.getArticleHashtagRelationEntities()
+                        .stream()
+                        .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
+                        .map(ArticleHashtagEntity::getTagName)
+                        .collect(Collectors.toSet()),
+                entity.getConstellationEntity() != null ? entity.getConstellationEntity().getName() : null,
+                entity.getOwnerEntity().getNickname(),
+                entity.getCommentEntities().stream().map(CommentDto::from).toList(),
                 entity.getCreatedAt(),
                 entity.getModifiedAt(),
-                entity.getDeletedAt()
-        );
-    }
-
-    public ArticleEntity toEntity(){
-        return ArticleEntity.of(
-                title,
-                tag,
-                description,
-                disclosure,
-                ownerEntity,
-                constellationEntity
+                Image.fromEntity(entity.getImageEntity())
         );
     }
 }
