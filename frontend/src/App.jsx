@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
 import Member from './pages/member/Member';
 import Universe from './pages/Universe';
@@ -31,21 +31,38 @@ export default function App() {
 }
 
 function NavApp() {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
+
   const [modalState, setModalState] = useState({
     isOpen: false,
     children: null,
     title: '',
   });
 
+  useEffect(() => {
+    if (sessionStorage['profile'] && sessionStorage['access_token']) setIsLogin(true);
+    else {
+      alert('로그인이 필요한 페이지입니다');
+      navigate('/');
+    }
+  }, [isLogin]);
+
   return (
-    <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
-      <NavBar />
-      <Routes>
-        <Route path="/home" element={<Universe />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/constellation" element={<ConstellationWriting />} />
-      </Routes>
-      <ModalContainer modalState={modalState} />
-    </ModalContext.Provider>
+    <>
+      {isLogin ? (
+        <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
+          <NavBar />
+          <Routes>
+            <Route path="/home" element={<Universe />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/constellation" element={<ConstellationWriting />} />
+          </Routes>
+          <ModalContainer modalState={modalState} />
+        </ModalContext.Provider>
+      ) : (
+        <div></div>
+      )}
+    </>
   );
 }
