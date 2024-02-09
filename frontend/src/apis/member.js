@@ -1,3 +1,4 @@
+import parseJwt from '../utils/parseJwt';
 import axios from './axios';
 
 export const login = async ({ email, password }) => {
@@ -6,7 +7,9 @@ export const login = async ({ email, password }) => {
     password,
   });
 
-  sessionStorage.setItem('token', data?.result?.token);
+  const token = data?.result?.token;
+  sessionStorage.setItem('access_token', token);
+  sessionStorage.setItem('profile', JSON.stringify(parseJwt(token)));
 
   axios.interceptors.request.use(
     (config) => {
