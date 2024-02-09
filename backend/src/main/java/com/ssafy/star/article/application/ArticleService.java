@@ -44,6 +44,8 @@ public class ArticleService {
     private final S3uploader s3uploader;
     private final ImageService imageService;
 
+    private static final int TARGET_HEIGHT = 1024;
+
     // 트랜잭션 처리를 하고 롤백 처리를 하려면 controller가 아니라 서비스단에서 upload를 호출해야할듯하다
     // try catch문을 통해서 사진 업로드 이후 save를 하고
     // 문제가 발생했을 경우(게시글이 정상적으로 생성되지 않았을 경우)
@@ -63,7 +65,7 @@ public class ArticleService {
 
         try{
 
-            url = s3uploader.upload(imageFile, "articles");
+            url = s3uploader.upload(imageFile, "articles", TARGET_HEIGHT);
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
             System.out.println("imageFile 이름 : "+imageFile.getOriginalFilename());
 

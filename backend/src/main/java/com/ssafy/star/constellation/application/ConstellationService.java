@@ -2,6 +2,7 @@ package com.ssafy.star.constellation.application;
 
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
@@ -11,6 +12,10 @@ import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
 
 import com.ssafy.star.constellation.dto.ConstellationUser;
+import com.ssafy.star.image.ImageType;
+import com.ssafy.star.image.application.ImageService;
+import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
@@ -20,7 +25,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.ssafy.star.constellation.ConstellationUserRole.ADMIN;
@@ -33,6 +40,11 @@ public class ConstellationService {
     private final ConstellationRepository constellationRepository;
     private final ConstellationUserRepository constellationUserRepository;
     private final UserRepository userRepository;
+    private final S3uploader s3uploader;
+    private final ImageService imageService;
+
+    private static final int ORIGIN_HEIGHT = 1024;
+    private static final int THUMB_HEIGHT = 256;
 
     // 별자리 전체 조회
     public Page<Constellation> list(String myEmail, Pageable pageable) {
@@ -99,9 +111,23 @@ public class ConstellationService {
 
 
     @Transactional
-    public Constellation create(String name, SharedType shared, String description, String myEmail) {
+    public Constellation create(String name, SharedType shared, String description, String myEmail, MultipartFile origin, MultipartFile thumb, MultipartFile cthumb) throws IOException {
         // 사용자의 user 엔터티 가져오기
         UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
+
+        // 사진들 추가
+        String originUrl = "";
+        String thumbUrl = "";
+        String contourThumbUrl = "";
+
+        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
+        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
+        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+
+        // image 테이블에 저장
+        imageService.saveImage(origin.getOriginalFilename(), originUrl, null, ImageType.CONSTELLATION);
+        imageService.saveImage(thumb.getOriginalFilename(), thumbUrl, null, ImageType.CONSTELLATION);
+        imageService.saveImage(cthumb.getOriginalFilename(), contourThumbUrl, null, ImageType.CONSTELLATION);
 
         // 별자리 엔터티 생성
         ConstellationEntity constellationEntity = ConstellationEntity.of(
@@ -125,16 +151,63 @@ public class ConstellationService {
         return Constellation.fromEntity(savedConstellationEntity);
     }
 
+    // 수정요청 로직
 
+
+    // 수정확인
     public Constellation modify(
             Long constellationId,
             String name,
             SharedType shared,
             String description,
-            String myEmail                // 사용자의 email
-    ) {
+            String myEmail,                // 사용자의 email
+            MultipartFile origin,
+            MultipartFile thumb,
+            MultipartFile cthumb
+    ) throws IOException {
         // 사용자가 admin인지 확인
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
+
+        // 사진들 추가
+        String originUrl = "";
+        String thumbUrl = "";
+        String contourThumbUrl = "";
+
+        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
+        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
+        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+
+        //TODO : 기존 별자리 조회하여 MongoDB ID 조회하고 사진 url 3장 가져오기
+        // 별자리 조회
+        Constellation constellation =  detail(constellationId, myEmail);
+
+        // MongoDB ID 조회
+        // 코드 필요
+
+        // 밑의 변수에 위에서 조회한 것을 집어넣는다고 가정하면
+        String oldOriginUrl = "";
+        String oldThumbUrl = "";
+        String oldContourThumbUrl = "";
+
+        // S3에서 이미지 삭제
+        s3uploader.deleteImageFromS3(oldOriginUrl);
+        s3uploader.deleteImageFromS3(oldThumbUrl);
+        s3uploader.deleteImageFromS3(oldContourThumbUrl);
+
+        Image oldOriginImage = imageService.getImageUrl(oldOriginUrl);
+        Image oldThumbImage = imageService.getImageUrl(oldThumbUrl);
+        Image oldContourThumbImage = imageService.getImageUrl(oldContourThumbUrl);
+
+        oldOriginImage.toEntity().setName(origin.getOriginalFilename());
+        oldOriginImage.toEntity().setUrl(originUrl);
+
+        oldThumbImage.toEntity().setName(thumb.getOriginalFilename());
+        oldThumbImage.toEntity().setUrl(thumbUrl);
+
+        oldContourThumbImage.toEntity().setName(cthumb.getOriginalFilename());
+        oldContourThumbImage.toEntity().setUrl(contourThumbUrl);
+
+        //TODO: 몽고 DB에서 해당 값 수정 코드 필요
 
         if(name != null) {
             constellationEntity.setName(name);

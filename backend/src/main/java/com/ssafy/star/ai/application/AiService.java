@@ -13,13 +13,14 @@ import java.io.IOException;
 public class AiService {
 
     private final S3uploader s3uploader;
+    private static final int TARGET_HEIGHT = 1024;
 
     @Transactional
     public String uploadTempImage(MultipartFile imageFile){
 
         String imageUrl = "";
         try{
-            imageUrl = s3uploader.upload(imageFile, "temp");
+            imageUrl = s3uploader.upload(imageFile, "temp", TARGET_HEIGHT);
             return imageUrl;
         } catch (IOException e){
             System.out.println("업로드 실패");
