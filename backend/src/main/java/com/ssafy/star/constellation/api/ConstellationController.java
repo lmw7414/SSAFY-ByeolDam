@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -92,8 +94,8 @@ public class ConstellationController {
             }
     )
     @GetMapping("/constellations")
-    public Response<Page<ConstellationResponse>> list(Pageable pageable, Authentication authentication) {
-        return Response.success(constellationService.list(authentication.getName(), pageable).map(ConstellationResponse::fromConstellation));
+    public Response<List<ConstellationResponse>> list(Authentication authentication, Pageable pageable) {
+        return Response.success(constellationService.list(authentication.getName(), pageable).stream().map(ConstellationResponse::fromConstellation).toList());
     }
 
     @Operation(

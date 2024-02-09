@@ -35,15 +35,16 @@ public class ConstellationService {
     private final UserRepository userRepository;
 
     // 별자리 전체 조회
-    public Page<Constellation> list(String myEmail, Pageable pageable) {
+    public List<Constellation> list(String myEmail, Pageable pageable) {
 
         // 사용자 Entity
         UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
 
-        Page<ConstellationUserEntity> constellationUserEntityPage = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable);
+        List<ConstellationUserEntity> constellationUserEntityPage
+                = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable).stream().toList();
 
         // TODO : 공개되어 있는 별자리거나 내 별자리인 경우
-        return constellationUserEntityPage.map(ConstellationUser::getConstellationEntity).map(Constellation::fromEntity);
+        return constellationUserEntityPage.stream().map(ConstellationUser::getConstellationEntity).map(Constellation::fromEntity).toList();
     }
 
     // 유저 별자리 전체 조회
