@@ -29,7 +29,7 @@ export default function Member() {
   };
 
   useEffect(() => {
-    if (sessionStorage.token) navigate('/home');
+    if (sessionStorage['access_token'] && sessionStorage['profile']) navigate('/home');
   }, []);
 
   return (
