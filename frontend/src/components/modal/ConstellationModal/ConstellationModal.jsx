@@ -1,6 +1,25 @@
+import { useState, useEffect } from 'react';
+
 import ConstellationRow from './ConstellationRow';
 
+import axios from '../../../apis/axios.js';
+import parseJwt from '../../../utils/parseJwt.js';
+
 export default function ConstellationModal() {
+  const readConstellations = async () => {
+    const JWTtoken = sessionStorage.getItem('token');
+    // const userInfo = sessionStorage.getItem('userInfo');
+    // console.log(JWTtoken);
+    // console.log(userInfo);
+    const parsed = parseJwt(JWTtoken);
+
+    console.log(parsed);
+    const profile = await axios.get(`/constellations/user/${parsed.email}`);
+  };
+
+  useEffect(() => {
+    readConstellations();
+  }, []);
   return (
     <div className="constellation-modal-container">
       <div className="">
