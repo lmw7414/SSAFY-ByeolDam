@@ -12,7 +12,9 @@ export default function ConstellationModal() {
     const JWTtoken = sessionStorage.getItem('token');
     const parsed = parseJwt(JWTtoken);
     // console.log(parsed.email);
-    const array = await axios.get(`/constellations/user/${parsed.email}`);
+    const data = await axios.get(`/constellations/user/${parsed.email}`);
+    const array = data.data.result.content;
+    console.log(array.length);
     setConstellationInfos(array);
   };
 
