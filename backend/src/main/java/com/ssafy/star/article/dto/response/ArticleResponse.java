@@ -21,6 +21,7 @@ public record ArticleResponse (
         List<CommentResponse> commentResponse,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
+        LocalDateTime deletedAt,
         ImageResponse image
 ){
 
@@ -37,6 +38,7 @@ public record ArticleResponse (
                 article.commentList().stream().map(CommentResponse::fromComment).toList(),
                 article.createdAt(),
                 article.modifiedAt(),
+                article.deletedAt(),
                 ImageResponse.fromImage(article.image())
         );
     }

@@ -27,6 +27,7 @@ public record Article (
     List<CommentDto> commentList,
     LocalDateTime createdAt,
     LocalDateTime modifiedAt,
+    LocalDateTime deletedAt,
     Image image
 
     ) {
@@ -47,6 +48,7 @@ public record Article (
                 entity.getCommentEntities().stream().map(CommentDto::from).toList(),
                 entity.getCreatedAt(),
                 entity.getModifiedAt(),
+                entity.getDeletedAt(),
                 Image.fromEntity(entity.getImageEntity())
         );
     }
