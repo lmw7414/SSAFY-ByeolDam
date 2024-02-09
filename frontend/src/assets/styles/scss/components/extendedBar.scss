@@ -1,29 +1,57 @@
 $extended-bar-width: 480px;
+$border-color: #3b255e;
 
 .extended-bar-big-container {
   position: absolute;
+  height: 100%;
   transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
-}
-
-.extended-bar-container {
-  height: 100vh;
-  width: $extended-bar-width;
-  z-index: 1;
   background-color: $modal-background;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 999999999;
+  animation: slide-in-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.extended-bar-closed {
+  position: absolute;
+  height: 100%;
+  transition: margin-left 0.7s; /* 부드러운 애니메이션을 위한 전환을 추가합니다. */
+  background-color: $modal-background;
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 999999999;
+  animation: slide-out-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.extended-bar-container {
+  flex-grow: 1;
+  width: $extended-bar-width;
   position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  margin-top: 1rem;
+  align-items: center;
+  animation: display-later 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.extended-bar-container-closed {
+  display: none;
 }
 
 .extended-bar-contents {
-  margin-top: 100px;
   width: $extended-bar-width - 80px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-bar-input {
-  height: 60px;
+  height: 3.5rem;
+  padding: 2rem 1rem;
   width: 400px;
   border: none;
   border-radius: 12px;
@@ -32,18 +60,18 @@ $extended-bar-width: 480px;
 
 .search-bar-bottom-contents {
   display: flex;
-  height: 100%;
-}
-
-.extended-bar-column-divide-line {
-  height: 100%;
+  flex-grow: 1;
+  align-items: flex-end;
+  padding-bottom: 5rem;
 }
 
 .extended-bar-side-menu-box {
-  margin-right: 20px;
-}
-
-.search-bar-filter-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 4rem;
+  height: 100%;
+  border-right: 3px solid $border-color;
 }
 
 .opacity-0 {
@@ -51,17 +79,13 @@ $extended-bar-width: 480px;
 }
 
 .extended-bar-icon-frame {
-  margin-top: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .extended-bar-icon {
-  width: 30px;
-  height: 30px;
-}
-
-.extended-bar-menu-box {
-  position: absolute;
-  bottom: 100px;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
 }
 
 .extended-bar-menu {
@@ -72,4 +96,47 @@ $extended-bar-width: 480px;
 
 .extended-bar-divide-line {
   width: 100%;
+}
+
+.extended-bar-main-contents-box {
+  height: 100%;
+  flex-grow: 1;
+  padding: 1rem 2rem;
+  border-top: 3px solid $border-color;
+}
+
+.search-bar-filter-box {
+  padding-top: 1.5rem;
+  width: 100%;
+  border-top: 3px solid $border-color;
+}
+
+@keyframes slide-in-left {
+  0% {
+    width: 320px;
+  }
+  100% {
+    width: 480px;
+  }
+}
+
+@keyframes slide-out-right {
+  0% {
+    width: 480px;
+  }
+  100% {
+    width: 320px;
+  }
+}
+
+@keyframes display-later {
+  0% {
+    display: none;
+  }
+  99% {
+    display: none;
+  }
+  100% {
+    display: flex;
+  }
 }

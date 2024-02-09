@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from '../../../apis/axios';
+import axios from '/src/apis/axios';
 
-export default function EditMyProfile({ profileData, changePage }) {
+export default function EditMyProfile({ profileData, changePage, setProfileupdate }) {
   const [editedProfile, setEditedProfile] = useState({ ...profileData });
 
   const handleChange = (e) => {
@@ -14,6 +14,7 @@ export default function EditMyProfile({ profileData, changePage }) {
 
     try {
       const response = await axios.put('/users', editedProfile);
+      setProfileupdate(1);
       console.log('내 정보 수정 성공');
       changePage(0);
     } catch (error) {
@@ -44,7 +45,7 @@ export default function EditMyProfile({ profileData, changePage }) {
           <div>
             <label>
               이메일
-              <input type="text" name="email" value={editedProfile.email} onChange={handleChange} />
+              <input type="text" name="email" value={editedProfile.email} disabled />
             </label>
           </div>
           <div>
@@ -68,7 +69,7 @@ export default function EditMyProfile({ profileData, changePage }) {
             <label>
               생일
               <input
-                type="text"
+                type="date"
                 name="birthday"
                 value={editedProfile.birthday}
                 onChange={handleChange}
@@ -91,7 +92,7 @@ export default function EditMyProfile({ profileData, changePage }) {
                 onChange={handleChange}
               >
                 <option value="VISIBLE">공개</option>
-                <option value="PRIVATE">비공개</option>
+                <option value="INVISIBLE">비공개</option>
               </select>
             </label>
           </div>
