@@ -58,3 +58,9 @@ export const getMyFollwings = async () => {
   if (!sessionStorage.token) return;
   const result = await axios.get('/me/followings');
 };
+
+export const logout = async () => {
+  // cosnt result = await axios.post('/users/logout');
+  if (sessionStorage['access_token']) sessionStorage.clear('access_token');
+  if (sessionStorage['profile']) sessionStorage.clear('profile');
+};
