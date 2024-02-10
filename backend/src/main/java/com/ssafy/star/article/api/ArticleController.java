@@ -2,24 +2,18 @@ package com.ssafy.star.article.api;
 
 
 import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.article.dto.request.ArticleConstellationSelect;
 import com.ssafy.star.article.dto.request.ArticleCreateRequest;
 import com.ssafy.star.article.dto.request.ArticleDeletionUndo;
 import com.ssafy.star.article.dto.request.ArticleModifyRequest;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
-import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.common.exception.ByeolDamException;
+import com.ssafy.star.common.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import com.ssafy.star.comment.application.CommentService;
-import com.ssafy.star.comment.dto.response.CommentResponse;
-import com.ssafy.star.user.domain.UserEntity;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -48,12 +40,20 @@ public class ArticleController {
     @PostMapping("/articles")
     public Response<Void> create(@RequestPart ArticleCreateRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
         log.info("request 정보 : {}", request);
-        if(imageFile != null){
-            articleService.create(request.title(), request.tag(), request.description(),
-                    request.disclosureType(), authentication.getName(), imageFile, request.imageType());
+        if (imageFile != null) {
+            articleService.create(
+                    request.title(),
+                    request.description(),
+                    request.disclosureType(),
+                    authentication.getName(),
+                    imageFile,
+                    request.imageType(),
+                    request.articleHashtagSet()
+            );
+            return Response.success();
+        } else {
+            throw new ByeolDamException(ErrorCode.ARTICLE_IMAGE_EMPTY, "article imagefile is empty");
         }
-
-        return Response.success();
     }
 
     @Operation(
@@ -64,10 +64,10 @@ public class ArticleController {
             }
     )
     @PutMapping("/articles/{articleId}")
-    public Response<ArticleResponse> modify(@PathVariable Long articleId, @RequestBody ArticleModifyRequest request, Authentication authentication) {
-        Article article = articleService.modify(articleId, request.title(), request.tag(), request.description(),
-                request.disclosureType(), authentication.getName());
-        return Response.success(ArticleResponse.fromArticle(article));
+    public Response<Void> modify(@PathVariable Long articleId, @RequestBody ArticleModifyRequest request, Authentication authentication) {
+        articleService.modify(articleId, request.title(), request.description(),
+                request.disclosureType(), authentication.getName(), request.articleHashtagSet());
+        return Response.success();
     }
 
     @Operation(
@@ -93,7 +93,7 @@ public class ArticleController {
     @GetMapping("/articles/follow")
     public Response<Page<ArticleResponse>> followFeed(Authentication authentication, Pageable pageable) {
         String email = authentication.getName();
-        return Response.success(articleService.followFeed(email,pageable).map(ArticleResponse::fromArticle));
+        return Response.success(articleService.followFeed(email, pageable).map(ArticleResponse::fromArticle));
     }
 
 
@@ -112,9 +112,9 @@ public class ArticleController {
 
     @Operation(
             summary = "유저의 게시물 전체 조회",
-            description = "유저의 게시물 전체 조회입니다. 유저가 접속자일 경우 전체 조회, "+
-                          "접속자가 유저를 팔로우 중일 경우 전체 조회, "+
-                          "그 외 discloseType이 VISIBLE인 게시물만 반환",
+            description = "유저의 게시물 전체 조회입니다. 유저가 접속자일 경우 전체 조회, " +
+                    "접속자가 유저를 팔로우 중일 경우 전체 조회, " +
+                    "그 외 discloseType이 VISIBLE인 게시물만 반환",
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
@@ -184,7 +184,7 @@ public class ArticleController {
     )
     @PutMapping("/articles/trashcan/undo")
     public Response<ArticleResponse> undoDeletion(@RequestBody ArticleDeletionUndo articleDeletionUndo, Authentication authentication) {
-        return Response.success(ArticleResponse.fromArticle(articleService.undoDeletion(articleDeletionUndo.articleId(),authentication.getName())));
+        return Response.success(ArticleResponse.fromArticle(articleService.undoDeletion(articleDeletionUndo.articleId(), authentication.getName())));
     }
 
 }

@@ -11,12 +11,10 @@ import com.ssafy.star.global.email.application.EmailService;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.global.oauth.util.CookieUtils;
 import com.ssafy.star.global.oauth.util.HeaderUtils;
-import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
 import com.ssafy.star.user.dto.User;
-import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserCacheRepository;
 import com.ssafy.star.user.repository.UserRefreshTokenRepository;
 import com.ssafy.star.user.repository.UserRepository;
@@ -35,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -49,7 +46,6 @@ public class UserService {
     private final UserCacheRepository userCacheRepository;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final EmailCacheRepository emailCacheRepository;
-    private final FollowRepository followRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
     private final AuthTokenProvider tokenProvider;
@@ -59,8 +55,6 @@ public class UserService {
     private Long mailExpiredMs;
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
-
-    //TODO : 로그인 시 응답 -> 유저 리스폰스 + 토큰 값
 
     public Optional<User> loadUserByEmail(String email) {
         return Optional.ofNullable(userCacheRepository.getUser(email)
@@ -108,29 +102,28 @@ public class UserService {
         return !userRepository.existsByNickname(nickname);
     }
 
-    // 로그인
+    /**
+     * 로그인
+     * 1. JWT 토큰 생성
+     * 2. 리프레시 토큰 생성
+     * 3. 유저 - 리프레시 토큰이 있는지 확인
+     * 4. 없으면 새로 등록
+     * 5. 있으면 DB에 업데이트
+     * 6. 기존 쿠키 삭제하고 새로 추가
+     * 7. JWT 토큰 리턴
+     */
     public String login(HttpServletRequest request, HttpServletResponse response, String email, String password) {
         // 회원가입 여부 체크
         User user = loadUserByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email))
         );
         userCacheRepository.setUser(user);
-
         // 비밀번호 체크
         if (!encoder.matches(password, user.password())) {
             throw new ByeolDamException(ErrorCode.INVALID_PASSWORD);
         }
 
-        /**
-         * 1. JWT 토큰 생성
-         * 2. 리프레시 토큰 생성
-         * 3. 유저 - 리프레시 토큰이 있는지 확인
-         * 4. 없으면 새로 등록
-         * 5. 있으면 DB에 업데이트
-         * 6. 기존 쿠키 삭제하고 새로 추가
-         * 7. JWT 토큰 리턴
-         */
-        AuthToken accessToken = tokenProvider.createAuthToken(email, user.nickname(), user.roleType().getCode(), appProperties.getAuth().getTokenExpiry());
+        AuthToken accessToken = tokenProvider.createAuthToken(email, user.roleType().getCode(), appProperties.getAuth().getTokenExpiry());
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = tokenProvider.createAuthToken(appProperties.getAuth().getTokenSecret(), refreshTokenExpiry);
 
@@ -146,13 +139,22 @@ public class UserService {
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtils.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
-        // 토큰 생성 후 리턴
         return accessToken.getToken();
     }
 
-    // 리프레시 토큰
+    public void logout(HttpServletRequest request, HttpServletResponse response, String email) {
+        //레디스에서 삭제
+        userCacheRepository.deleteUser(email);
+        // 리프레시 토큰 정보 삭제
+        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(email);
+        userRefreshTokenRepository.delete(userRefreshToken);
+
+        // 헤더 토큰 삭제
+        CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
+    }
 
     /**
+     * 리프레시 토큰
      * 1. 액세스 토큰 기존 헤더에서 가져오기
      * 2. 액세스 토큰 (String)-> (Token)으로 변환
      * 3. 유효한 토큰인지 검증
@@ -167,7 +169,6 @@ public class UserService {
      * 12. DB에 업데이트
      * 13. 액세스 토큰 리턴
      */
-
     public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
         // 1. 헤더로 부터 액세스 토큰 가져오기
         String accessToken = HeaderUtils.getAccessToken(request);
@@ -179,14 +180,12 @@ public class UserService {
         }
 
         // 2-2. 토큰이 유효하지 않다면 리프레시 토큰이 있는지 확인하자
-
         Claims claims = authToken.getExpiredClaims();  // 만료되었을 경우 만료 토큰을 가져옴.
         if (claims == null) {
             return accessToken;  // 아직 만료 안됨
         }
 
         String email = claims.get("email", String.class);
-        String nickname = claims.get("nickname", String.class);
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
         //refresh token
@@ -206,7 +205,7 @@ public class UserService {
         }
 
         Date now = new Date();
-        AuthToken newAccessToken = tokenProvider.createAuthToken(email, nickname, roleType.getCode(), appProperties.getAuth().getTokenExpiry());
+        AuthToken newAccessToken = tokenProvider.createAuthToken(email, roleType.getCode(), appProperties.getAuth().getTokenExpiry());
 
         long validTime = authRefreshToken.extractClaims().getExpiration().getTime() - now.getTime();
 
@@ -258,7 +257,7 @@ public class UserService {
 
     //회원정보 수정
     @Transactional
-    public void updateMyProfile(
+    public User updateMyProfile(
             String email,
             String password,
             String name,
@@ -270,7 +269,8 @@ public class UserService {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         //닉네임 중복체크
-        if (satisfyNickname(nickname)) {
+        if (!userEntity.getNickname().equals(nickname)) {
+            satisfyNickname(nickname);
             userEntity.setNickname(nickname);
         }
         if (password != null) {
@@ -287,8 +287,9 @@ public class UserService {
         }
         //null이어도 되는 필드
         userEntity.setMemo(memo);
-
+        userCacheRepository.updateUser(User.fromEntity(userEntity));
         userRepository.saveAndFlush(userEntity);
+        return User.fromEntity(userEntity);
     }
 
     //회원 탈퇴
@@ -316,6 +317,7 @@ public class UserService {
 
     private boolean satisfyNickname(String nickname) {
         validateNicknamePattern(nickname);
+
         userRepository.findByNickname(nickname).ifPresent(it -> {
                     throw new ByeolDamException(ErrorCode.DUPLICATED_USER_NICKNAME, String.format("%s is duplcated", nickname));
                 }

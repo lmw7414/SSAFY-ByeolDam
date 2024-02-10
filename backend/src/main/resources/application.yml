@@ -1,3 +1,7 @@
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: -1
+
 spring:
   profiles:
     active: local #default
@@ -6,7 +10,6 @@ spring:
         - common
       prod:
         - common
-
 
 ---
 spring:
@@ -94,6 +97,8 @@ app:
   oauth2:
     authorizedRedirectUris:
       - http://localhost:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173
 
 ---
 spring:

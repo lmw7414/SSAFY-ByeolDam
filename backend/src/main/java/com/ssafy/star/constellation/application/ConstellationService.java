@@ -47,15 +47,16 @@ public class ConstellationService {
     private static final int THUMB_HEIGHT = 256;
 
     // 별자리 전체 조회
-    public Page<Constellation> list(String myEmail, Pageable pageable) {
+    public List<Constellation> list(String myEmail, Pageable pageable) {
 
         // 사용자 Entity
         UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
 
-        Page<ConstellationUserEntity> constellationUserEntityPage = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable);
+        List<ConstellationUserEntity> constellationUserEntityPage
+                = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable).stream().toList();
 
         // TODO : 공개되어 있는 별자리거나 내 별자리인 경우
-        return constellationUserEntityPage.map(ConstellationUser::getConstellationEntity).map(Constellation::fromEntity);
+        return constellationUserEntityPage.stream().map(ConstellationUser::getConstellationEntity).map(Constellation::fromEntity).toList();
     }
 
     // 유저 별자리 전체 조회
@@ -137,7 +138,7 @@ public class ConstellationService {
         );
 
         // ConstellationUserEntity 생성 및 연결
-        ConstellationUserEntity constellationUserEntity = new ConstellationUserEntity(
+        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(
                 constellationEntity,
                 userEntity,
                 ConstellationUserRole.ADMIN
@@ -243,7 +244,7 @@ public class ConstellationService {
         }
 
         // 별자리에 공유할 유저 추가, 권한은 유저로
-        ConstellationUserEntity constellationUserEntity = new ConstellationUserEntity(constellationEntity, userEntity, USER);
+        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(constellationEntity, userEntity, USER);
         constellationEntity.addUser(constellationUserEntity);
 
         constellationUserRepository.saveAndFlush(constellationUserEntity);

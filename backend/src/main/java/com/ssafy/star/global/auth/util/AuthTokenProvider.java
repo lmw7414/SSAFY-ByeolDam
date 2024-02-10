@@ -25,8 +25,8 @@ public class AuthTokenProvider {
     }
 
     // 액세스 토큰
-    public AuthToken createAuthToken(String id, String nickname, String role, long expiry) {
-        return new AuthToken(id, nickname, role, key, expiry);
+    public AuthToken createAuthToken(String id, String role, long expiry) {
+        return new AuthToken(id, role, key, expiry);
     }
 
     public AuthToken convertAuthToken(String token) {
@@ -42,7 +42,7 @@ public class AuthTokenProvider {
                             })
                             .map(SimpleGrantedAuthority::new)
                             .toList();
-            BoardPrincipal principal = BoardPrincipal.of(authToken.getUserEmail(), authToken.getUserNickname(), null, authorities);
+            BoardPrincipal principal = BoardPrincipal.of(authToken.getUserEmail(), null, authorities);
             return new UsernamePasswordAuthenticationToken(principal, authToken, authorities);
         } else {
             throw new TokenValidFailedException();

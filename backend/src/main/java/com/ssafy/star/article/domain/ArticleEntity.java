@@ -1,36 +1,30 @@
 package com.ssafy.star.article.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.comment.domain.CommentEntity;
-
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-
+import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.UserEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "article")
 @Getter
-@Setter
+@NoArgsConstructor
 @SQLDelete(sql = "UPDATE `article` SET deleted_at = NOW() where id=?")
 //@Where(clause = "deleted_at is NULL")
 public class ArticleEntity {
 
+    // TODO : Article 인덱싱 ownerEntity 기준으로
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +33,9 @@ public class ArticleEntity {
     @Column(name = "title", nullable = false, length = 105)
     private String title;
 
-    @Column(name = "tag", length = 255)
-    private String tag;
-
-    // TODO : Image
+    @ToString.Exclude
+    @OneToMany(mappedBy = "articleEntity", cascade = CascadeType.ALL)
+    private Set<ArticleHashtagRelationEntity> articleHashtagRelationEntities = new HashSet<>();
 
     @Column(name = "hits", nullable = false)
     private long hits;
@@ -77,11 +70,9 @@ public class ArticleEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    //Image(사진) Table의 FK
-    //1:1관계
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "Image")
-//    private ImageEntity imageEntity;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image")
+    private ImageEntity imageEntity;
 
     @PrePersist
     void createdAt() {
@@ -98,26 +89,48 @@ public class ArticleEntity {
         this.deletedAt = null;
     }
 
-    protected ArticleEntity() {}
+    public void addHits() { this.hits++; }
+
+    public void selectConstellation(ConstellationEntity constellationEntity) { this.constellationEntity = constellationEntity; }
+
+    public void update(String title, String description, DisclosureType disclosure) {
+        this.title = title;
+        this.description = description;
+        this.disclosure = disclosure;
+    }
 
     private ArticleEntity(
             String title,
-            String tag,
             String description,
             DisclosureType disclosure,
             UserEntity ownerEntity,
-            ConstellationEntity constellationEntity
+            ConstellationEntity constellationEntity,
+            ImageEntity imageEntity
     ) {
         this.title = title;
-        this.tag = tag;
         this.description = description;
         this.disclosure = disclosure;
         this.ownerEntity = ownerEntity;
         this.constellationEntity = constellationEntity;
+        this.imageEntity = imageEntity;
     }
 
-    public static ArticleEntity of(String title, String tag, String description, DisclosureType disclosure, UserEntity ownerEntity, ConstellationEntity constellationEntity){
-        ArticleEntity entity = new ArticleEntity(title, tag, description, disclosure,ownerEntity,constellationEntity);
+    public static ArticleEntity of(
+            String title,
+            String description,
+            DisclosureType disclosure,
+            UserEntity ownerEntity,
+            ConstellationEntity constellationEntity,
+            ImageEntity imageEntity
+    ){
+        ArticleEntity entity = new ArticleEntity(
+                title,
+                description,
+                disclosure,
+                ownerEntity,
+                constellationEntity,
+                imageEntity
+        );
         return entity;
     }
 

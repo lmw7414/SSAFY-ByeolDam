@@ -1,21 +1,22 @@
 package com.ssafy.star.article.application;
 
 import com.ssafy.star.article.DisclosureType;
+import com.ssafy.star.article.dao.ArticleHashtagRelationRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
-import com.ssafy.star.user.domain.ApprovalStatus;
+import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
-import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,11 +38,13 @@ import java.util.stream.Collectors;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final ArticleHashtagRelationRepository articleHashtagRelationRepository;
     private final ConstellationRepository constellationRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final S3uploader s3uploader;
     private final ImageService imageService;
+    private final ArticleHashtagRelationService articleHashtagRelationService;
 
     private static final int TARGET_HEIGHT = 1024;
 
@@ -55,25 +57,39 @@ public class ArticleService {
      * 게시물 등록
       */
     @Transactional
-    public void create(String title, String tag, String description, DisclosureType disclosureType,
-                       String email, MultipartFile imageFile, ImageType imageType) {
-
+    public void create(
+            String title,
+            String description,
+            DisclosureType disclosureType,
+            String email,
+            MultipartFile imageFile,
+            ImageType imageType,
+            Set<String> articleHashtagSet
+    ) {
         String url = "";
         String thumbnailUrl = "";
         UserEntity userEntity = getUserEntityOrException(email);
-        log.info("userEntity 정보 : {}", userEntity);
 
         try{
 
             url = s3uploader.upload(imageFile, "articles", TARGET_HEIGHT);
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
-            System.out.println("imageFile 이름 : "+imageFile.getOriginalFilename());
+            ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);
 
-            articleRepository.save(ArticleEntity.of(title, tag, description, disclosureType, userEntity, null));
-            imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl,imageType);
-            System.out.println("url: "+url);
-            System.out.println("thumbUrl: "+thumbnailUrl);
-        } catch (IOException e){
+            ArticleEntity articleEntity = ArticleEntity.of(title,
+                    description,
+                    disclosureType,
+                    userEntity,
+                    null,
+                    imageEntity
+            );
+
+            articleRepository.save(articleEntity);
+
+            articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
+            // TODO :articleHashtagRepository에서 String이 같은 것이 있다면 추가 X, 없다면 추가 O
+            // => 해시태그 tagName 속성은 unique
+        } catch (IOException e) {
             s3uploader.deleteImageFromS3(url);
             s3uploader.deleteImageFromS3(thumbnailUrl);
         }
@@ -83,22 +99,21 @@ public class ArticleService {
      * 게시물 수정
      */
     @Transactional
-    public Article modify(
+    public void modify(
             Long articleId,
             String title,
-            String tag,
             String description,
             DisclosureType disclosure,
-            String email
+            String email,
+            Set<String> articleHashtagSet
     ) {
         // 게시물 owner가 맞는지 확인
         ArticleEntity articleEntity = getArticleOwnerOrException(articleId, email);
 
-        articleEntity.setTitle(title);
-        articleEntity.setTag(tag);
-        articleEntity.setDescription(description);
-        articleEntity.setDisclosure(disclosure);
-        return Article.fromEntity(articleRepository.saveAndFlush(articleEntity));
+        articleHashtagRelationService.deleteByArticleEntity(articleEntity);
+        articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
+
+        articleEntity.update(title, description, disclosure);
     }
 
     /**
@@ -108,7 +123,14 @@ public class ArticleService {
     public void delete(Long articleId, String email) {
         // 게시물 owner가 맞는지 확인
         ArticleEntity articleEntity = getArticleOwnerOrException(articleId, email);
-        articleRepository.delete(articleEntity);
+        if(articleEntity.getDeletedAt() != null) {
+            throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %s has already deleted", articleId));
+        } else {
+            System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
+            articleRepository.delete(articleEntity);
+            articleHashtagRelationService.deleteByArticleEntity(articleEntity);
+        }
+
     }
 
     /**
@@ -133,7 +155,9 @@ public class ArticleService {
         }
 
         if(articleEntity.getDeletedAt() != null) {
+            System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
             articleEntity.undoDeletion();
+            articleHashtagRelationRepository.findAllByArticleEntity(articleEntity).forEach(ArticleHashtagRelationEntity::undoDeletion);
         } else {
             throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is not abandoned", "articleId:" + Long.toString(articleId)));
         }
@@ -220,7 +244,7 @@ public class ArticleService {
 
         // articleId AND deletedAt == null AND (내 게시물이거나 VISIBLE)
         if(articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
-            articleEntity.setHits(articleEntity.getHits() + 1);
+            articleEntity.addHits();
 
             return Article.fromEntity(articleRepository.save(articleEntity));
         } else {
@@ -248,7 +272,8 @@ public class ArticleService {
         } else if (articleEntity.getConstellationEntity().equals(constellationEntity)) {
             throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is already constellation %s", "articleId:" + Long.toString(articleId), "constellationId:" + Long.toString(constellationId)));
         }
-        articleEntity.setConstellationEntity(constellationEntity);
+
+        articleEntity.selectConstellation(constellationEntity);
     }
 
     /**

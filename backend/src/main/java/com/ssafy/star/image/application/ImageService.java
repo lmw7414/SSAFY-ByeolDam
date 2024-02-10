@@ -17,8 +17,8 @@ public class ImageService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public void saveImage(String name, String url, String thumbnailUrl, ImageType imageType){
-        imageRepository.save(ImageEntity.of(name, url, thumbnailUrl, imageType));
+    public ImageEntity saveImage(String name, String url, String thumbnailUrl, ImageType imageType){
+        return imageRepository.save(ImageEntity.of(name, url, thumbnailUrl, imageType));
     }
 
     @Transactional
