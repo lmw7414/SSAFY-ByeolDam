@@ -10,8 +10,7 @@ import ModalContainer from './components/modal/ModalContainer';
 import { ModalContext } from './hooks/useModal';
 import { useEffect, useState } from 'react';
 import ConstellationWriting from './pages/constellation/ConstellationWriting';
-import LoginTest from './pages/member/LoginTest';
-import SignupTest from './pages/member/SignupTest';
+import SignUp from './pages/member/SignUp';
 import SocialLogin from './pages/member/SocialLogin';
 
 export default function App() {
@@ -20,8 +19,8 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Member />} />
-          <Route path="/login" element={<LoginTest />} />
-          <Route path="/signup" element={<SignupTest />} />
+          <Route path="/login" element={<Member />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/login/oauth2/code/:providerId" element={<SocialLogin />} />
           <Route path="/*" element={<NavApp />} />
         </Routes>
