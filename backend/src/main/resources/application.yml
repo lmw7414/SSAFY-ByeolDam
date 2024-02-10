@@ -1,3 +1,7 @@
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: -1
+
 spring:
   profiles:
     active: local #default
@@ -6,7 +10,6 @@ spring:
         - common
       prod:
         - common
-
 
 ---
 spring:

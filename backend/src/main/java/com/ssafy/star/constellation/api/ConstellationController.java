@@ -1,6 +1,5 @@
 package com.ssafy.star.constellation.api;
 
-import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dto.Constellation;
@@ -36,7 +35,7 @@ public class ConstellationController {
             summary = "별자리 생성",
             description = "별자리 생성입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @PostMapping("/constellations")
@@ -58,7 +57,7 @@ public class ConstellationController {
             summary = "별자리 수정",
             description = "별자리 수정입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @PutMapping("/constellations/{constellationId}")
@@ -78,7 +77,7 @@ public class ConstellationController {
             summary = "별자리 삭제",
             description = "별자리 삭제입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @DeleteMapping("/constellations/{constellationId}")
@@ -91,7 +90,7 @@ public class ConstellationController {
             summary = "별자리 전체 조회",
             description = "별자리 전체 조회입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @GetMapping("/constellations")
@@ -103,7 +102,7 @@ public class ConstellationController {
             summary = "유저의 별자리 전체 조회",
             description = "유저의 별자리 전체 조회입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @GetMapping("/constellations/user/{email}")
@@ -115,7 +114,7 @@ public class ConstellationController {
             summary = "별자리 상세 조회",
             description = "별자리 상세 조회입니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @GetMapping("/constellations/{constellationId}")
@@ -128,7 +127,7 @@ public class ConstellationController {
             summary = "공유 별자리에 유저 추가",
             description = "공유 별자리에 유저를 추가합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "추가 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "추가 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @PostMapping("/add-user/constellations/{constellationId}")
@@ -142,7 +141,7 @@ public class ConstellationController {
             summary = "공유 별자리의 유저 삭제",
             description = "공유 별자리의 유저를 삭제합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @DeleteMapping("/delete-user/constellations/{constellationId}")
@@ -156,7 +155,7 @@ public class ConstellationController {
             summary = "공유 별자리의 유저 조회",
             description = "공유 별자리의 유저를 조회합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @GetMapping("/users/constellations/{constellationId}")
@@ -168,7 +167,7 @@ public class ConstellationController {
             summary = "공유 별자리의 관리자 변경",
             description = "공유 별자리의 관리자를 변경합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @PutMapping("/role-modify/constellations/{constellationId}")
