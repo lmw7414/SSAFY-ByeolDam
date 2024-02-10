@@ -3,11 +3,15 @@ package com.ssafy.star.comment.application;
 
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
-import com.ssafy.star.comment.repository.CommentRepository;
 import com.ssafy.star.comment.domain.CommentEntity;
 import com.ssafy.star.comment.dto.CommentDto;
+import com.ssafy.star.comment.repository.CommentRepository;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.notification.dto.NotificationArgs;
+import com.ssafy.star.notification.dto.NotificationEvent;
+import com.ssafy.star.notification.dto.NotificationType;
+import com.ssafy.star.notification.producer.NotificationProducer;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class CommentService {
     private final ArticleRepository articleRepositoty;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationProducer notificationProducer;
 
     // 댓글 조회
     @Transactional(readOnly = true)
@@ -41,14 +46,34 @@ public class CommentService {
         UserEntity userEntity = getUserEntityOrException(email);
         // 대댓글인 경우, 부모댓글이 존재하는지 확인
         if (parentId != null) {
+            CommentEntity parentCommentEntity = getCommentEntityOrException(parentId);
+            if (parentCommentEntity.getParentId() != null) {
+                throw new ByeolDamException(ErrorCode.REPLY_TO_REPLY);
+            }
             getCommentEntityOrException(parentId);
         }
+
         // 내용이 빈 문자열인지 확인
         if (content.isBlank()) {
             throw new ByeolDamException(ErrorCode.INVALID_CONTENT);
         }
 
-        return CommentDto.from(commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentId)));
+        // 댓글 생성
+        CommentEntity commentEntity = commentRepository.save(CommentEntity.of(userEntity, articleEntity, content, parentId));
+
+        if (parentId != null) {
+            // 대댓글 알림 - 댓글 작성자와 대댓글 작성자가 다른 경우 알람 보내기
+            CommentEntity parentCommentEntity = getCommentEntityOrException(parentId);
+            if (!parentCommentEntity.getUserEntity().equals(userEntity)) {
+                notificationProducer.send(new NotificationEvent(NotificationType.NEW_COMMENT_ON_COMMENT, new NotificationArgs(userEntity.getId(), parentId), parentCommentEntity.getUserEntity().getId()));
+            }
+        } else {
+            // 댓글 알림 - 게시글 작성자와 댓글 작성자가 다른 경우 알람 보내기
+            if (!articleEntity.getUser().equals(userEntity)) {
+                notificationProducer.send(new NotificationEvent(NotificationType.NEW_COMMENT_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getUser().getId()));
+            }
+        }
+        return CommentDto.from(commentEntity);
     }
 
     // 댓글 수정

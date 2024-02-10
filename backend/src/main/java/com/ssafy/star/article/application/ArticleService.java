@@ -6,8 +6,12 @@ import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
-import com.ssafy.star.like.repository.ArticleLikeRepository;
 import com.ssafy.star.like.domain.ArticleLikeEntity;
+import com.ssafy.star.like.repository.ArticleLikeRepository;
+import com.ssafy.star.notification.dto.NotificationArgs;
+import com.ssafy.star.notification.dto.NotificationEvent;
+import com.ssafy.star.notification.dto.NotificationType;
+import com.ssafy.star.notification.producer.NotificationProducer;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
@@ -28,6 +32,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ArticleLikeRepository articleLikeRepository;
+    private final NotificationProducer notificationProducer;
 
     // 게시물 등록
     @Transactional
@@ -103,8 +108,13 @@ public class ArticleService {
         // 좋아요 상태인지 확인
         articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
                 articleLikeRepository::delete,
-                () -> articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity))
-        );
+                () -> {
+                    articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity));
+                    // 자신의 게시물이 아닌경우, 좋아요 알람보내기
+                    if (!articleEntity.getUser().equals(userEntity)) {
+                        notificationProducer.send(new NotificationEvent(NotificationType.NEW_LIKE_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getUser().getId()));
+                    }
+                });
     }
 
     //게시물 좋아요 상태 확인

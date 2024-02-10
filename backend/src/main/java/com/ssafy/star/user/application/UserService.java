@@ -5,8 +5,10 @@ import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.global.auth.util.JwtTokenUtils;
-import com.ssafy.star.like.repository.ArticleLikeRepository;
 import com.ssafy.star.like.domain.ArticleLikeEntity;
+import com.ssafy.star.like.repository.ArticleLikeRepository;
+import com.ssafy.star.notification.dto.NotificationDto;
+import com.ssafy.star.notification.repository.NotificationRepository;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
@@ -27,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ArticleLikeRepository articleLikeRepository;
     private final BCryptPasswordEncoder encoder;
+    private final NotificationRepository notificationRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -144,5 +147,12 @@ public class UserService {
         return articleLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
                 .map(ArticleLikeEntity::getArticleEntity)
                 .map(Article::fromEntity);
+    }
+
+    // 알람목록 확인
+    @Transactional
+    public Page<NotificationDto> notificationList(String email, Pageable pageable) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+        return notificationRepository.findAllByUserEntity(userEntity, pageable).map(NotificationDto::fromEntity);
     }
 }

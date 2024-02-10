@@ -16,9 +16,11 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not founded"),
+    REPLY_TO_REPLY(HttpStatus.BAD_REQUEST, "unable to reply to parent comments"),
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "Content type is invalid"),
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "Follow status not founded in follow list"),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Request is invalid"),
+    NOTIFICATION_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connect to notification occurs error"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error");
 
 

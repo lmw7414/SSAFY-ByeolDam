@@ -99,7 +99,7 @@ public class ArticleController {
 
     @Operation(
             summary = "게시물 좋아요 요청",
-            description = "게시물 좋아요를 요청합니다."
+            description = "게시물 좋아요를 요청하고 게시물 작성자에게 알람을 보냅니다."
     )
     @PostMapping("/{articleId}/likes")
     public Response<Void> like(Authentication authentication, @PathVariable Long articleId) {
@@ -137,4 +137,6 @@ public class ArticleController {
     public Response<List<UserResponse>> likeList(@PathVariable Long articleId) {
         return Response.success(articleService.likeList(articleId).stream().map(UserResponse::fromUser).toList());
     }
+
+
 }

@@ -2,6 +2,8 @@ package com.ssafy.star.user.api;
 
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.response.Response;
+import com.ssafy.star.notification.application.NotificationService;
+import com.ssafy.star.notification.dto.response.NotificationResponse;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class UserController {
 
     private final UserService userService;
     private final FollowService followService;
+    private final NotificationService notificationService;
 
     @Operation(
             summary = "회원가입",
@@ -246,5 +250,26 @@ public class UserController {
     @GetMapping("/me/like-articles")
     public Response<Page<ArticleResponse>> likeArticleList(Authentication authentication, Pageable pageable) {
         return Response.success(userService.likeArticleList(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    }
+
+    @Operation(
+            summary = "나의 알림 리스트를 확인한다.",
+            description = "나의 알림 리스트를 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "나의 알림 리스트를 반환", content = @Content(schema = @Schema(implementation = NotificationResponse.class)))
+            }
+    )
+    @GetMapping("/notification")
+    public Response<Page<NotificationResponse>> notification(Authentication authentication, Pageable pageable) {
+        return Response.success(userService.notificationList(authentication.getName(), pageable).map(NotificationResponse::fromNotificationDto));
+    }
+
+    @Operation(
+            summary = "SseEmitter를 생성 및 연결",
+            description = "사용자의 실시간 알림을 위해 SseEmitter를 생성하고 연결합니다"
+    )
+    @GetMapping(value = "/notification/subscribe")
+    public SseEmitter subscribe(Authentication authentication) {
+        return notificationService.connectNotification(authentication.getName());
     }
 }

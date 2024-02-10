@@ -74,9 +74,7 @@ public class ArticleEntity {
     private UserEntity user;
 
     @PrePersist
-    void createdAt() {
-        this.createdAt = LocalDateTime.from(LocalDateTime.now());
-    }
+    void createdAt() { this.createdAt = LocalDateTime.from(LocalDateTime.now()); }
 
     @PreUpdate
     void modifiedAt() {
