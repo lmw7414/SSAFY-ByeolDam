@@ -65,13 +65,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionManager ->
                         exceptionManager.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 )
-                .addFilterBefore(authenticationConfig.tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout(config -> config
-                        .logoutUrl("/logout")
-                        .addLogoutHandler(authenticationConfig.logoutSuccessHandler())
-                        .deleteCookies("refresh_token")
-                );
-
+                .addFilterBefore(authenticationConfig.tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

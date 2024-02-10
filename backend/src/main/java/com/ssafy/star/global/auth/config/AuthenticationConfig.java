@@ -98,14 +98,6 @@ public class AuthenticationConfig {
 
     }
 
-    /**
-     * 로그아웃 성공 핸들러
-     */
-    @Bean
-    public CustomLogoutHandler logoutSuccessHandler() {
-        return new CustomLogoutHandler(userCacheRepository, userRefreshTokenRepository);
-    }
-
     @Bean
     public UserDetailsService userDetailsService(UserService userService) {
         return email -> userService
