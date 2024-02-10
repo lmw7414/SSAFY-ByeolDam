@@ -22,7 +22,7 @@ export const login = async ({ email, password }) => {
   );
 };
 
-export const join = async ({ email, password, name, nickname }) => {
+export const signup = async ({ email, password, name, nickname }) => {
   const result = await axios.post('/users/join', {
     email,
     password,
@@ -44,8 +44,17 @@ export const checkEmail = async (email) => {
   return result;
 };
 
+export const verificateEmail = async (email) => {
+  const result = await axios.post('/email/verification-request', { email });
+  return result;
+};
+
+export const verificateCode = async ({ email, code }) => {
+  const result = await axios.get(`/email/verification?email=${email}&code=${code}`);
+  return result;
+};
+
 export const getMyFollwings = async () => {
   if (!sessionStorage.token) return;
   const result = await axios.get('/me/followings');
-  console.log(result);
 };

@@ -75,6 +75,15 @@
   background-color: $text-primary;
 }
 
+.member-input-label {
+  margin-top: 0.5rem;
+  color: white;
+}
+
+.member-duplicated {
+  color: red;
+}
+
 .member-separator-box {
   height: 2rem;
   width: 100%;
@@ -102,4 +111,70 @@
   font-size: 12px;
   color: $text-primary;
   cursor: pointer;
+}
+
+.member-input-email-box {
+  display: flex;
+  width: 100%;
+  height: 2.5rem;
+  margin: 0.3rem 0;
+
+  .member-input {
+    margin: 0;
+    border-radius: 6px 0 0 6px;
+    flex-grow: 1;
+  }
+
+  button {
+    padding: 0 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 0 6px 6px 0;
+    border: none;
+    cursor: pointer;
+    background-color: $secondary;
+    color: white;
+  }
+}
+
+.member-input-validation-container {
+  margin-top: 0.5rem;
+}
+
+.member-input-validation-box {
+  display: flex;
+  width: 100%;
+  margin: 0.3rem 0;
+
+  .member-input-validation-wrapper {
+    position: relative;
+    flex-grow: 1;
+
+    div {
+      position: absolute;
+      top: 0;
+      right: 0.5rem;
+      line-height: 2.5rem;
+      color: red;
+    }
+  }
+
+  .member-input {
+    border-radius: 6px 0 0 6px;
+    margin: 0;
+    width: 100%;
+  }
+
+  button {
+    padding: 0 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 0 6px 6px 0;
+    border: none;
+    cursor: pointer;
+    background-color: $secondary;
+    color: white;
+  }
+}
+
+.member-validation-end {
+  color: green;
 }
