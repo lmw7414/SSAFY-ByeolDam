@@ -15,7 +15,6 @@ import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
 import com.ssafy.star.user.dto.User;
-import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserCacheRepository;
 import com.ssafy.star.user.repository.UserRefreshTokenRepository;
 import com.ssafy.star.user.repository.UserRepository;
@@ -34,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -57,8 +55,6 @@ public class UserService {
     private Long mailExpiredMs;
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
-
-    //TODO : 로그인 시 응답 -> 유저 리스폰스 + 토큰 값
 
     public Optional<User> loadUserByEmail(String email) {
         return Optional.ofNullable(userCacheRepository.getUser(email)
@@ -106,7 +102,8 @@ public class UserService {
         return !userRepository.existsByNickname(nickname);
     }
 
-    /** 로그인
+    /**
+     * 로그인
      * 1. JWT 토큰 생성
      * 2. 리프레시 토큰 생성
      * 3. 유저 - 리프레시 토큰이 있는지 확인
@@ -144,6 +141,7 @@ public class UserService {
 
         return accessToken.getToken();
     }
+
     public void logout(HttpServletRequest request, HttpServletResponse response, String email) {
         //레디스에서 삭제
         userCacheRepository.deleteUser(email);
@@ -155,7 +153,8 @@ public class UserService {
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
     }
 
-    /** 리프레시 토큰
+    /**
+     * 리프레시 토큰
      * 1. 액세스 토큰 기존 헤더에서 가져오기
      * 2. 액세스 토큰 (String)-> (Token)으로 변환
      * 3. 유효한 토큰인지 검증
@@ -270,7 +269,7 @@ public class UserService {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         //닉네임 중복체크
-        if(!userEntity.getNickname().equals(nickname)) {
+        if (!userEntity.getNickname().equals(nickname)) {
             satisfyNickname(nickname);
             userEntity.setNickname(nickname);
         }
