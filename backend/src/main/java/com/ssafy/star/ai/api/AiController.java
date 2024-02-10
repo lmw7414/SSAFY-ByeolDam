@@ -38,7 +38,7 @@ public class AiController {
         System.out.println("fileName : " + fileName);
 
         // Django 서버 URL
-        String djangoUrl = "http://127.0.0.1:8000/ByeolDamAI/getImage/";
+        String djangoUrl = "http://125.241.47.137:8000/ByeolDamAI/getImage/";
 
         // HTTP 요청을 위한 헤더 설정
         HttpHeaders headers = new HttpHeaders();

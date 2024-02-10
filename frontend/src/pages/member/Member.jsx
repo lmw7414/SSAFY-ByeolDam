@@ -57,7 +57,14 @@ export default function Member() {
           />
           <button className="member-button">로그인</button>
         </form>
-        <div className="member-singup-button">계정이 없으신가요?</div>
+        <div
+          className="member-singup-button"
+          onClick={() => {
+            navigate('/signup');
+          }}
+        >
+          계정이 없으신가요?
+        </div>
         <div className="member-socials-box">
           <div className="member-separator-box">
             <div className="member-separator" />
