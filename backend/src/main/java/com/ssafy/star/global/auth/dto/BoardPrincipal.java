@@ -17,35 +17,32 @@ import java.util.Map;
 public record BoardPrincipal(
         String email,
         String password,
-        String nickname,
         Collection<? extends GrantedAuthority> authorities,
         Map<String, Object> attributes
 ) implements UserDetails, OAuth2User, OidcUser {
 
-    public static BoardPrincipal of(String email, String password, String nickname, Map<String, Object> attributes) {
+    public static BoardPrincipal of(String email, String password, Map<String, Object> attributes) {
         return new BoardPrincipal(
                 email,
                 password,
-                nickname,
                 Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode())),
                 attributes
 
         );
     }
 
-    public static BoardPrincipal of(String email, String nickname, String password, Collection<? extends GrantedAuthority> authorities) {
-        return new BoardPrincipal(email, password, nickname, authorities, Map.of());
+    public static BoardPrincipal of(String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        return new BoardPrincipal(email, password, authorities, Map.of());
     }
 
-    public static BoardPrincipal of(String email, String password, String nickname) {
-        return of(email, password, nickname, Map.of());
+    public static BoardPrincipal of(String email, String password) {
+        return of(email, password, Map.of());
     }
 
     public static BoardPrincipal from(User dto) {
         return of(
                 dto.email(),
-                dto.password(),
-                dto.nickname()
+                dto.password()
         );
     }
 
@@ -53,7 +50,6 @@ public record BoardPrincipal(
         return of(
                 dto.email(),
                 dto.password(),
-                dto.nickname(),
                 attributes
         );
     }
@@ -100,7 +96,7 @@ public record BoardPrincipal(
 
     @Override
     public String getName() {
-        return nickname;
+        return email;
     }
 
     @Override
