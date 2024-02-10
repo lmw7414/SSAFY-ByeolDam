@@ -83,6 +83,21 @@ public class UserController {
         return Response.success(new UserLoginResponse(userResponse, token));
     }
 
+    @Operation(
+            summary = "로그아웃",
+            description = "로그아웃 작업. 레디스 메모리에서 유저 정보 삭제, 리프레시 토큰 정보 삭제, 쿠키 삭제 등의 작업이 이뤄진다."
+    )
+    @PostMapping("/users/logout")
+    public Response<Void> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
+        userService.logout(request, response, authentication.getName());
+        return Response.success();
+    }
+
+    @Operation(
+            summary = "토큰 리프레시",
+            description = "액세스 토큰이 만료되었을 때 요청해야하는 API. 액세스 토큰이 만료가 되지 않았다면 기존 액세스 토큰을 다시 보내주고, " +
+                    "만료가 되었다면 리프레시 토큰이 있는지 확인 후 새로 액세스 토큰을 발급해준다. 리프레시 토큰 기간이 3일 이하로 남았다면, 리프레시 토큰도 새롯 생성한다."
+    )
     @GetMapping("/users/refresh")
     public Response<UserLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         String token = userService.refreshToken(request, response);
@@ -124,9 +139,19 @@ public class UserController {
             description = "프로필, 비밀번호, 이름, 닉네임, 메모 계정 공개/비공개, 생일 등의 정보 등을 수정한다."
     )
     @PutMapping("/users")
-    public Response<Void> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
-        userService.updateMyProfile(authentication.getName(), request.password(), request.name(), request.nickname(), request.memo(), request.disclosureType(), request.birthday());
-        return Response.success();
+    public Response<UserResponse> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
+
+        return Response.success(
+                UserResponse.fromUser(userService.updateMyProfile(
+                        authentication.getName(),
+                        request.password(),
+                        request.name(),
+                        request.nickname(),
+                        request.memo(),
+                        request.disclosureType(),
+                        request.birthday())
+                )
+        );
     }
 
     @PutMapping("/users/profile-image")   //여기 바꿔줘야하나

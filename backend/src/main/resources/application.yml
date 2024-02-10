@@ -94,6 +94,8 @@ app:
   oauth2:
     authorizedRedirectUris:
       - http://localhost:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173
 
 ---
 spring:
