@@ -7,7 +7,7 @@ import useModal from '../hooks/useModal';
 import ExtendedBar from './ExtendedBar';
 import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
-import FollowContainer from './modal/Follow/FollowContainer';
+import FollowModal from './modal/Follow/FollowModal';
 
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
@@ -16,6 +16,7 @@ export default function NavBar() {
   const [following, setFollowing] = useState(0);
   const [follower, setFollower] = useState(0);
   const [modalState, setModalState] = useModal();
+  const [nickname, setNickname] = useState('');
 
   const navigate = useNavigate();
   const goHome = () => {
@@ -44,33 +45,46 @@ export default function NavBar() {
   const openSettingsPage = () => {
     setBarId(4);
   };
-  console.log('barId : ', barId);
-  console.log('navEx : ', navEx);
 
-  const readFollowing = async () => {
-    const data = await axios.get('immigrant_co/count-followings');
-    return data.data.result;
-  };
-
-  const readFollower = async () => {
-    const data = await axios.get('immigrant_co/count-followers');
-    return data.data.result;
+  const readNickname = async () => {
+    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
+    return nickname;
   };
 
   useEffect(() => {
-    readFollower().then((result) => {
-      setFollower(result);
-    });
-    readFollowing().then((result) => {
-      setFollowing(result);
+    readNickname().then((result) => {
+      // console.log(result);
+      setNickname(result);
     });
   }, []);
+
+  // console.log('barId : ', barId);
+  // console.log('navEx : ', navEx);
+
+  // const readFollowing = async () => {
+  //   const data = await axios.get('immigrant_co/count-followings');
+  //   return data.data.result;
+  // };
+
+  // const readFollower = async () => {
+  //   const data = await axios.get('immigrant_co/count-followers');
+  //   return data.data.result;
+  // };
+
+  // useEffect(() => {
+  //   readFollower().then((result) => {
+  //     setFollower(result);
+  //   });
+  //   readFollowing().then((result) => {
+  //     setFollowing(result);
+  //   });
+  // }, []);
 
   const openFollowerModal = () => {
     setModalState({
       isOpen: true,
       title: '팔로워',
-      children: <FollowContainer followSubject={'follower'} />,
+      children: <FollowModal followSubject={'follower'} modalState={modalState} />,
     });
   };
 
@@ -78,7 +92,7 @@ export default function NavBar() {
     setModalState({
       isOpen: true,
       title: '팔로잉',
-      children: <FollowContainer followSubject={'following'} />,
+      children: <FollowModal followSubject={'following'} modalState={modalState} />,
     });
   };
 
@@ -94,11 +108,10 @@ export default function NavBar() {
         />
       ) : (
         <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'nav-bar-hidden'}`}>
+          <div className="nav-bar-logo" onClick={goHome}>
+            <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+          </div>
           <div className="nav-bar-container">
-            <div className="nav-bar-logo" onClick={goHome}>
-              <img src="/src/assets/images/temporary-logo.png" alt="logo" />
-            </div>
-
             <div className="nav-bar-contents">
               <div className="nav-bar-profile-box">
                 <div className="profile-image-box">
@@ -111,7 +124,7 @@ export default function NavBar() {
                   </div>
                 </div>
                 <div className="nickname title">
-                  <p>상당히느긋한사람</p>
+                  <p>{nickname}</p>
                 </div>
                 <div className="profile-info-box">
                   <ProfileInfo text={'별'} num={26} />
@@ -166,19 +179,19 @@ export default function NavBar() {
                 />
               </div>
             </div>
+          </div>
 
-            <div className="nav-bar-toggle-container" onClick={closeNavBar}>
-              <div className="nav-bar-menu-icon-box">
-                <img
-                  src={
-                    isNavBarVisible
-                      ? '/src/assets/images/nav-bar-toggle-button/close.png'
-                      : '/src/assets/images/nav-bar-toggle-button/open.png'
-                  }
-                  alt="toggle_button"
-                  className="toggle-button"
-                />
-              </div>
+          <div className="nav-bar-toggle-container" onClick={closeNavBar}>
+            <div className="nav-bar-menu-icon-box">
+              <img
+                src={
+                  isNavBarVisible
+                    ? '/src/assets/images/nav-bar-toggle-button/close.png'
+                    : '/src/assets/images/nav-bar-toggle-button/open.png'
+                }
+                alt="toggle_button"
+                className="toggle-button"
+              />
             </div>
           </div>
         </div>

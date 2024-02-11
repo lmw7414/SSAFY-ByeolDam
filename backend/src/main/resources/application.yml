@@ -1,3 +1,7 @@
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: -1
+
 spring:
   profiles:
     active: local #default
@@ -6,7 +10,6 @@ spring:
         - common
       prod:
         - common
-
 
 ---
 spring:
@@ -81,7 +84,7 @@ mail:
   auth-code-expired-ms: 600000 #10분
 
 cors:
-  allowed-origins: 'http:localhost:3000,http:localhost:5173,i10b309.p.ssafy.io:5173'
+  allowed-origins: 'http://localhost:3000,http://localhost:5173,http://i10b309.p.ssafy.io:5173'
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
   allowed-headers: '*'
   max-age: 3600
@@ -93,7 +96,9 @@ app:
     refreshTokenExpiry: 604800000 #7일
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth/redirect
+      - http://localhost:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173/oauth/redirect
+      - http://i10b309.p.ssafy.io:5173
 
 ---
 spring:
@@ -121,6 +126,12 @@ spring:
       url: redis://localhost:6379
       repositories:
         enabled: false
+    mongodb:
+      uri: mongodb://localhost:27017/byeol_dam?authSource=admin
+      username: ${SPRING_DATASOURCE_USERNAME}
+      password: ${SPRING_DATASOURCE_PASSWORD}
+      database: byeol_dam
+      authentication-database: admin
 
 ---
 

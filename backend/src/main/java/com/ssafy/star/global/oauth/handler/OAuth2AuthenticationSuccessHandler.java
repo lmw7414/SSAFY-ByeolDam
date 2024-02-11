@@ -63,7 +63,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
-
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             throw new IllegalArgumentException("인증되지 않은 redirect URI");
         }
@@ -74,13 +73,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         ProviderType providerType = ProviderType.valueOf(authToken.getAuthorizedClientRegistrationId().toUpperCase());
 
         BoardPrincipal user = (BoardPrincipal) authentication.getPrincipal();
-        log.debug("Oauth2 접근 유저 Oidc : {}", user);
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
         Collection<? extends GrantedAuthority> authorities = ((OidcUser) authentication.getPrincipal()).getAuthorities();
-        log.debug("Oauth2 접근 유저 OAuth2UserInfo : {}", userInfo.getAttributes());
         RoleType roleType = hasAuthority(authorities, RoleType.ADMIN.getCode()) ? RoleType.ADMIN : RoleType.USER;
 
-        AuthToken accessToken = tokenProvider.createAuthToken(userInfo.getEmail(), user.nickname(),roleType.getCode(), appProperties.getAuth().getTokenExpiry());
+        AuthToken accessToken = tokenProvider.createAuthToken(userInfo.getEmail(), roleType.getCode(), appProperties.getAuth().getTokenExpiry());
 
         // Refresh 토큰 설정
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();

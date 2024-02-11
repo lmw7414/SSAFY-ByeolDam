@@ -15,29 +15,27 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    private static final int TARGET_HEIGHT = 1024;
-
     //이미지 리사이징
-    public static BufferedImage resizeImage(MultipartFile multipartFile) throws IOException {
+    public static BufferedImage resizeImage(MultipartFile multipartFile, int height) throws IOException {
 
         BufferedImage sourceImage = turnImage(multipartFile);
 
         int newWidth, newHeight;
 
-        if(sourceImage.getWidth() > TARGET_HEIGHT || sourceImage.getHeight() > TARGET_HEIGHT){
+        if(sourceImage.getWidth() > height || sourceImage.getHeight() > height){
             // 가로가 세로보다 큰 경우
             if (sourceImage.getWidth() >= sourceImage.getHeight()) {
-                newWidth = TARGET_HEIGHT;
+                newWidth = height;
 //                newHeight = (int) (TARGET_HEIGHT * ((double) sourceImage.getHeight() / sourceImage.getWidth()));
-                newHeight = TARGET_HEIGHT;
+                newHeight = height;
             } else { // 세로가 가로보다 큰 경우
 //                newWidth = (int) (TARGET_HEIGHT * ((double) sourceImage.getWidth() / sourceImage.getHeight()));
-                newWidth = TARGET_HEIGHT;
-                newHeight = TARGET_HEIGHT;
+                newWidth = height;
+                newHeight = height;
             }
         } else {
-            newWidth = TARGET_HEIGHT;
-            newHeight = TARGET_HEIGHT;
+            newWidth = height;
+            newHeight = height;
         }
 
         return Scalr.resize(sourceImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, newWidth, newHeight);

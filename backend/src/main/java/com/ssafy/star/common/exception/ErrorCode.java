@@ -14,6 +14,7 @@ public enum ErrorCode {
     UNSUITABLE_EMAIL(HttpStatus.BAD_REQUEST, "Email does not meet the condition"),
     SELF_FOLLOW_ERROR(HttpStatus.BAD_REQUEST, "Self following is invalid"),
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Article not founded"),
+    ARTICLE_IMAGE_EMPTY(HttpStatus.BAD_REQUEST, "Article image is empty"),
     ARTICLE_DELETED(HttpStatus.NOT_FOUND, "Article is deleted"),
     CONSTELLATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Constellation not founded"),
     CONSTELLATION_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "ConstellationUser not founded"),
@@ -29,8 +30,9 @@ public enum ErrorCode {
     UNABLE_TO_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, "Email failed to send"),
     NEVER_ATTEMPT_EMAIL_AUTH(HttpStatus.BAD_REQUEST, "이메일 인증을 요청한 적이 없음"),
     INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "인증코드가 일치하지 않음"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error");
-
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
+    IMAGE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "Image Not Founded"),
+    ALREADY_DEFAULT_IMAGE(HttpStatus.CONFLICT, "Profile already Default");
 
     final private HttpStatus status;
     final private String message;
