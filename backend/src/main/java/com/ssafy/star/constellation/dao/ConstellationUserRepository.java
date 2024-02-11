@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.dao;
 
+import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.user.domain.UserEntity;
@@ -21,4 +22,6 @@ public interface ConstellationUserRepository extends JpaRepository<Constellation
 
     @Query("SELECT cu FROM ConstellationUserEntity cu WHERE cu.constellationEntity = :constellationEntity")
     Page<ConstellationUserEntity> findConstellationUserEntitiesByConstellationEntity(@Param("constellationEntity") ConstellationEntity constellationEntity, Pageable pageable);
+
+    List<ConstellationUserEntity> findByUserEntityAndConstellationUserRole(UserEntity userEntity, ConstellationUserRole constellationUserRole);
 }

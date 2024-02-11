@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
 
@@ -24,6 +26,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
         /**
          * 유저 게시물 전체 조회(지워지지 않은)
           */
+        // TODO : 유저 여러명 게시물 한꺼번에 가져오기
         // userEntity, deletedAt == Null, VISIBLE
         @Query("SELECT a FROM ArticleEntity a WHERE a.ownerEntity = :ownerEntity AND a.deletedAt IS NULL AND a.disclosure = 'VISIBLE'")
         Page<ArticleEntity> findAllByOwnerEntityAndNotDeletedAndDisclosure(@Param("ownerEntity") UserEntity ownerEntity, Pageable pageable);
@@ -43,5 +46,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
          */
         @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND ((a.disclosure = 'VISIBLE' AND a.constellationEntity.shared = 'SHARED') OR a.ownerEntity = :userEntity)")
         Page<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity, Pageable pageable);
+
+        List<ArticleEntity> findAllByOwnerEntity(UserEntity userEntity);
 }
 

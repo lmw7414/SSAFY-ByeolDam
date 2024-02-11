@@ -1,7 +1,6 @@
 package com.ssafy.star.constellation.dao;
 
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

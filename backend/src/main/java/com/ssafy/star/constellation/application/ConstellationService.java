@@ -4,12 +4,13 @@ import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.SharedType;
+import com.ssafy.star.constellation.dao.ConstellationLikeRepository;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
+import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
-
 import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
@@ -33,6 +34,7 @@ public class ConstellationService {
     private final ConstellationRepository constellationRepository;
     private final ConstellationUserRepository constellationUserRepository;
     private final UserRepository userRepository;
+    private final ConstellationLikeRepository constellationLikeRepository;
 
     // 별자리 전체 조회
     public List<Constellation> list(String myEmail, Pageable pageable) {
@@ -153,7 +155,7 @@ public class ConstellationService {
     public void delete(Long constellationId, String myEmail) {
         // 사용자가 admin인지 확인
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-
+        constellationLikeRepository.deleteAllByConstellationEntity(constellationEntity);
         constellationRepository.delete(constellationEntity);
     }
 
@@ -325,5 +327,49 @@ public class ConstellationService {
                         new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, %s has no constellationUserEntity", userEmail, constellationEntity.getName())));
         constellationUserEntity.setConstellationUserRole(role);
         constellationUserRepository.saveAndFlush(constellationUserEntity);
+    }
+
+    //별자리 좋아요 요청
+    @Transactional
+    public void like(Long constellationId, String email) {
+        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        // 좋아요 상태인지 확인
+        constellationLikeRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).ifPresentOrElse(
+                constellationLikeRepository::delete,
+                () -> constellationLikeRepository.save(ConstellationLikeEntity.of(userEntity, constellationEntity))
+        );
+    }
+
+    //별자리 좋아요 상태 확인
+    @Transactional
+    public Boolean checkLike(Long constellationId, String email) {
+        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        //좋아요 상태인지 확인
+        return constellationLikeRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).isPresent();
+    }
+
+    //별자리 좋아요 갯수 확인
+    @Transactional
+    public Integer likeCount(Long constellationId) {
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        //좋아요 갯수 확인
+        return constellationLikeRepository.countByConstellationEntity(constellationEntity);
+    }
+
+    //별자리 좋아요한 사람들의 목록 확인
+    @Transactional
+    public List<User> likeList(Long constellationId) {
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+        //목록 확인
+        return constellationLikeRepository.findAllByConstellationEntity(constellationEntity)
+                .stream()
+                .map(ConstellationLikeEntity::getUserEntity)
+                .map(User::fromEntity)
+                .toList();
     }
 }

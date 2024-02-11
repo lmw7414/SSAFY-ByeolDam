@@ -2,9 +2,11 @@ package com.ssafy.star.article.application;
 
 import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dao.ArticleHashtagRelationRepository;
+import com.ssafy.star.article.dao.ArticleLikeRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
+import com.ssafy.star.article.domain.ArticleLikeEntity;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
@@ -17,6 +19,7 @@ import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +48,7 @@ public class ArticleService {
     private final S3uploader s3uploader;
     private final ImageService imageService;
     private final ArticleHashtagRelationService articleHashtagRelationService;
+    private final ArticleLikeRepository articleLikeRepository;
 
     // 트랜잭션 처리를 하고 롤백 처리를 하려면 controller가 아니라 서비스단에서 upload를 호출해야할듯하다
     // try catch문을 통해서 사진 업로드 이후 save를 하고
@@ -124,10 +128,10 @@ public class ArticleService {
             throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %s has already deleted", articleId));
         } else {
             System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
+            articleLikeRepository.deleteAllByArticleEntity(articleEntity);
             articleRepository.delete(articleEntity);
             articleHashtagRelationService.deleteByArticleEntity(articleEntity);
         }
-
     }
 
     /**
@@ -154,7 +158,9 @@ public class ArticleService {
         if(articleEntity.getDeletedAt() != null) {
             System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
             articleEntity.undoDeletion();
+            articleLikeRepository.findAllByArticleEntity(articleEntity).forEach(ArticleLikeEntity::undoDeletion);
             articleHashtagRelationRepository.findAllByArticleEntity(articleEntity).forEach(ArticleHashtagRelationEntity::undoDeletion);
+
         } else {
             throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is not abandoned", "articleId:" + Long.toString(articleId)));
         }
@@ -321,4 +327,49 @@ public class ArticleService {
 
         return articleEntity;
     }
+
+    //게시물 좋아요 요청
+    @Transactional
+    public void like(Long articleId, String email) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        // 좋아요 상태인지 확인
+        articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
+                articleLikeRepository::delete,
+                () -> articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity))
+        );
+    }
+
+    //게시물 좋아요 상태 확인
+    @Transactional
+    public Boolean checkLike(Long articleId, String email) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        UserEntity userEntity = getUserEntityOrException(email);
+
+        //좋아요 상태인지 확인
+        return articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).isPresent();
+    }
+
+    //게시물 좋아요 갯수 확인
+    @Transactional
+    public Integer likeCount(Long articleId) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+
+        //좋아요 갯수 확인
+        return articleLikeRepository.countByArticleEntity(articleEntity);
+    }
+
+    //게시물 좋아요한 사람들의 목록 확인
+    @Transactional
+    public List<User> likeList(Long articleId) {
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+        //목록 확인
+        return articleLikeRepository.findAllByArticleEntity(articleEntity)
+                .stream()
+                .map(ArticleLikeEntity::getUserEntity)
+                .map(User::fromEntity)
+                .toList();
+    }
+
 }
