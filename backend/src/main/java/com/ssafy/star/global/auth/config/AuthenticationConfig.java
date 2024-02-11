@@ -6,7 +6,6 @@ import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.global.auth.config.filter.TokenAuthenticationFilter;
 import com.ssafy.star.global.auth.dto.BoardPrincipal;
-import com.ssafy.star.global.auth.handler.CustomLogoutHandler;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.ssafy.star.global.oauth.handler.OAuth2AuthenticationSuccessHandler;

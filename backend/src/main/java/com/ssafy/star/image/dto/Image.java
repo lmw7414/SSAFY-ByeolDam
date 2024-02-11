@@ -13,6 +13,7 @@ public record Image(
         ImageType imageType
 ) {
     public static Image fromEntity(ImageEntity imageEntity){
+        if (imageEntity == null) return null;
         return new Image(
                 imageEntity.getId(),
                 imageEntity.getName(),

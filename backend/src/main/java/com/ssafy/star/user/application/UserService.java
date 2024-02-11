@@ -3,6 +3,7 @@ package com.ssafy.star.user.application;
 import com.ssafy.star.common.config.properties.AppProperties;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
@@ -11,6 +12,9 @@ import com.ssafy.star.global.email.application.EmailService;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.global.oauth.util.CookieUtils;
 import com.ssafy.star.global.oauth.util.HeaderUtils;
+import com.ssafy.star.image.ImageType;
+import com.ssafy.star.image.dao.ImageRepository;
+import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
@@ -28,7 +32,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -48,6 +54,9 @@ public class UserService {
     private final EmailCacheRepository emailCacheRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
+    private final S3uploader s3uploader;
+
+
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
 
@@ -55,6 +64,7 @@ public class UserService {
     private Long mailExpiredMs;
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
+    private final ImageRepository imageRepository;
 
     public Optional<User> loadUserByEmail(String email) {
         return Optional.ofNullable(userCacheRepository.getUser(email)
@@ -230,7 +240,7 @@ public class UserService {
         validateEmailPattern(email);
         checkEmailExistenceOrException(email);
         if (satisfyNickname(nickname)) {
-            UserEntity userEntity = UserEntity.of(email, ProviderType.LOCAL, encoder.encode(password), name, nickname);
+            UserEntity userEntity = UserEntity.of(email, ProviderType.LOCAL, encoder.encode(password), name, nickname, null);
             return User.fromEntity(userRepository.save(userEntity));
         }
         throw new ByeolDamException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -290,6 +300,67 @@ public class UserService {
         userCacheRepository.updateUser(User.fromEntity(userEntity));
         userRepository.saveAndFlush(userEntity);
         return User.fromEntity(userEntity);
+    }
+
+    // 기본 프로필로 변경하기
+    @Transactional
+    public User updateProfileDefault(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
+                () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", email))
+        );
+        ImageEntity oldImage = userEntity.getImageEntity();
+        if (oldImage == null) { // 이미 기본 프로필일 경우
+            throw new ByeolDamException(ErrorCode.ALREADY_DEFAULT_IMAGE);
+        } else { // 기본 프로필로 변경하는 경우
+            s3uploader.deleteImageFromS3(oldImage.getUrl());
+            imageRepository.delete(oldImage);
+            userEntity.setImageEntity(null);
+        }
+        return User.fromEntity(userEntity);
+    }
+
+    /**
+     * 1. user의 entity를 가져온다.
+     * 2. S3에 수정한 profile 사진을 저장한다.
+     * 3. userEntity의 id를 가지고 imageService의 getImageUrl 함수를 이용하여 Image Dto를 가져온다.
+     * 4. image Table에 수정한 이미지 정보를 저장한다.
+     * 5. image Table에서 가져왔던 Image Dto를 이용해 해당하는 부분을 삭제한다.
+     * 6. Image Dto에 저장되어있던 url을 이용하여 S3에서 해당하는 이미지 경로를 삭제한다.
+     */
+    @Transactional
+    public User updateProfileImage(String email, MultipartFile multipartFile, ImageType imageType) {
+        String profileUrl = "";
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
+                () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", email))
+        );
+        try {
+            // 기존의 이미지 불러오기
+            ImageEntity oldImgEntity = userEntity.getImageEntity();
+
+            // 1. 기존 이미지가 없을 경우
+            if (oldImgEntity == null) {
+                profileUrl = s3uploader.uploadProfile(multipartFile, "profiles");
+                ImageEntity newImage = ImageEntity.of(multipartFile.getOriginalFilename(), profileUrl, imageType);
+                userEntity.setImageEntity(newImage);
+                imageRepository.save(newImage);
+            }
+            // 2. 기존 이미지가 있을 경우
+            else {
+                //S3에서 기존 이미지 삭제
+                s3uploader.deleteImageFromS3(oldImgEntity.getUrl());
+
+                // 새로운 이미지 추가
+                profileUrl = s3uploader.uploadProfile(multipartFile, "profiles");
+                oldImgEntity.setName(multipartFile.getOriginalFilename());
+                oldImgEntity.setUrl(profileUrl);
+                oldImgEntity.setImageType(imageType);
+                imageRepository.save(oldImgEntity);
+            }
+            return User.fromEntity(userEntity);
+        } catch (IOException e) {
+            s3uploader.deleteImageFromS3(profileUrl);
+        }
+        throw new ByeolDamException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     //회원 탈퇴

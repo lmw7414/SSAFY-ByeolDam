@@ -12,7 +12,5 @@ public record ArticleCreateRequest (
     String title,
     String tag,
     String description,
-    DisclosureType disclosureType,
-    ImageType imageType
-//    private image;
+    DisclosureType disclosureType
 ){}
