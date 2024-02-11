@@ -13,6 +13,8 @@ import ConstellationWriting from './pages/constellation/ConstellationWriting';
 import LoginTest from './pages/member/LoginTest';
 import SignupTest from './pages/member/SignupTest';
 import SocialLogin from './pages/member/SocialLogin';
+import SearchStar from './pages/search/SearchStar';
+import SearchConstellation from './pages/search/SearchConstellation';
 
 export default function App() {
   return (
@@ -56,6 +58,8 @@ function NavApp() {
           <Routes>
             <Route path="/home" element={<Universe />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/search/star" element={<SearchStar />} />
+            <Route path="/search/constellation" element={<SearchConstellation />} />
             <Route path="/constellation" element={<ConstellationWriting />} />
           </Routes>
           <ModalContainer modalState={modalState} />
