@@ -29,7 +29,7 @@ public class S3uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName, int height) throws IOException {
 
         BufferedImage resizedImage = resizeImage(multipartFile, TARGET_HEIGHT);
         File uploadFile = convert(resizedImage, multipartFile.getOriginalFilename());

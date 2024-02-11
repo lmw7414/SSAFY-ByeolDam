@@ -40,3 +40,11 @@ public class ImageService {
 
 
 }
+
+    @Transactional
+    public void deleteImage(Image image){
+        imageRepository.deleteById(image.id());
+    }
+
+
+}
