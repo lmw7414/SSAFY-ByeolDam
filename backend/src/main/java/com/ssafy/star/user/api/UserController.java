@@ -3,7 +3,7 @@ package com.ssafy.star.user.api;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.response.Response;
-import com.ssafy.star.global.auth.util.AuthToken;
+import com.ssafy.star.image.ImageType;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class UserController {
             description = "로그아웃 작업. 레디스 메모리에서 유저 정보 삭제, 리프레시 토큰 정보 삭제, 쿠키 삭제 등의 작업이 이뤄진다."
     )
     @PostMapping("/users/logout")
-    public Response<Void> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
+    public Response<Void> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
         userService.logout(request, response, authentication.getName());
         return Response.success();
     }
@@ -151,6 +152,31 @@ public class UserController {
                         request.birthday())
                 )
         );
+    }
+
+    @Operation(
+            summary = "프로필 이미지 수정하기",
+            description = "프로필 이미지를 수정한다."
+    )
+    @PutMapping("/users/profile-image")
+    public Response<UserResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
+        return Response.success(
+                UserResponse.fromUser(
+                        userService.updateProfileImage(
+                                authentication.getName(),
+                                multipartFile,
+                                ImageType.PROFILE)
+                )
+        );
+    }
+
+    @Operation(
+            summary = "기본 프로필 이미지로 수정하기",
+            description = "프로필 이미지를 수정한다."
+    )
+    @PutMapping("/users/default-image")
+    public Response<UserResponse> updateDefaultProfileImage(Authentication authentication) {
+        return Response.success(UserResponse.fromUser(userService.updateProfileDefault(authentication.getName())));
     }
 
     @Operation(
