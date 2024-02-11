@@ -14,6 +14,7 @@ public enum ErrorCode {
     UNSUITABLE_EMAIL(HttpStatus.BAD_REQUEST, "Email does not meet the condition"),
     SELF_FOLLOW_ERROR(HttpStatus.BAD_REQUEST, "Self following is invalid"),
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Article not founded"),
+    ARTICLE_IMAGE_EMPTY(HttpStatus.BAD_REQUEST, "Article image is empty"),
     ARTICLE_DELETED(HttpStatus.NOT_FOUND, "Article is deleted"),
     CONSTELLATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Constellation not founded"),
     CONSTELLATION_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "ConstellationUser not founded"),

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
+
         // 전체 조회 (trashcan이 REMAINED 상태이고, 내 게시물이거나 게시물 disclosure가 VISIBLE인 경우)
         @Query("SELECT a FROM ArticleEntity a WHERE a.deletedAt IS NULL AND (a.ownerEntity = :ownerEntity OR a.disclosure = 'VISIBLE')")
         Page<ArticleEntity> findAllByNotDeletedAndDisclosure(@Param("ownerEntity") UserEntity ownerEntity, Pageable pageable);
