@@ -1,5 +1,5 @@
 $extended-bar-width: 480px;
-$border-color: #3b255e;
+$border-color: white; /*#3b255e*/
 
 .extended-bar-big-container {
   position: absolute;
@@ -71,7 +71,7 @@ $border-color: #3b255e;
   justify-content: space-between;
   width: 4rem;
   height: 100%;
-  border-right: 3px solid $border-color;
+  border-right: 2px solid $border-color;
 }
 
 .opacity-0 {
@@ -102,13 +102,13 @@ $border-color: #3b255e;
   height: 100%;
   flex-grow: 1;
   padding: 1rem 2rem;
-  border-top: 3px solid $border-color;
+  border-top: 2px solid $border-color;
 }
 
 .search-bar-filter-box {
   padding-top: 1.5rem;
   width: 100%;
-  border-top: 3px solid $border-color;
+  border-top: 2px solid $border-color;
 }
 
 @keyframes slide-in-left {

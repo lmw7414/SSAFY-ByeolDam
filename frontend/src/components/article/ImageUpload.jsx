@@ -3,8 +3,10 @@ import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 
 import GradientBackground from './GradientBackground';
 import getGradientFromImage from '../../utils/getGradientFromImage';
+import TagEditor from './TagEditor';
+import dataURLtoBlob from '../../utils/dataURLtoBlob';
 
-export default function ImageUpload({ setStep, setFile }) {
+export default function ImageUpload({ setStep, setFile, setArticle, article }) {
   const [editor, setEditor] = useState({
     image: null,
     color: null,
@@ -15,10 +17,13 @@ export default function ImageUpload({ setStep, setFile }) {
   });
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(false);
+  const [originalFile, setOriginalFile] = useState('fileName');
+
+  const stage = useRef();
   const imageRef = useRef();
   const transformer = useRef();
-  const width = 600;
-  const height = 600;
+  const width = 512;
+  const height = 512;
 
   const keyInputHandler = (e) => {
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) undo();
@@ -42,20 +47,26 @@ export default function ImageUpload({ setStep, setFile }) {
     setSelected(transformer.current.nodes().indexOf(imageRef.current) < 0);
   };
 
-  useEffect(() => {
-    if (!editor.image) return;
-    const initialState = { x: editor.x, y: editor.y, scaleX: 1, scaleY: 1, rotation: 0 };
+  const setDescription = (e) => {
+    setArticle({
+      ...article,
+      description: e.target.value,
+    });
+  };
 
-    setImageState(initialState);
-    setHistory([]);
+  const setTags = (articleHashtagSet) => {
+    setArticle({
+      ...article,
+      articleHashtagSet,
+    });
+  };
 
-    transformer.current.getLayer().batchDraw();
-  }, [editor]);
-
-  useEffect(() => {
-    if (selected) transformer.current.nodes([imageRef.current]);
-    else transformer.current.nodes([]);
-  }, [selected]);
+  const saveFile = () => {
+    transformer.current.nodes([]);
+    const blob = dataURLtoBlob(stage.current.toDataURL({ pixelRatio: 2 }));
+    const file = new File([blob], originalFile.name, { type: originalFile.type });
+    setFile(file);
+  };
 
   const loadImage = () => {
     const input = document.createElement('input');
@@ -66,7 +77,7 @@ export default function ImageUpload({ setStep, setFile }) {
 
     input.addEventListener('change', () => {
       const file = input.files[0];
-
+      setOriginalFile(file);
       const img = new Image();
       img.src = URL.createObjectURL(file);
       img.onload = async () => {
@@ -83,59 +94,96 @@ export default function ImageUpload({ setStep, setFile }) {
     });
   };
 
+  useEffect(() => {
+    if (!editor.image) return;
+    const initialState = { x: editor.x, y: editor.y, scaleX: 1, scaleY: 1, rotation: 0 };
+
+    setImageState(initialState);
+    setHistory([]);
+
+    transformer.current.getLayer().batchDraw();
+  }, [editor]);
+
+  useEffect(() => {
+    if (selected) transformer.current.nodes([imageRef.current]);
+    else transformer.current.nodes([]);
+  }, [selected]);
+
   return (
-    <div tabIndex={1} onKeyDown={keyInputHandler}>
-      <Stage width={width} height={height}>
-        <Layer>
-          {editor.color && (
-            <GradientBackground
-              color={editor.color}
-              width={width}
-              height={height}
-              onClick={() => {
-                setSelected(false);
-              }}
-            />
-          )}
-          {editor.image && (
-            <KonvaImage
-              ref={imageRef}
-              x={editor.x}
-              y={editor.y}
-              image={editor.image}
-              width={editor.width}
-              height={editor.height}
-              onClick={clickImage}
-              onDragStart={() => {
-                setHistory([...history, { ...imageRef.current.attrs }]);
-              }}
-              draggable={selected}
-            />
-          )}
-          <Transformer
-            ref={transformer}
-            onTransformStart={() => {
-              setHistory([...history, { ...imageRef.current.attrs }]);
-            }}
-          />
-        </Layer>
-      </Stage>
-      <div
-        onClick={(e) => {
-          e.stopPropagation();
-          loadImage();
-        }}
-      >
-        사진 추가
+    <div className="article-editor-box">
+      <div className="image-upload-box">
+        <div className="image-editor-wrapper" tabIndex={1} onKeyDown={keyInputHandler}>
+          <Stage ref={stage} width={width} height={height}>
+            <Layer>
+              {editor.color && (
+                <GradientBackground
+                  color={editor.color}
+                  width={width}
+                  height={height}
+                  onClick={() => {
+                    setSelected(false);
+                  }}
+                />
+              )}
+              {editor.image && (
+                <KonvaImage
+                  ref={imageRef}
+                  x={editor.x}
+                  y={editor.y}
+                  image={editor.image}
+                  width={editor.width}
+                  height={editor.height}
+                  onClick={clickImage}
+                  onDragStart={() => {
+                    setHistory([...history, { ...imageRef.current.attrs }]);
+                  }}
+                  draggable={selected}
+                />
+              )}
+              <Transformer
+                ref={transformer}
+                onTransformStart={() => {
+                  setHistory([...history, { ...imageRef.current.attrs }]);
+                }}
+              />
+            </Layer>
+          </Stage>
+        </div>
+        <div
+          className="image-change-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            loadImage();
+          }}
+        >
+          {editor.image ? '사진 변경' : '사진 추가'}
+        </div>
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          setStep(2);
-        }}
-      >
-        다음
-      </button>
+      <div className="article-content-box">
+        <label className="article-content-label" htmlFor="article-description-label">
+          설명
+        </label>
+        <input
+          className="article-content-input"
+          type="text"
+          onChange={setDescription}
+          name="description"
+        />
+        <label className="article-content-label" htmlFor="">
+          태그
+        </label>
+        <TagEditor setTags={setTags} />
+        <button
+          className="article-upload-btn"
+          type="button"
+          onClick={() => {
+            saveFile();
+            setStep(2);
+          }}
+        >
+          다음
+        </button>
+      </div>
     </div>
   );
 }

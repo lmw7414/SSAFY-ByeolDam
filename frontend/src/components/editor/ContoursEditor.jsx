@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { Layer, Stage, Image as KonvaImage, Line, Circle } from 'react-konva';
 import getUuidByString from 'uuid-by-string';
 import getSegmentDistance from '../../utils/getSegmentDistance';
-import saveClippedImage from '../../utils/saveClippedImage';
 
 export default function ContoursEditor({
   image,
@@ -52,8 +51,6 @@ export default function ContoursEditor({
       }
 
       if (nearestLineIdx > 0 && nearestLineIdx < points.length) addPoint(x, y, nearestLineIdx);
-    } else if (e.evt.button === 1) {
-      saveClippedImage(image, points, width, height);
     }
   };
 
