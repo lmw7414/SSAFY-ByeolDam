@@ -1,31 +1,48 @@
 services:
-    byeoldam-database:
-      container_name: byeoldam-database
-      build:
-        dockerfile: Dockerfile
-        context: ./database
-      image: lmw7414/byeoldam-database
-      volumes:
-        # 설정파일 저장될  위치
-        - ./database/config:/etc/mysql/conf.d
-        # DB 데이터 저장 디렉토리
-        - ./database/data:/var/lib/mysql
-      environment:
-        - MARIADB_DATABASE=byeol_dam
-        - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
-        - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-        - "TZ=Asia/Seoul"
-      command:
-        - --character-set-server=utf8mb4
-        - --collation-server=utf8mb4_unicode_ci
-      ports:
-        - "3306:3306"
+  byeoldam-database:
+    container_name: byeoldam-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: lmw7414/byeoldam-database
+    volumes:
+      # 설정파일 저장될  위치
+      - ./database/config:/etc/mysql/conf.d
+      # DB 데이터 저장 디렉토리
+      - ./database/data:/var/lib/mysql
+    environment:
+      - MARIADB_DATABASE=byeol_dam
+      - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
+      - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - "TZ=Asia/Seoul"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
 
-    byeoldam-redis:
-      container_name: byeoldam-redis
-      build:
-        dockerfile: Dockerfile
-        context: ./redis
-      image: lmw7414/byeoldam-redis
-      ports:
-        - "6379:6379"
+  byeoldam-redis:
+    container_name: byeoldam-redis
+    build:
+      dockerfile: Dockerfile
+      context: ./redis
+    image: lmw7414/byeoldam-redis
+    ports:
+      - "6379:6379"
+
+  byeoldam-mongodb:
+    container_name: byeoldam-mongodb
+      #build:
+      #dockerfile: Dockerfile
+    #context: ./mongodb
+    image: mongo:latest
+    volumes:
+      # DB 데이터 저장 파일
+      - ./mongodb/data:/var/lib/mongodb
+      - ./mongodb/config:/etc/mongodb/conf.d
+    environment:
+      - MONGO_INITDB_DATABASE=byeol_dam
+      - MONGO_INITDB_ROOT_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "27017:27017"

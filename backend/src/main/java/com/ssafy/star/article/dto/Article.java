@@ -16,9 +16,7 @@ import java.util.stream.Collectors;
 public record Article (
         Long id,
     String title,
-//    private imageResponse image;
     long hits,
-
     String description,
     DisclosureType disclosure,
     Set<String> articleHashtags,
@@ -31,21 +29,32 @@ public record Article (
     Image image
 
     ) {
+
     public static Article fromEntity(ArticleEntity entity){
+
+        Set<String> hashtags = entity.getArticleHashtagRelationEntities()
+                .stream()
+                .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
+                .map(ArticleHashtagEntity::getTagName)
+                .collect(Collectors.toSet());
+
+        String constellationName = entity.getConstellationEntity() != null ? entity.getConstellationEntity().getName() : null;
+
+        List<CommentDto> comments = entity.getCommentEntities()
+                .stream()
+                .map(CommentDto::from)
+                .collect(Collectors.toList());
+
         return new Article(
                 entity.getId(),
                 entity.getTitle(),
                 entity.getHits(),
                 entity.getDescription(),
                 entity.getDisclosure(),
-                (Set<String>) entity.getArticleHashtagRelationEntities()
-                        .stream()
-                        .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
-                        .map(ArticleHashtagEntity::getTagName)
-                        .collect(Collectors.toSet()),
-                entity.getConstellationEntity() != null ? entity.getConstellationEntity().getName() : null,
+                hashtags,
+                constellationName,
                 entity.getOwnerEntity().getNickname(),
-                entity.getCommentEntities().stream().map(CommentDto::from).toList(),
+                comments,
                 entity.getCreatedAt(),
                 entity.getModifiedAt(),
                 entity.getDeletedAt(),

@@ -26,15 +26,19 @@ public class ImageService {
         imageRepository.save(ImageEntity.of(name, url, imageType));
     }
 
-//    @Transactional
-//    public Image getImageUrl(Long id){
-//        ImageEntity imageEntity = imageRepository.findById(id).orElseThrow(()-> new ByeolDamException(ErrorCode.IMAGE_NOT_FOUND_ERROR, String.format("%s not founded", id)));
-//        return Image.fromEntity(imageEntity);
-//    }
-@Transactional
-public Image getImageUrl(String url){
-    ImageEntity imageEntity = imageRepository.findByUrl(url).orElseThrow(()-> new ByeolDamException(ErrorCode.IMAGE_NOT_FOUND_ERROR, String.format("%s not founded", url)));
-    return Image.fromEntity(imageEntity);
+    @Transactional
+    public Image getImageUrl(Long id){
+        ImageEntity imageEntity = imageRepository.findById(id).orElseThrow(()-> new ByeolDamException(ErrorCode.IMAGE_NOT_FOUND_ERROR, String.format("%s not founded", id)));
+        return Image.fromEntity(imageEntity);
+    }
+
+    @Transactional
+    public void deleteImage(Image image){
+        imageRepository.deleteById(image.id());
+    }
+
+
+
 }
 
     @Transactional
