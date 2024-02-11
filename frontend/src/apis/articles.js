@@ -27,13 +27,13 @@ export const addArticle = async (
   formData.append('request', request);
   formData.append('imageFile', file);
 
-  const { data } = await axios.post('articles', formData, {
+  const result = await axios.post('articles', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
 
-  return { resultCode: data.resultCode };
+  return result;
 };
 
 export const deleteArticle = async (articleId) => {

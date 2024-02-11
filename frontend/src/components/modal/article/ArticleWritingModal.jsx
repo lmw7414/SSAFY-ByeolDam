@@ -15,7 +15,9 @@ export default function ArticleWritingModal() {
   });
 
   const writeArticle = () => {
-    // addArticle(article, file);
+    addArticle(article, file).then((result) => {
+      console.log(result);
+    });
     console.log(article, file);
   };
 
