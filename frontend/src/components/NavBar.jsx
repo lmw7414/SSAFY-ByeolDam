@@ -51,12 +51,12 @@ export default function NavBar() {
     return nickname;
   };
 
-  useEffect(() => {
-    readNickname().then((result) => {
-      // console.log(result);
-      setNickname(result);
-    });
-  }, []);
+  // useEffect(() => {
+  //   readNickname().then((result) => {
+  //     // console.log(result);
+  //     setNickname(result);
+  //   });
+  // }, []);
 
   // console.log('barId : ', barId);
   // console.log('navEx : ', navEx);
