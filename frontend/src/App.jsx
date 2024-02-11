@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import ConstellationWriting from './pages/constellation/ConstellationWriting';
 import SignUp from './pages/member/SignUp';
 import SocialLogin from './pages/member/SocialLogin';
+import FeedList from './pages/feed/FeedList';
 
 export default function App() {
   return (
@@ -56,6 +57,7 @@ function NavApp() {
             <Route path="/home" element={<Universe />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/constellation" element={<ConstellationWriting />} />
+            <Route path="/feed" element={<FeedList />}></Route>
           </Routes>
           <ModalContainer modalState={modalState} />
         </ModalContext.Provider>
