@@ -21,6 +21,16 @@ public record UserResponse(
 ) {
 
     public static UserResponse fromUser(User dto) {
-        return new UserResponse(dto.image().url(), dto.email(), dto.providerType(), dto.roleType(), dto.name(), dto.nickname(), dto.memo(), dto.disclosureType(), dto.birthday());
+        return new UserResponse(
+                dto.image() == null ? "" : dto.image().url(),
+                dto.email(),
+                dto.providerType(),
+                dto.roleType(),
+                dto.name(),
+                dto.nickname(),
+                dto.memo(),
+                dto.disclosureType(),
+                dto.birthday()
+        );
     }
 }

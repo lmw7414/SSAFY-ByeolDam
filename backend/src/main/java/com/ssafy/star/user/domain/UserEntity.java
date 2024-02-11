@@ -6,7 +6,6 @@ import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.image.domain.ImageEntity;
-import com.ssafy.star.image.dto.Image;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -23,7 +22,7 @@ import java.util.List;
 @Entity
 @Getter
 @ToString
-@Table(name = "user_account")
+@Table(name = "\"user_account\"")
 @SQLDelete(sql = "UPDATE user_account SET deleted_at = NOW() where id=?")
 @Where(clause = "deleted_at is NULL")
 public class UserEntity {
@@ -88,6 +87,7 @@ public class UserEntity {
 
     private LocalDateTime deletedAt;
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image")
     private ImageEntity imageEntity;

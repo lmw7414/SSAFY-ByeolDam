@@ -88,7 +88,7 @@ public class UserController {
             description = "로그아웃 작업. 레디스 메모리에서 유저 정보 삭제, 리프레시 토큰 정보 삭제, 쿠키 삭제 등의 작업이 이뤄진다."
     )
     @PostMapping("/users/logout")
-    public Response<Void> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
+    public Response<Void> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
         userService.logout(request, response, authentication.getName());
         return Response.success();
     }
@@ -154,10 +154,29 @@ public class UserController {
         );
     }
 
-    @PutMapping("/users/profile-image")   //여기 바꿔줘야하나
-    public Response<Void> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
-        userService.updateProfileImage(authentication.getName(), multipartFile, ImageType.PROFILE);
-        return Response.success();
+    @Operation(
+            summary = "프로필 이미지 수정하기",
+            description = "프로필 이미지를 수정한다."
+    )
+    @PutMapping("/users/profile-image")
+    public Response<UserResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
+        return Response.success(
+                UserResponse.fromUser(
+                        userService.updateProfileImage(
+                                authentication.getName(),
+                                multipartFile,
+                                ImageType.PROFILE)
+                )
+        );
+    }
+
+    @Operation(
+            summary = "기본 프로필 이미지로 수정하기",
+            description = "프로필 이미지를 수정한다."
+    )
+    @PutMapping("/users/default-image")
+    public Response<UserResponse> updateDefaultProfileImage(Authentication authentication) {
+        return Response.success(UserResponse.fromUser(userService.updateProfileDefault(authentication.getName())));
     }
 
     @Operation(
