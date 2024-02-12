@@ -20,15 +20,15 @@ export default function NotificationSettings() {
         <h2 className="nickname">좋아요</h2>
         <div className="norification-menu-box">
           <div className="radio-box">
-            <input type="radio" />
+            <input type="radio" name="like-alarm" />
             <p className="nickname">해제</p>
           </div>
           <div className="radio-box">
-            <input type="radio" />
+            <input type="radio" name="like-alarm" />
             <p className="nickname">내가 팔로우 하는 사용자</p>
           </div>
           <div className="radio-box">
-            <input type="radio" />
+            <input type="radio" name="like-alarm" />
             <p className="nickname">모든 사람</p>
           </div>
         </div>
@@ -36,10 +36,10 @@ export default function NotificationSettings() {
       <hr className="settings-detail-divide" />
 
       <div className="notification-settings-menu">
-        <h2 className="nickname">푸시 알림</h2>
+        <h2 className="nickname">댓글</h2>
         <div className="norification-menu-box">
           <div className="radio-box">
-            <input type="radio" />
+            <input type="radio" name="comment-alarm" />
             <p className="nickname">해제</p>
           </div>
         </div>
