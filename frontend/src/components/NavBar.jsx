@@ -111,9 +111,11 @@ export default function NavBar() {
                     />
                   </div>
                 </div>
-                <div className="nickname title">
-                  <p>{profile.nickname}</p>
+                <div className="nickname-memo-container">
+                  <p className="real-nickname">{profile.nickname}</p>
+                  <p className="memo">{profile.memo}</p>
                 </div>
+
                 <div className="profile-info-box">
                   <ProfileInfo text={'별'} num={profile.articleCounts} />
 
