@@ -326,4 +326,9 @@ public class ConstellationService {
         constellationUserEntity.setConstellationUserRole(role);
         constellationUserRepository.saveAndFlush(constellationUserEntity);
     }
+
+    public int countConstellations(String email){
+        UserEntity userEntity = getUserEntityByEmailOrException(email);
+        return constellationUserRepository.countConstellationByUser(userEntity);
+    }
 }

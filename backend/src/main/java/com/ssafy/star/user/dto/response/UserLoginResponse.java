@@ -1,7 +1,7 @@
 package com.ssafy.star.user.dto.response;
 
 public record UserLoginResponse(
-        UserResponse user,
+        UserDefaultResponse user,
         String token
 ) {
 }
