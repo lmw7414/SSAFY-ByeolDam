@@ -85,9 +85,12 @@ export default function NavBar() {
     setFollowing(followingResult);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   readNickname().then((result) => {
+  //     // console.log(result);
+  //     setNickname(result);
+  //   });
+  // }, []);
 
   // 팔로우 모달
   const openFollowerModal = () => {

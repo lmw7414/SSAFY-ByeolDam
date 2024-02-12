@@ -55,7 +55,7 @@ function NavApp() {
         <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
           <NavBar />
           <Routes>
-            <Route path="/home" element={<Universe />} />
+            <Route path="/home/*" element={<Universe />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/search/star" element={<SearchStar />} />
             <Route path="/search/constellation" element={<SearchConstellation />} />
