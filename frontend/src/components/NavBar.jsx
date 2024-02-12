@@ -20,6 +20,7 @@ export default function NavBar() {
   const [follower, setFollower] = useState('');
   const [modalState, setModalState] = useModal();
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
   const [profileImgUrl, setProfileImgUrl] = useState('');
   // const [parsedJwt, setParsedJwt] = useState(null);
 
@@ -53,36 +54,34 @@ export default function NavBar() {
     setBarId(4);
   };
 
-  // 네비게이션 바 프로필 정보 표시
-  const readJWT = async () => {
-    const JWTtoken = sessionStorage.getItem('token');
-    const parsed = parseJwt(JWTtoken);
-    // 닉네임 state로 가져오기
-    setNickname(parsed.nickname);
-    // 프로필이미지 URL 가져오기
-    const profile = await axios.get(`/users/${parsed.nickname}`);
-    setProfileImgUrl(profile.data.result.imageUrl);
-    return parsed;
+  const readProfile = async () => {
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    setNickname(profile.nickname);
+    setEmail(profile.email);
+    return profile;
   };
 
-  const readFollowing = async (parsed) => {
-    const data = await axios.get(`${parsed.nickname}/count-followings`);
-    return data.data.result;
+  const readFollowing = async (profile) => {
+    const data = await axios.get(`${profile.nickname}/count-followings`);
+    setFollowing(data.data.result);
   };
 
-  const readFollower = async (parsed) => {
-    const data = await axios.get(`${parsed.nickname}/count-followers`);
-    return data.data.result;
+  const readFollower = async (profile) => {
+    const data = await axios.get(`${profile.nickname}/count-followers`);
+    setFollower(data.data.result);
   };
 
+  const readStarConstellation = async () => {
+    console.log(email);
+    const constellation = await axios.get(`constellations/user/${email}`);
+    console.log(constellation);
+  };
   const fetchData = async () => {
-    const data = await readJWT();
-
-    const followerResult = await readFollower(data);
-    setFollower(followerResult);
-
-    const followingResult = await readFollowing(data);
-    setFollowing(followingResult);
+    const data = await readProfile();
+    await readFollower(data);
+    await readFollowing(data);
+    await readStarConstellation();
   };
 
   // useEffect(() => {
