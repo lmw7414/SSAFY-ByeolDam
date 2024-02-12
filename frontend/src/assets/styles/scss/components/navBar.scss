@@ -1,4 +1,4 @@
-$nav-bar-width: 320px;
+$nav-bar-width: 20rem;
 $nav-menu-font-size: 1.7rem;
 
 .nav-bar-big-container {
@@ -61,7 +61,7 @@ $nav-menu-font-size: 1.7rem;
 .nav-bar-contents {
   margin-top: 2rem;
   flex-grow: 1;
-  width: $nav-bar-width - 80px;
+  width: calc($nav-bar-width - 80px);
 }
 
 .nav-bar-profile-box {
