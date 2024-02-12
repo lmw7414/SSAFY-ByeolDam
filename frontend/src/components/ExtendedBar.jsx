@@ -47,7 +47,7 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
   return (
     <div className={isClose ? 'extended-bar-closed' : 'extended-bar-big-container'}>
       <div className="nav-bar-logo" onClick={goHome}>
-        <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+        <img src="/images/temporary-logo.png" alt="logo" />
       </div>
       <div className={isClose ? 'extended-bar-container-closed' : 'extended-bar-container'}>
         <div className="extended-bar-contents">
@@ -65,8 +65,8 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 <ExtendedBarIcon
                   src={
                     filterId === 0
-                      ? '/src/assets/images/search-bar-filter-icons/user_activated.png'
-                      : '/src/assets/images/search-bar-filter-icons/user.png'
+                      ? '/images/search-bar-filter-icons/user_activated.png'
+                      : '/images/search-bar-filter-icons/user.png'
                   }
                   alt={'user'}
                   onClick={() => changeFilter(0)}
@@ -74,8 +74,8 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 <ExtendedBarIcon
                   src={
                     filterId === 1
-                      ? '/src/assets/images/search-bar-filter-icons/star_activated.png'
-                      : '/src/assets/images/search-bar-filter-icons/star.png'
+                      ? '/images/search-bar-filter-icons/star_activated.png'
+                      : '/images/search-bar-filter-icons/star.png'
                   }
                   alt={'star'}
                   onClick={() => changeFilter(1)}
@@ -83,8 +83,8 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 <ExtendedBarIcon
                   src={
                     filterId === 2
-                      ? '/src/assets/images/search-bar-filter-icons/constellation_activated.png'
-                      : '/src/assets/images/search-bar-filter-icons/constellation.png'
+                      ? '/images/search-bar-filter-icons/constellation_activated.png'
+                      : '/images/search-bar-filter-icons/constellation.png'
                   }
                   alt={'constellation'}
                   onClick={() => changeFilter(2)}
@@ -95,22 +95,22 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 <ExtendedBarIcon
                   src={
                     barId === 1
-                      ? '/src/assets/images/nav-bar-menu-icons/search_activated.png'
-                      : '/src/assets/images/nav-bar-menu-icons/search.png'
+                      ? '/images/nav-bar-menu-icons/search_activated.png'
+                      : '/images/nav-bar-menu-icons/search.png'
                   }
                   alt={'search'}
                   onClick={openSearchBar}
                 />
                 <ExtendedBarIcon
-                  src={'/src/assets/images/nav-bar-menu-icons/feed.png'}
+                  src={'/images/nav-bar-menu-icons/feed.png'}
                   alt={'feed'}
                   className={'extended-bar-menu-icon'}
                 />
                 <ExtendedBarIcon
                   src={
                     barId === 3
-                      ? '/src/assets/images/nav-bar-menu-icons/notifications_activated.png'
-                      : '/src/assets/images/nav-bar-menu-icons/notifications.png'
+                      ? '/images/nav-bar-menu-icons/notifications_activated.png'
+                      : '/images/nav-bar-menu-icons/notifications.png'
                   }
                   alt={'notifications'}
                   onClick={openNotificationBar}
@@ -119,16 +119,13 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                   <ExtendedBarIcon
                     src={
                       barId === 4
-                        ? '/src/assets/images/nav-bar-menu-icons/settings_activated.png'
-                        : '/src/assets/images/nav-bar-menu-icons/settings.png'
+                        ? '/images/nav-bar-menu-icons/settings_activated.png'
+                        : '/images/nav-bar-menu-icons/settings.png'
                     }
                     alt={'notifications'}
                   />
                 </Link>
-                <ExtendedBarIcon
-                  src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
-                  alt={'logout'}
-                />
+                <ExtendedBarIcon src={'/images/nav-bar-menu-icons/logout.png'} alt={'logout'} />
               </div>
             </div>
 
@@ -141,7 +138,7 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
       <div className="nav-bar-toggle-container" onClick={closeExtendedBar}>
         <div className="nav-bar-menu-icon-box">
           <img
-            src="/src/assets/images/nav-bar-toggle-button/close.png"
+            src="/images/nav-bar-toggle-button/close.png"
             alt="toggle_button"
             className="toggle-button"
           />

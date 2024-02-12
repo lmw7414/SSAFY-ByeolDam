@@ -18,7 +18,7 @@ export default function ModalContainer() {
               <div></div>
               <h1 className="modal-title">{currentModalState.title}</h1>
               <img
-                src="/src/assets/images/base/close-button.png"
+                src="/images/base/close-button.png"
                 alt="modal-close"
                 className="modal-close"
                 onClick={closeModal}

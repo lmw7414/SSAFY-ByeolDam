@@ -33,7 +33,7 @@ export default function FollowModal({ followSubject, modalState }) {
   // console.log(array);
   const dummyArray = [
     {
-      imageUrl: '/src/assets/images/space.png',
+      imageUrl: '/images/space.png',
       email: 'eung0202@naver.com',
       name: '리은규',
       nickname: '스트링치즈먹고싶다',
@@ -42,7 +42,7 @@ export default function FollowModal({ followSubject, modalState }) {
       birthday: '1956-02-28',
     },
     {
-      imageUrl: '/src/assets/images/space.png',
+      imageUrl: '/images/space.png',
       email: 'chiron7777@naver.com',
       name: '리현쳘',
       nickname: '배가부르다말다',
@@ -51,7 +51,7 @@ export default function FollowModal({ followSubject, modalState }) {
       birthday: '1956-02-28',
     },
     {
-      imageUrl: '/src/assets/images/space.png',
+      imageUrl: '/images/space.png',
       email: 'lsh243@naver.com',
       name: '리수혁',
       nickname: '메이플하고시팓',
