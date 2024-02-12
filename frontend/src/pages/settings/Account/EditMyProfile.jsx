@@ -48,7 +48,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
               <input type="text" name="email" value={editedProfile.email} disabled />
             </label>
           </div>
-          <div>
+          {/* <div>
             <label>
               비밀번호 수정
               <input
@@ -58,7 +58,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
                 onChange={handleChange}
               />
             </label>
-          </div>
+          </div> */}
           <div>
             <label>
               이름

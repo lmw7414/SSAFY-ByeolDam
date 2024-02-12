@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.api;
 
+import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dto.Constellation;
@@ -7,8 +8,9 @@ import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
+import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.dto.request.NicknameRequest;
-import com.ssafy.star.user.dto.response.UserResponse;
+import com.ssafy.star.user.dto.response.UserDefaultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,9 +30,9 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ConstellationController {
-
     private final ConstellationService constellationService;
-
+    private final ArticleService articleService;
+    private final FollowService followService;
 
     @Operation(
             summary = "별자리 생성",
@@ -176,10 +178,17 @@ public class ConstellationController {
             }
     )
     @GetMapping("/users/constellations/{constellationId}")
-    public Response<List<UserResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
+    public Response<List<UserDefaultResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
         return Response.success(constellationService.findConstellationUsers(constellationId, authentication.getName())
                 .stream()
-                .map(UserResponse::fromUser)
+                .map(res -> UserDefaultResponse.fromUser(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email()),
+                                followService.countFollowers(res.nickname()),
+                                followService.countFollowings(res.nickname())
+                        )
+                )
                 .toList()
         );
     }
@@ -192,7 +201,8 @@ public class ConstellationController {
             }
     )
     @PutMapping("/role-modify/constellations/{constellationId}")
-    public Response<Void> roleModify(@PathVariable Long constellationId, @RequestBody UserEmailRequest userEmailRequest, Authentication authentication) {
+    public Response<Void> roleModify(@PathVariable Long constellationId, @RequestBody UserEmailRequest
+            userEmailRequest, Authentication authentication) {
         String userEmail = userEmailRequest.userEmail();
         constellationService.roleModify(constellationId, userEmail, authentication.getName());
         return Response.success();

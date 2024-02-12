@@ -11,7 +11,7 @@ export default function Settings() {
     <div className="settings-container">
       <div className="settings-menu-container">
         <div
-          className="settings-menu"
+          className={`settings-menu ${settingId === 0 ? 'selected' : ''}`}
           onClick={() => {
             setSettingId(0);
           }}
@@ -19,7 +19,7 @@ export default function Settings() {
           <p className="settings-menu-text">계정</p>
         </div>
         <div
-          className="settings-menu"
+          className={`settings-menu ${settingId === 1 ? 'selected' : ''}`}
           onClick={() => {
             setSettingId(1);
           }}
@@ -27,7 +27,7 @@ export default function Settings() {
           <p className="settings-menu-text">알림</p>
         </div>
         <div
-          className="settings-menu"
+          className={`settings-menu ${settingId === 2 ? 'selected' : ''}`}
           onClick={() => {
             setSettingId(2);
           }}

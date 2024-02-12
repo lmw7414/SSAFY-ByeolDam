@@ -93,7 +93,6 @@ public class S3uploader {
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
-    //TODO: 이미지 삭제가 실패한 경우 고려
     public void deleteImageFromS3(String filePath){
         String splitStr = ".com/";
         String fileName = filePath.substring(filePath.lastIndexOf(splitStr)+splitStr.length());

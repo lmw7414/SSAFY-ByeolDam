@@ -26,10 +26,8 @@ public class ImageUtils {
             // 가로가 세로보다 큰 경우
             if (sourceImage.getWidth() >= sourceImage.getHeight()) {
                 newWidth = height;
-//                newHeight = (int) (TARGET_HEIGHT * ((double) sourceImage.getHeight() / sourceImage.getWidth()));
                 newHeight = height;
             } else { // 세로가 가로보다 큰 경우
-//                newWidth = (int) (TARGET_HEIGHT * ((double) sourceImage.getWidth() / sourceImage.getHeight()));
                 newWidth = height;
                 newHeight = height;
             }
