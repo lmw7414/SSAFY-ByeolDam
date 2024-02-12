@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import axios from '/src/apis/axios';
+import { logout } from '../apis/member';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -9,16 +9,26 @@ import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
 import FollowModal from './modal/Follow/FollowModal';
 
+// import jwt from 'jsonwebtoken';
+import parseJwt from '../utils/parseJwt.js';
+import axios from '../apis/axios';
+
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
-  const [following, setFollowing] = useState(0);
-  const [follower, setFollower] = useState(0);
   const [modalState, setModalState] = useModal();
-  const [nickname, setNickname] = useState('');
+  // const [follower, setFollower] = useState('');
+  // const [following, setFollowing] = useState('');
+  // const [nickname, setNickname] = useState('');
+  // const [email, setEmail] = useState('');
+  const [profile, setProfile] = useState({});
+  const [profileImgUrl, setProfileImgUrl] = useState('');
+  // const [parsedJwt, setParsedJwt] = useState(null);
 
+  // 네비게이션 바 작동 관련
   const navigate = useNavigate();
+
   const goHome = () => {
     navigate('/home');
     setBarId(0);
@@ -46,40 +56,18 @@ export default function NavBar() {
     setBarId(4);
   };
 
-  const readNickname = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    return nickname;
+  const readProfile = async () => {
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    const data = await axios.get(`/users/${profile.nickname}`);
+    setProfile(data.data.result);
   };
 
   useEffect(() => {
-    readNickname().then((result) => {
-      // console.log(result);
-      setNickname(result);
-    });
+    readProfile();
   }, []);
 
-  // console.log('barId : ', barId);
-  // console.log('navEx : ', navEx);
-
-  // const readFollowing = async () => {
-  //   const data = await axios.get('immigrant_co/count-followings');
-  //   return data.data.result;
-  // };
-
-  // const readFollower = async () => {
-  //   const data = await axios.get('immigrant_co/count-followers');
-  //   return data.data.result;
-  // };
-
-  // useEffect(() => {
-  //   readFollower().then((result) => {
-  //     setFollower(result);
-  //   });
-  //   readFollowing().then((result) => {
-  //     setFollowing(result);
-  //   });
-  // }, []);
-
+  // 팔로우 모달
   const openFollowerModal = () => {
     setModalState({
       isOpen: true,
@@ -109,31 +97,37 @@ export default function NavBar() {
       ) : (
         <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'nav-bar-hidden'}`}>
           <div className="nav-bar-logo" onClick={goHome}>
-            <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+            <img src="/images/temporary-logo.png" alt="logo" />
           </div>
           <div className="nav-bar-container">
             <div className="nav-bar-contents">
               <div className="nav-bar-profile-box">
                 <div className="profile-image-box">
                   <div className="profile-image-container">
-                    <img
-                      className="profile-image"
-                      src="/src/assets/images/space.png"
-                      alt="profile_image"
-                    />
+                    <img className="profile-image" src="/images/space.png" alt="profile_image" />
                   </div>
                 </div>
-                <div className="nickname title">
-                  <p>{nickname}</p>
+                <div className="nickname-memo-container">
+                  <p className="real-nickname">{profile.nickname}</p>
+                  <p className="memo">{profile.memo}</p>
                 </div>
+
                 <div className="profile-info-box">
-                  <ProfileInfo text={'별'} num={26} />
+                  <ProfileInfo text={'별'} num={profile.articleCounts} />
 
-                  <ProfileInfo text={'별자리'} num={4} />
+                  <ProfileInfo text={'별자리'} num={profile.constellationCounts} />
 
-                  <ProfileInfo text={'팔로워'} num={following} onClick={openFollowerModal} />
+                  <ProfileInfo
+                    text={'팔로워'}
+                    num={profile.followings}
+                    onClick={openFollowerModal}
+                  />
 
-                  <ProfileInfo text={'팔로잉'} num={follower} onClick={openFollowingModal} />
+                  <ProfileInfo
+                    text={'팔로잉'}
+                    num={profile.followers}
+                    onClick={openFollowingModal}
+                  />
                 </div>
               </div>
 
@@ -144,18 +138,18 @@ export default function NavBar() {
               <div className="nav-bar-menu-box">
                 <NavBarMenu
                   text={'검색'}
-                  src={'/src/assets/images/nav-bar-menu-icons/search.png'}
+                  src={'/images/nav-bar-menu-icons/search.png'}
                   alt={'search'}
                   onClick={openSearchBar}
                 />
                 <NavBarMenu
                   text={'피드'}
-                  src={'/src/assets/images/nav-bar-menu-icons/feed.png'}
+                  src={'/images/nav-bar-menu-icons/feed.png'}
                   alt={'feed'}
                 />
                 <NavBarMenu
                   text={'알림'}
-                  src={'/src/assets/images/nav-bar-menu-icons/notifications.png'}
+                  src={'/images/nav-bar-menu-icons/notifications.png'}
                   alt={'notifications'}
                   onClick={openNotificationBar}
                 />
@@ -164,8 +158,8 @@ export default function NavBar() {
                     text={'설정'}
                     src={
                       barId === 4
-                        ? '/src/assets/images/nav-bar-menu-icons/settings_activated.png'
-                        : '/src/assets/images/nav-bar-menu-icons/settings.png'
+                        ? '/images/nav-bar-menu-icons/settings_activated.png'
+                        : '/images/nav-bar-menu-icons/settings.png'
                     }
                     alt={'settings'}
                     onClick={openSettingsPage}
@@ -174,8 +168,12 @@ export default function NavBar() {
                 </Link>
                 <NavBarMenu
                   text={'로그아웃'}
-                  src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
+                  src={'/images/nav-bar-menu-icons/logout.png'}
                   alt={'logout'}
+                  onClick={() => {
+                    logout();
+                    navigate('/');
+                  }}
                 />
               </div>
             </div>
@@ -186,8 +184,8 @@ export default function NavBar() {
               <img
                 src={
                   isNavBarVisible
-                    ? '/src/assets/images/nav-bar-toggle-button/close.png'
-                    : '/src/assets/images/nav-bar-toggle-button/open.png'
+                    ? '/images/nav-bar-toggle-button/close.png'
+                    : '/images/nav-bar-toggle-button/open.png'
                 }
                 alt="toggle_button"
                 className="toggle-button"

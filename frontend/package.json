@@ -17,6 +17,7 @@
     "color-thief-node": "^1.0.4",
     "eslint-config-airbnb": "^19.0.4",
     "image-js": "^0.35.5",
+    "jsonwebtoken": "^9.0.2",
     "konva": "^9.3.2",
     "lodash": "^4.17.21",
     "maath": "^0.10.7",

@@ -1,9 +1,9 @@
-export default function downloadURI(uri, name) {
+export const downloadURI = (uri, name) => {
   var link = document.createElement('a');
   link.download = name;
   link.href = uri;
   link.click();
-}
+};
 
 export const convertPoints = (points, width, height, w, h) => {
   const [lx, rx] = points.reduce(

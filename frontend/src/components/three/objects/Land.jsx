@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
 
 export default function Land() {
-  const gltf = useLoader(GLTFLoader, './src/assets/models/land/land.glb');
+  const gltf = useLoader(GLTFLoader, '/models/land/land.glb');
   return (
     <primitive
       scale={5}

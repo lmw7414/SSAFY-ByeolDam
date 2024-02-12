@@ -37,13 +37,13 @@ export default function Universe() {
     <div className="canvas-container">
       <div className="main_buttons_box">
         <img
-          src="/src/assets/images/main_buttons/post_create_button.png"
+          src="/images/main_buttons/post_create_button.png"
           alt="post_create_button"
           className="main-button"
           onClick={openArticleWritingModal}
         />
         <img
-          src="/src/assets/images/main_buttons/constellation_list.png"
+          src="/images/main_buttons/constellation_list.png"
           alt="post_create_button"
           className="main-button"
           onClick={openConstellationModal}

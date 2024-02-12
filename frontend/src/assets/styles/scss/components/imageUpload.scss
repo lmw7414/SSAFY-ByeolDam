@@ -1,0 +1,58 @@
+.image-upload-box,
+.article-content-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.5rem;
+}
+
+.article-editor-box {
+  display: flex;
+  flex-direction: row;
+}
+
+.image-change-btn {
+  margin-top: 1rem;
+  background-color: rgb(142, 124, 172);
+  border: none;
+  border-radius: 2px;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 1rem;
+  cursor: pointer;
+  color: white;
+  align-self: flex-start;
+}
+
+.article-content-label {
+  color: white;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 0.2rem;
+}
+
+.article-content-input {
+  margin-bottom: 1rem;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+}
+
+.article-content-box {
+  width: 20rem;
+  margin-left: 2rem;
+}
+
+.article-upload-btn {
+  margin-top: auto;
+  background-color: $secondary;
+  border: none;
+  border-radius: 12px;
+  height: 2.5rem;
+  cursor: pointer;
+  color: white;
+  width: 100%;
+}
+
+.image-editor-wrapper {
+  border: 1px solid $secondary;
+}

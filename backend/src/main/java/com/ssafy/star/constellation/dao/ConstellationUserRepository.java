@@ -21,4 +21,7 @@ public interface ConstellationUserRepository extends JpaRepository<Constellation
 
     @Query("SELECT cu FROM ConstellationUserEntity cu WHERE cu.constellationEntity = :constellationEntity")
     Page<ConstellationUserEntity> findConstellationUserEntitiesByConstellationEntity(@Param("constellationEntity") ConstellationEntity constellationEntity, Pageable pageable);
+
+    @Query(value = "SELECT COUNT(*) FROM ConstellationUserEntity entity WHERE entity.userEntity = :userEntity")
+    Integer countConstellationByUser(@Param("userEntity") UserEntity userEntity);
 }

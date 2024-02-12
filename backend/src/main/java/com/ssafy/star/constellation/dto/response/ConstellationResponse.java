@@ -2,9 +2,6 @@ package com.ssafy.star.constellation.dto.response;
 
 import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.dto.Constellation;
-import com.ssafy.star.user.dto.response.UserResponse;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 

@@ -23,7 +23,7 @@ export default function StarGroup({ position = [24, 20, 24], name, selected }) {
       if (key == 'a') setTarget(!target);
     });
 
-    fetch('./src/assets/data/contours.json')
+    fetch('./data/contours.json')
       .then((data) => data.json())
       .then(([data]) => {
         const zipped = douglasPeucker(
