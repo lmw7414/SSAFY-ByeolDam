@@ -14,20 +14,20 @@ const size = 15;
 const data = [
   {
     id: 'bread',
-    url: './src/assets/data/bread.json',
-    thumbnail: './src/assets/images/sample/bread.jpg',
+    url: './src/assets/data/춤2.json',
+    thumbnail: './src/assets/images/sample/춤2.jpg',
   },
   { id: 'car', url: './src/assets/data/car.json', thumbnail: './src/assets/images/sample/car.jpg' },
   { id: 'cat', url: './src/assets/data/cat.json', thumbnail: './src/assets/images/sample/cat.jpg' },
   {
     id: 'chicken',
-    url: './src/assets/data/chicken.json',
-    thumbnail: './src/assets/images/sample/chicken.jpg',
+    url: './src/assets/data/싸피.json',
+    thumbnail: './src/assets/images/sample/싸피.png',
   },
   {
     id: 'coffee',
-    url: './src/assets/data/coffee.json',
-    thumbnail: './src/assets/images/sample/coffee.jpg',
+    url: './src/assets/data/삼성.json',
+    thumbnail: './src/assets/images/sample/삼성.png',
   },
   {
     id: 'couple',
@@ -61,13 +61,13 @@ const data = [
   },
   {
     id: 'scenery',
-    url: './src/assets/data/scenery.json',
-    thumbnail: './src/assets/images/sample/scenery.jpg',
+    url: './src/assets/data/여행2.json',
+    thumbnail: './src/assets/images/sample/여행2.jpg',
   },
   {
     id: 'selfie',
-    url: './src/assets/data/selfie.json',
-    thumbnail: './src/assets/images/sample/selfie.jpg',
+    url: './src/assets/data/강아지3.json',
+    thumbnail: './src/assets/images/sample/강아지3.jpg',
   },
   {
     id: 'sports',
