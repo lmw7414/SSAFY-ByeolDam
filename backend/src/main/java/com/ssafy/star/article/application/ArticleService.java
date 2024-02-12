@@ -332,4 +332,9 @@ public class ArticleService {
 
         return articleEntity;
     }
+
+    public int countArticles(String email){
+        UserEntity userEntity = getUserEntityOrException(email);
+        return articleRepository.countArticlesByUser(userEntity);
+    }
 }

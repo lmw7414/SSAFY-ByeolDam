@@ -1,10 +1,12 @@
 package com.ssafy.star.user.application;
 
+import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.common.config.properties.AppProperties;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
@@ -19,6 +21,10 @@ import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
 import com.ssafy.star.user.dto.User;
+import com.ssafy.star.user.dto.request.UserModifyRequest;
+import com.ssafy.star.user.dto.response.UserDefaultResponse;
+import com.ssafy.star.user.dto.response.UserLoginResponse;
+import com.ssafy.star.user.dto.response.UserProfileResponse;
 import com.ssafy.star.user.repository.UserCacheRepository;
 import com.ssafy.star.user.repository.UserRefreshTokenRepository;
 import com.ssafy.star.user.repository.UserRepository;
@@ -56,6 +62,9 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final S3uploader s3uploader;
 
+    private final ArticleService articleService;
+    private final ConstellationService constellationService;
+    private final FollowService followService;
 
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
@@ -122,7 +131,7 @@ public class UserService {
      * 6. 기존 쿠키 삭제하고 새로 추가
      * 7. JWT 토큰 리턴
      */
-    public String login(HttpServletRequest request, HttpServletResponse response, String email, String password) {
+    public UserLoginResponse login(HttpServletRequest request, HttpServletResponse response, String email, String password) {
         // 회원가입 여부 체크
         User user = loadUserByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email))
@@ -148,8 +157,9 @@ public class UserService {
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtils.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
+        UserDefaultResponse defaultResponse = UserDefaultResponse.fromUser(user, articleService.countArticles(email), constellationService.countConstellations(email), followService.countFollowers(user.nickname()), followService.countFollowings(user.nickname()));
 
-        return accessToken.getToken();
+        return new UserLoginResponse(defaultResponse, accessToken.getToken());
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response, String email) {
@@ -259,52 +269,59 @@ public class UserService {
 
     //회원정보 조회
     @Transactional(readOnly = true)
-    public User my(String nickName) {
+    public UserProfileResponse my(String nickName) {
         UserEntity userEntity = userRepository.findByNickname(nickName).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", nickName)));
-        return User.fromEntity(userEntity);
+        User user = User.fromEntity(userEntity);
+        return UserProfileResponse.fromUser(
+                user,
+                articleService.countArticles(user.email()),
+                constellationService.countConstellations(user.email()),
+                followService.countFollowers(nickName),
+                followService.countFollowings(nickName)
+        );
     }
 
     //회원정보 수정
     @Transactional
-    public User updateMyProfile(
-            String email,
-            String password,
-            String name,
-            String nickname,
-            String memo,
-            DisclosureType disclosureType,
-            LocalDate birthday) {
+    public UserProfileResponse updateMyProfile(String email, UserModifyRequest request) {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         //닉네임 중복체크
-        if (!userEntity.getNickname().equals(nickname)) {
-            satisfyNickname(nickname);
-            userEntity.setNickname(nickname);
+        if (!userEntity.getNickname().equals(request.nickname())) {
+            satisfyNickname(request.nickname());
+            userEntity.setNickname(request.nickname());
         }
-        if (password != null) {
-            userEntity.setPassword(encoder.encode(password));
+        if (request.password() != null) {
+            userEntity.setPassword(encoder.encode(request.password()));
         }
-        if (name != null) {
-            userEntity.setName(name);
+        if (request.name() != null) {
+            userEntity.setName(request.name());
         }
-        if (birthday != null) {
-            userEntity.setBirthday(birthday);
+        if (request.birthday() != null) {
+            userEntity.setBirthday(request.birthday());
         }
-        if (disclosureType != null) {
-            userEntity.setDisclosureType(disclosureType);
+        if (request.disclosureType() != null) {
+            userEntity.setDisclosureType(request.disclosureType());
         }
         //null이어도 되는 필드
-        userEntity.setMemo(memo);
+        userEntity.setMemo(request.memo());
         userCacheRepository.updateUser(User.fromEntity(userEntity));
         userRepository.saveAndFlush(userEntity);
-        return User.fromEntity(userEntity);
+
+        User user = User.fromEntity(userEntity);
+        return UserProfileResponse.fromUser(
+                user,
+                articleService.countArticles(email),
+                constellationService.countConstellations(email),
+                followService.countFollowers(user.nickname()),
+                followService.countFollowings(user.nickname()));
     }
 
     // 기본 프로필로 변경하기
     @Transactional
-    public User updateProfileDefault(String email) {
+    public UserDefaultResponse updateProfileDefault(String email) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
                 () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", email))
         );
@@ -316,7 +333,13 @@ public class UserService {
             imageRepository.delete(oldImage);
             userEntity.setImageEntity(null);
         }
-        return User.fromEntity(userEntity);
+        User user = User.fromEntity(userEntity);
+        return UserDefaultResponse.fromUser(
+                user,
+                articleService.countArticles(email),
+                constellationService.countConstellations(email),
+                followService.countFollowers(user.nickname()),
+                followService.countFollowings(user.nickname()));
     }
 
     /**
@@ -328,7 +351,7 @@ public class UserService {
      * 6. Image Dto에 저장되어있던 url을 이용하여 S3에서 해당하는 이미지 경로를 삭제한다.
      */
     @Transactional
-    public User updateProfileImage(String email, MultipartFile multipartFile, ImageType imageType) {
+    public UserDefaultResponse updateProfileImage(String email, MultipartFile multipartFile, ImageType imageType) {
         String profileUrl = "";
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
                 () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", email))
@@ -356,7 +379,13 @@ public class UserService {
                 oldImgEntity.setImageType(imageType);
                 imageRepository.save(oldImgEntity);
             }
-            return User.fromEntity(userEntity);
+            User user = User.fromEntity(userEntity);
+            return UserDefaultResponse.fromUser(
+                    user,
+                    articleService.countArticles(email),
+                    constellationService.countConstellations(email),
+                    followService.countFollowers(user.nickname()),
+                    followService.countFollowings(user.nickname()));
         } catch (IOException e) {
             s3uploader.deleteImageFromS3(profileUrl);
         }
