@@ -9,7 +9,7 @@ export const login = async ({ email, password }) => {
 
   const token = data?.result?.token;
   sessionStorage.setItem('access_token', token);
-  sessionStorage.setItem('profile', JSON.stringify(parseJwt(token)));
+  sessionStorage.setItem('profile', JSON.stringify(data.result.user));
 
   axios.interceptors.request.use(
     (config) => {
