@@ -16,12 +16,10 @@ public record UserDefaultResponse(
         String name,
         String nickname,
         DisclosureType disclosureType,
-
-        //TODO : 팔로워 수, 팔로잉 수, 게시글 수, 별자리 수 추가 필요
         Integer articleCounts,
         Integer constellationCounts,
-        Long Followers,
-        Long Followings
+        Long followers,
+        Long followings
 ) {
 
     public static UserDefaultResponse fromUser(User dto, int articleCounts, int constellationCounts,Long followers, Long followings) {
