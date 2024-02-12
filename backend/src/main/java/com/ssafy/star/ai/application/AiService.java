@@ -29,7 +29,7 @@ public class AiService {
 
         String imageUrl = "";
         try{
-            imageUrl = s3uploader.upload(imageFile, "temp", TARGET_HEIGHT);
+            imageUrl = s3uploader.upload(imageFile, "temp");
             return imageUrl;
         } catch (IOException e){
             System.out.println("업로드 실패");

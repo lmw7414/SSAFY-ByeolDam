@@ -239,9 +239,9 @@ public class ConstellationService {
         UserEntity userEntity = getUserEntityByNicknameOrException(email);
 
         // 사진들 추가
-        String originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        String cThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+        String originUrl = s3uploader.upload(origin, "constellation/origin");
+        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb");
+        String cThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb");
 
         // image 테이블에 저장
         imageService.saveImage(origin.getOriginalFilename(), originUrl, null, ImageType.CONSTELLATION);
@@ -363,9 +363,9 @@ public class ConstellationService {
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
 
         // 사진들 추가
-        String originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        String cThumbUrl = s3uploader.upload(cThumb, "constellation/cthumb", THUMB_HEIGHT);
+        String originUrl = s3uploader.upload(origin, "constellation/origin");
+        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb");
+        String cThumbUrl = s3uploader.upload(cThumb, "constellation/cthumb");
 
         Long contourId = constellationEntity.getContourId();
         ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
