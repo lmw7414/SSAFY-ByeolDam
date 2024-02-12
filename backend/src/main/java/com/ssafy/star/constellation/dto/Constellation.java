@@ -1,7 +1,6 @@
 package com.ssafy.star.constellation.dto;
 
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,10 +13,9 @@ public record Constellation (
     Long contourId,
     long hits,
     String description,
-    List<ConstellationUserEntity> constellationUserEntities,
+    List<ConstellationUser> constellationUsers,
     LocalDateTime createdAt,
-    LocalDateTime modifiedAt,
-    LocalDateTime deletedAt
+    LocalDateTime modifiedAt
 )
 {
     public static Constellation of(
@@ -26,10 +24,9 @@ public record Constellation (
             Long contourId,
             long hits,
             String description,
-            List<ConstellationUserEntity> constellationUserEntities,
+            List<ConstellationUser> constellationUsers,
             LocalDateTime createdAt,
-            LocalDateTime modifiedAt,
-            LocalDateTime deletedAt
+            LocalDateTime modifiedAt
     ) {
         return new Constellation(
                 id,
@@ -37,10 +34,9 @@ public record Constellation (
                 contourId,
                 hits,
                 description,
-                constellationUserEntities,
+                constellationUsers,
                 createdAt,
-                modifiedAt,
-                deletedAt
+                modifiedAt
         );
     }
 
@@ -51,10 +47,9 @@ public record Constellation (
                 entity.getContourId(),
                 entity.getHits(),
                 entity.getDescription(),
-                entity.getConstellationUserEntities(),
+                entity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                 entity.getCreatedAt(),
-                entity.getModifiedAt(),
-                entity.getDeletedAt()
+                entity.getModifiedAt()
         );
     }
 

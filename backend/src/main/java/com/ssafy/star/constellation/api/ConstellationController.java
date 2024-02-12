@@ -7,6 +7,7 @@ import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
+import com.ssafy.star.constellation.dto.response.ConstellationWithArticleResponse;
 import com.ssafy.star.user.dto.request.NicknameRequest;
 import com.ssafy.star.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +48,6 @@ public class ConstellationController {
                                  @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
                                  @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
-        String email = authentication.getName();
         //TODO : 윤곽선은 request에 같이 담아져서 옴, request에서 어떻게 추출해서 MongoDB에 저장할지 고민 필요
 
         // 사용자를 관리자로 만듦
@@ -117,8 +117,8 @@ public class ConstellationController {
             }
     )
     @GetMapping("/constellations")
-    public Response<List<ConstellationResponse>> myConstellations(Authentication authentication) {
-        return Response.success(constellationService.myConstellations(authentication.getName()).stream().map(ConstellationResponse::fromConstellation).toList());
+    public Response<List<ConstellationWithArticleResponse>> myConstellations(Authentication authentication) {
+        return Response.success(constellationService.myConstellations(authentication.getName()).stream().map(ConstellationWithArticleResponse::fromConstellationWithArticle).toList());
     }
 
     @Operation(
@@ -129,11 +129,11 @@ public class ConstellationController {
             }
     )
     @GetMapping("/constellations/user/{nickname}")
-    public Response<List<ConstellationResponse>> userConstellations(Authentication authentication, @PathVariable String nickname) {
+    public Response<List<ConstellationWithArticleResponse>> userConstellations(Authentication authentication, @PathVariable String nickname) {
         return Response.success(
                 constellationService.userConstellations(nickname, authentication.getName())
                         .stream()
-                        .map(ConstellationResponse::fromConstellation)
+                        .map(ConstellationWithArticleResponse::fromConstellationWithArticle)
                         .toList()
         );
     }

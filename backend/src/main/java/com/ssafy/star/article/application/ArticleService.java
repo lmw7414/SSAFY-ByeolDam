@@ -200,20 +200,10 @@ public class ArticleService {
     }
 
     /**
-     * 게시물 전체 조회
-     */
-    @Transactional(readOnly = true)
-    public Page<Article> list(String email, Pageable pageable) {
-        UserEntity userEntity = getUserEntityOrException(email);
-        // Not deleted 상태이고, DisclosureType이 VISIBLE이거나 자신의 게시물이라면 보여주기
-        return articleRepository.findAllByNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
-    }
-
-    /**
      * 유저의 게시물 전체 조회
      */
     @Transactional(readOnly = true)
-    public Page<Article> userArticlePage(String userEmail, String myEmail, Pageable pageable) {
+    public List<Article> userArticleList(String userEmail, String myEmail) {
         // 찾는 유저가 접속자라면 전체 조회한다
         UserEntity myEntity = getUserEntityOrException(myEmail);
         UserEntity userEntity = getUserEntityOrException(userEmail);
@@ -223,10 +213,10 @@ public class ArticleService {
             if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
 
                 // disclosureType에 따라 조회여부 판단
-                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
+                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(Article::fromEntity).toList();
             }
         }
-        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity).stream().map(Article::fromEntity).toList();
     }
 
     /**
@@ -279,11 +269,11 @@ public class ArticleService {
      * 별자리의 전체 게시물 조회
      */
     @Transactional
-    public Page<Article> articlesInConstellation(Long constellationId, String email, Pageable pageable) {
+    public List<Article> articlesInConstellation(Long constellationId, String email) {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
         UserEntity userEntity = getUserEntityOrException(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
     }
 
     // 포스트가 존재하는지

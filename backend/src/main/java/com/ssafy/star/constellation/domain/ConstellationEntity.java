@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,8 +17,6 @@ import java.util.List;
 @Table(name = "constellation")
 @ToString
 @Getter
-@SQLDelete(sql = "UPDATE constellation SET deleted_at = NOW() where id=?")
-@Where(clause = "deleted_at is NULL")
 public class ConstellationEntity {
 
     @Id
@@ -50,8 +46,6 @@ public class ConstellationEntity {
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
-
-    private LocalDateTime deletedAt;
 
     @PrePersist
     void createdAt() {

@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.application;
 
+import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
@@ -11,7 +12,7 @@ import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
-
+import com.ssafy.star.constellation.dto.ConstellationWithArticle;
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.contour.repository.ContourRepository;
@@ -19,15 +20,11 @@ import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.ApprovalStatus;
-import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +39,7 @@ import static com.ssafy.star.constellation.ConstellationUserRole.USER;
 @RequiredArgsConstructor
 public class ConstellationService {
 
+    private final ArticleRepository articleRepository;
     private final ConstellationRepository constellationRepository;
     private final ConstellationUserRepository constellationUserRepository;
     private final UserRepository userRepository;
@@ -60,14 +58,9 @@ public class ConstellationService {
      * 내부 게시물은 deletedAt NULL인 경우 확인 가능
      */
     @Transactional(readOnly = true)
-    public List<Constellation> myConstellations(String email) {
+    public List<ConstellationWithArticle> myConstellations(String email) {
         UserEntity userEntity = getUserEntityByEmailOrException(email);
-
-        //TODO : article 포함할 것
-        return constellationRepository.findAllByUserEntity(userEntity)
-                .stream()
-                .map(Constellation::fromEntity)
-                .toList();
+        return constellationRepository.findAllByUserEntity(userEntity).stream().map(ConstellationWithArticle::fromEntity).toList();
     }
 
     /**
@@ -75,7 +68,7 @@ public class ConstellationService {
      * - 내가 다른 사람의 우주에 접근했을 때
      */
     @Transactional(readOnly = true)
-    public List<Constellation> userConstellations(String email, String nickname) {
+    public List<ConstellationWithArticle> userConstellations(String email, String nickname) {
         UserEntity userEntity = getUserEntityByNicknameOrException(nickname);  // 타 유저의 계정 이메일
         UserEntity myEntity = getUserEntityByEmailOrException(email);      // 로그인한 사람의 이메일
         // 내 계정으로 내 우주를 접근하는 경우
@@ -85,14 +78,11 @@ public class ConstellationService {
 
         if (DisclosureType.INVISIBLE == userEntity.getDisclosureType()) {
             // 나와 팔로우 관계라면 가능
-            FollowEntity followEntity = followRepository.findByFromUserAndToUserAndStatus(myEntity, userEntity, ApprovalStatus.ACCEPT)
+            followRepository.findByFromUserAndToUserAndStatus(myEntity, userEntity, ApprovalStatus.ACCEPT)
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.INVALID_PERMISSION));
         }
 
-        return constellationUserRepository.findConstellationByUserEntity(userEntity)
-                .stream()
-                .map(Constellation::fromEntity)
-                .toList();
+        return constellationUserRepository.findConstellationByUserEntity(userEntity).stream().map(ConstellationWithArticle::fromEntity).toList();
     }
 
     // 별자리에 공유할 유저 추가
@@ -151,52 +141,37 @@ public class ConstellationService {
     }
 
     /**
-     * 별자리 공유하는 유저 조회
-     * 공개된 별자리는 모두가 유저 조회할 수 있고, 비공개 별자리는 회원들만 유저 조회 가능
+     * 공유 별자리 유저 조회
      */
-    public List<User> findConstellationUsers(Long constellationId, String myEmail) {
+    public List<User> findConstellationUsers(Long constellationId, String email) {
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
 
         // 별자리에 속한 user 구하기 : constellationEntity -> constellationUserEntity -> userEntity
         List<ConstellationUserEntity> constellationUsersByConstellationEntity = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity);
         List<UserEntity> userEntities = constellationUsersByConstellationEntity.stream().map(ConstellationUserEntity::getUserEntity).toList();
 
-
-        // 비공개된 별자리
-        UserEntity userEntity = getUserEntityByNicknameOrException(myEmail);
-
-        // 접속자가 소유하고 있는 별자리 구하기 : userEntity -> ConstellationUserEntity -> constellationEntity
-        List<ConstellationUserEntity> constellationUsersByUserEntity = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity);
-        List<ConstellationEntity> constellationEntities = constellationUsersByUserEntity.stream().map(ConstellationUserEntity::getConstellationEntity).toList();
-
-        for (ConstellationEntity constellation : constellationEntities) {
-            // 접속자가 소유하고 있는 별자리와 조회하려는 별자리가 일치하는지 확인
-            if (constellation.getId().equals(constellationId)) {
-                return userEntities.stream().map(User::fromEntity).toList();
-            }
-        }
-
-        throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", myEmail));
+        return userEntities.stream().map(User::fromEntity).toList();
     }
 
     // 관리자와 유저 UserRole 맞바꾸기
-    public void roleModify(Long constellationId, String userEmail, String myEmail) {
+    @Transactional
+    public void roleModify(Long constellationId, String nickname, String email) {
         // user 존재하는지 확인
-        getUserEntityByNicknameOrException(userEmail);
+        UserEntity userEntity = getUserEntityByNicknameOrException(nickname);
+        UserEntity myEntity = getUserEntityByEmailOrException(email);
 
-        // 사용자가 admin이라면 별자리 Entity 반환
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-        System.out.println("constellation : " + constellationId);
+        // 사용자가 admin이라면
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
 
         // 대상 user, ADMIN으로 권한 변경
-        changeRole(userEmail, constellationEntity, ADMIN);
+        changeRole(userEntity, constellationEntity, ADMIN);
 
         // ADMIN, USER로 권한 변경
         try {
             // 도중 오류 발생 시 user 권한 되돌리기
-            changeRole(myEmail, constellationEntity, USER);
+            changeRole(myEntity, constellationEntity, USER);
         } catch (ByeolDamException e) {
-            changeRole(userEmail, constellationEntity, USER);
+            changeRole(userEntity, constellationEntity, USER);
         }
     }
 
@@ -222,7 +197,7 @@ public class ConstellationService {
      * - 몽고DB의 ID 값을 별자리 테이블에 id 값 저장
      */
     @Transactional
-    public Constellation create(
+    public void create(
             String name,
             String description,
             String email,
@@ -263,8 +238,7 @@ public class ConstellationService {
         constellationUserRepository.save(constellationUserEntity);
 
         // 별자리를 데이터베이스에 저장
-        ConstellationEntity savedConstellationEntity = constellationRepository.saveAndFlush(constellationEntity);
-        return Constellation.fromEntity(savedConstellationEntity);
+        constellationRepository.saveAndFlush(constellationEntity);
     }
 
     /**
@@ -428,15 +402,11 @@ public class ConstellationService {
         }
     }
 
-    private void changeRole(String userEmail, ConstellationEntity constellationEntity, ConstellationUserRole role) {
-        UserEntity userEntity = userRepository.findByEmail(userEmail)
-                .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userEmail)));
-
+    private void changeRole(UserEntity userEntity, ConstellationEntity constellationEntity, ConstellationUserRole role) {
         // role 데이터를 저장하고 있는 별자리회원 Entity
         ConstellationUserEntity constellationUserEntity = constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity)
                 .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, %s has no constellationUserEntity", userEmail, constellationEntity.getName())));
+                        new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, %s has no constellationUserEntity", userEntity.getNickname(), constellationEntity.getName())));
         constellationUserEntity.setConstellationUserRole(role);
         constellationUserRepository.saveAndFlush(constellationUserEntity);
     }
