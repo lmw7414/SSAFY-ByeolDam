@@ -1,3 +1,5 @@
+import SearchResultBox from '../../components/base/SearchResultBox';
+
 export default function SearchStar() {
   const dummyPosts = [
     {
@@ -82,10 +84,7 @@ export default function SearchStar() {
     <div className="search-page-background">
       <div className="search-result-container">
         {dummyPosts.map((post) => (
-          <div key={post.id} className="search-result">
-            <p>{post.title}</p>
-            <img src={post.imgUrl} alt="" className="search-result-image" />
-          </div>
+          <SearchResultBox key={post.id} data={post} />
         ))}
       </div>
     </div>
