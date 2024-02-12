@@ -17,6 +17,8 @@ import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.contour.repository.ContourRepository;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
+import com.ssafy.star.image.dao.ImageRepository;
+import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.ApprovalStatus;
 import com.ssafy.star.user.domain.FollowEntity;
@@ -49,6 +51,7 @@ public class ConstellationService {
     private final FollowRepository followRepository;
     private final S3uploader s3uploader;
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
 
     private static final int ORIGIN_HEIGHT = 1024;
     private static final int THUMB_HEIGHT = 256;
@@ -288,6 +291,14 @@ public class ConstellationService {
         s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
         s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
 
+        ImageEntity origin = imageService.getImageUrl(contourEntity.getOriginUrl());
+        ImageEntity thumb = imageService.getImageUrl(contourEntity.getThumbUrl());
+        ImageEntity cThumb = imageService.getImageUrl(contourEntity.getCThumbUrl());
+        // 이미지 테이블에서 관련 이미지 삭제
+        imageRepository.delete(origin);
+        imageRepository.delete(thumb);
+        imageRepository.delete(cThumb);
+
         // 몽고DB에서 contour 삭제
         contourRepository.delete(contourEntity);
 
@@ -326,65 +337,79 @@ public class ConstellationService {
         );
     }
 
-    // 5. 별자리 수정확정 로직
+    /**
+     * 5. 별자리 수정확정 로직
+     * - 리퀘스트로 사진 3장 받기 + 윤곽선 리스트들 + 선택된 윤곽선 -
+     * - S3에 이미지 저장 -
+     * - 기존 별자리 조회 -> 몽고 DB id 조회 -> 사진 url 3장 가져오기
+     * - S3에서 해당 이미지 삭제하기
+     * - 이미지 테이블 엔티티 삭제
+     * - 위의 S3이미지로 이미지 테이블에 추가 -> Constellation
+     * - 몽고DB에서 해당 id로 들어가 값을 수정
+     * - 별자리 이름, 태그 등 변경 내용이 있으면 수정
+     */
     public Constellation modify(
             Long constellationId,
             String name,
             String description,
-            String myEmail,                // 사용자의 email
+            String email,                // 사용자의 email
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cThumb,
             List<List<List<Integer>>> contoursList,
             List<List<Integer>> ultimate
     ) throws IOException {
-        // 현재 수정하려는 유저가 본인인지 확인
-        UserEntity userEntity = getUserEntityByNicknameOrException(myEmail);
         // 별자리 가져오기(나의 별자리 범주이고, 내가 Admin인 경우)
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-
-        //TODO
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
 
         // 사진들 추가
         String originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
         String thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
         String cThumbUrl = s3uploader.upload(cThumb, "constellation/cthumb", THUMB_HEIGHT);
 
-        //TODO : 기존 별자리 조회하여 MongoDB ID 조회하고 사진 url 3장 가져오기
+        Long contourId = constellationEntity.getContourId();
+        ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND, String.format("ContourId : %s is not founded", contourId))
+        );
 
-        // MongoDB ID 조회
-        // 코드 필요
+        // 기존 이미지 URL
+        String oldOriginUrl = contourEntity.getOriginUrl();
+        String oldThumbUrl = contourEntity.getThumbUrl();
+        String oldCThumbUrl = contourEntity.getCThumbUrl();
 
-        // 밑의 변수에 위에서 조회한 것을 집어넣는다고 가정하면
-        String oldOriginUrl = "";
-        String oldThumbUrl = "";
-        String oldContourThumbUrl = "";
+        ImageEntity oldOriginImage = imageService.getImageUrl(oldOriginUrl);
+        ImageEntity oldThumbImage = imageService.getImageUrl(oldThumbUrl);
+        ImageEntity oldContourThumbImage = imageService.getImageUrl(oldCThumbUrl);
 
-        // S3에서 이미지 삭제
+        // 기존 이미지 삭제
         s3uploader.deleteImageFromS3(oldOriginUrl);
         s3uploader.deleteImageFromS3(oldThumbUrl);
-        s3uploader.deleteImageFromS3(oldContourThumbUrl);
+        s3uploader.deleteImageFromS3(oldCThumbUrl);
 
-        Image oldOriginImage = imageService.getImageUrl(oldOriginUrl);
-        Image oldThumbImage = imageService.getImageUrl(oldThumbUrl);
-        Image oldContourThumbImage = imageService.getImageUrl(oldContourThumbUrl);
+        // 몽고DB에 반영하기
+        contourEntity.setOriginUrl(originUrl);
+        contourEntity.setThumbUrl(thumbUrl);
+        contourEntity.setCThumbUrl(cThumbUrl);
+        contourEntity.setContoursList(contoursList);
+        contourEntity.setUltimate(ultimate);
+        contourRepository.save(contourEntity);
 
-        oldOriginImage.toEntity().setName(origin.getOriginalFilename());
-        oldOriginImage.toEntity().setUrl(originUrl);
+        oldOriginImage.setName(origin.getOriginalFilename());
+        oldOriginImage.setUrl(originUrl);
+        imageRepository.save(oldOriginImage);
 
-        oldThumbImage.toEntity().setName(thumb.getOriginalFilename());
-        oldThumbImage.toEntity().setUrl(thumbUrl);
+        oldThumbImage.setName(thumb.getOriginalFilename());
+        oldThumbImage.setUrl(thumbUrl);
+        imageRepository.save(oldOriginImage);
 
-        oldContourThumbImage.toEntity().setName(cThumb.getOriginalFilename());
-        oldContourThumbImage.toEntity().setUrl(cThumbUrl);
-
-        //TODO: 몽고 DB에서 해당 값 수정 코드 필요
+        oldContourThumbImage.setName(cThumb.getOriginalFilename());
+        oldContourThumbImage.setUrl(cThumbUrl);
+        imageRepository.save(oldContourThumbImage);
 
         if (name != null) {
             constellationEntity.setName(name);
         }
         constellationEntity.setDescription(description);    // 설명 null 가능
-
         return Constellation.fromEntity(constellationRepository.saveAndFlush(constellationEntity));
     }
 
