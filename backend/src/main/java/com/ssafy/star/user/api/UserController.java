@@ -129,7 +129,6 @@ public class UserController {
     )
     @GetMapping("/users/{nickname}")
     public Response<UserProfileResponse> myProfile(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.my(nickname));
     }
 
@@ -139,7 +138,6 @@ public class UserController {
     )
     @PutMapping("/users")
     public Response<UserProfileResponse> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
-        //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.updateMyProfile(authentication.getName(), request));
     }
 
@@ -149,7 +147,6 @@ public class UserController {
     )
     @PutMapping("/users/profile-image")
     public Response<UserDefaultResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
-        //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.updateProfileImage(authentication.getName(), multipartFile, ImageType.PROFILE));
     }
 
@@ -159,10 +156,7 @@ public class UserController {
     )
     @PutMapping("/users/default-image")
     public Response<UserDefaultResponse> updateDefaultProfileImage(Authentication authentication) {
-        //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.updateProfileDefault(authentication.getName()));
-
-//        return Response.success(UserProfileResponse.fromUser(userService.updateProfileDefault(authentication.getName())));
     }
 
     @Operation(
@@ -215,7 +209,6 @@ public class UserController {
     )
     @GetMapping("me/request-follow")
     public Response<List<FollowResponse>> requestFollowList(Authentication authentication) {
-        // TODO : 팔로워 Response
         return Response.success(followService.requestFollowList(authentication.getName())
                 .stream()
                 .map(res ->
@@ -251,7 +244,6 @@ public class UserController {
     )
     @GetMapping("/me/followers")
     public Response<List<FollowResponse>> followers(Authentication authentication) {
-        // TODO : 팔로워 Response 사용
         return Response.success(followService.followers(authentication.getName())
                 .stream()
                 .map(res ->
@@ -273,7 +265,6 @@ public class UserController {
     )
     @GetMapping("/me/followings")
     public Response<List<FollowResponse>> followings(Authentication authentication) {
-        // TODO : 팔로워 Response 사용
         return Response.success(followService.followings(authentication.getName())
                 .stream()
                 .map(res ->
@@ -294,7 +285,6 @@ public class UserController {
     )
     @GetMapping("/{nickname}/followers")
     public Response<List<FollowResponse>> otherFollowers(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        // TODO : 팔로워 Response 사용
         return Response.success(followService.otherFollowers(authentication.getName(), nickname)
                 .stream()
                 .map(res ->
@@ -315,7 +305,6 @@ public class UserController {
     )
     @GetMapping("/{nickname}/followings")
     public Response<List<FollowResponse>> otherFollowings(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        // TODO : 팔로워 Response 사용
         return Response.success(followService.otherFollowings(authentication.getName(), nickname)
                 .stream()
                 .map(res ->

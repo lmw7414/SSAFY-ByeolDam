@@ -46,11 +46,6 @@ public class ArticleService {
     private final ImageService imageService;
     private final ArticleHashtagRelationService articleHashtagRelationService;
 
-    // 트랜잭션 처리를 하고 롤백 처리를 하려면 controller가 아니라 서비스단에서 upload를 호출해야할듯하다
-    // try catch문을 통해서 사진 업로드 이후 save를 하고
-    // 문제가 발생했을 경우(게시글이 정상적으로 생성되지 않았을 경우)
-    // 롤백을 해준다 (문제가 발생했으면 앞서 저장된 이미지 삭제
-
     /**
      * 게시물 등록
       */
@@ -84,8 +79,6 @@ public class ArticleService {
             articleRepository.save(articleEntity);
 
             articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
-            // TODO :articleHashtagRepository에서 String이 같은 것이 있다면 추가 X, 없다면 추가 O
-            // => 해시태그 tagName 속성은 unique
         } catch (IOException e) {
             s3uploader.deleteImageFromS3(url);
             s3uploader.deleteImageFromS3(thumbnailUrl);
@@ -274,11 +267,6 @@ public class ArticleService {
                 throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
                         String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
             }
-
-//            // 선택한 별자리가 기존의 constellationEntity인 경우 Error 반환
-//            if (articleEntity.getConstellationEntity().equals(constellationEntity)) {
-//                throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is already constellation %s", "articleId:" + Long.toString(articleId), "constellationId:" + Long.toString(constellationId)));
-//            }
 
             articleEntity.selectConstellation(constellationEntity);
         }
