@@ -283,41 +283,6 @@ public class UserService {
     }
 
     //회원정보 수정
-//    @Transactional
-//    public User updateMyProfile(
-//            String email,
-//            String password,
-//            String name,
-//            String nickname,
-//            String memo,
-//            DisclosureType disclosureType,
-//            LocalDate birthday) {
-//
-//        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() ->
-//                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
-//        //닉네임 중복체크
-//        if (!userEntity.getNickname().equals(nickname)) {
-//            satisfyNickname(nickname);
-//            userEntity.setNickname(nickname);
-//        }
-//        if (password != null) {
-//            userEntity.setPassword(encoder.encode(password));
-//        }
-//        if (name != null) {
-//            userEntity.setName(name);
-//        }
-//        if (birthday != null) {
-//            userEntity.setBirthday(birthday);
-//        }
-//        if (disclosureType != null) {
-//            userEntity.setDisclosureType(disclosureType);
-//        }
-//        //null이어도 되는 필드
-//        userEntity.setMemo(memo);
-//        userCacheRepository.updateUser(User.fromEntity(userEntity));
-//        userRepository.saveAndFlush(userEntity);
-//        return User.fromEntity(userEntity);
-//    }
     @Transactional
     public UserProfileResponse updateMyProfile(String email, UserModifyRequest request) {
 

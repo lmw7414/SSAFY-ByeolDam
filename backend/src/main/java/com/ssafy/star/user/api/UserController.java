@@ -141,18 +141,6 @@ public class UserController {
     public Response<UserProfileResponse> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
         //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.updateMyProfile(authentication.getName(), request));
-
-//        return Response.success(
-//                UserProfileResponse.fromUser(userService.updateMyProfile(
-//                        authentication.getName(),
-//                        request.password(),
-//                        request.name(),
-//                        request.nickname(),
-//                        request.memo(),
-//                        request.disclosureType(),
-//                        request.birthday())
-//                )
-//        );
     }
 
     @Operation(
@@ -163,14 +151,6 @@ public class UserController {
     public Response<UserDefaultResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
         //TODO : 새로운 UserResponse 추가 필요
         return Response.success(userService.updateProfileImage(authentication.getName(), multipartFile, ImageType.PROFILE));
-//        return Response.success(
-//                UserProfileResponse.fromUser(
-//                        userService.updateProfileImage(
-//                                authentication.getName(),
-//                                multipartFile,
-//                                ImageType.PROFILE)
-//                )
-//        );
     }
 
     @Operation(
