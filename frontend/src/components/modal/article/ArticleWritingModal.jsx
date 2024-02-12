@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import ImageUpload from '../../article/ImageUpload';
 import ConstellationSelect from '../../article/ConstellationSelect';
 import { addArticle } from '../../../apis/articles';
+import useModal from '../../../hooks/useModal';
 
 export default function ArticleWritingModal() {
   const [step, setStep] = useState(1);
@@ -13,12 +14,16 @@ export default function ArticleWritingModal() {
     imageType: 'ARTICLE',
     constellation: '',
   });
+  const [modalState, setModalState] = useModal();
 
   const writeArticle = () => {
     addArticle(article, file).then((result) => {
-      console.log(result);
+      useModal({
+        ...modalState,
+        isOpen: false,
+      });
+      alert('별이 생성되었습니다.');
     });
-    console.log(article, file);
   };
 
   return (

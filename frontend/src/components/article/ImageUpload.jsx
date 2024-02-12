@@ -64,7 +64,7 @@ export default function ImageUpload({ setStep, setFile, setArticle, article }) {
   const saveFile = () => {
     transformer.current.nodes([]);
     const blob = dataURLtoBlob(stage.current.toDataURL({ pixelRatio: 2 }));
-    const file = new File([blob], originalFile.name, { type: originalFile.type });
+    const file = new File([blob], originalFile.name.split('.')[0] + '.png', { type: 'image/png' });
     setFile(file);
   };
 

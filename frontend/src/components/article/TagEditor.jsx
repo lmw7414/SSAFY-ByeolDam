@@ -20,19 +20,26 @@ export default function TagEditor({ setTags }) {
     setTagList(tagList.filter((tag) => tagName !== tag));
   };
 
+  const addTage = (tagName) => {
+    if (tagList.includes(tagName)) return;
+    setTagList([...tagList, tagName]);
+  };
+
   const addTagEnter = (e) => {
     if (e.code !== 'Enter') return;
     setIsWriting(false);
     let tagName = e.target.value.trim().replace('#', '');
     if (!tagName) return;
-    setTagList([...tagList, `#${tagName}`]);
+    addTage(`#${tagName}`);
+    setIsWriting(true);
+    e.target.value = '';
   };
 
   const addTagBlur = (e) => {
     setIsWriting(false);
     let tagName = e.target.value.trim().replace('#', '');
     if (!tagName) return;
-    setTagList([...tagList, `#${tagName}`]);
+    addTage(`#${tagName}`);
   };
 
   useEffect(() => {
@@ -58,7 +65,7 @@ export default function TagEditor({ setTags }) {
           style={{ width: `min(calc(${width}ch + 1rem), 100%)` }}
           className="article-tag-insert-input"
           onChange={setInputWidth}
-          onKeyDown={addTagEnter}
+          onKeyUp={addTagEnter}
           onBlur={addTagBlur}
         />
       ) : (
