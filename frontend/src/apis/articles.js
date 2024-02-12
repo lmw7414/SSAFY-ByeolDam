@@ -2,7 +2,7 @@ import axios from './axios';
 
 export const getArticles = async (articleId) => {
   const { data } = await axios.get(`articles/${articleId}`);
-  return { resultCode: data.resultCode, data: data.articles };
+  return data;
 };
 
 export const addArticle = async (

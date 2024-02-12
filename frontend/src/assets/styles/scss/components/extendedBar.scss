@@ -1,4 +1,3 @@
-$extended-bar-width: 480px;
 $border-color: white; /*#3b255e*/
 
 .extended-bar-big-container {
@@ -43,7 +42,7 @@ $border-color: white; /*#3b255e*/
 }
 
 .extended-bar-contents {
-  width: $extended-bar-width - 80px;
+  width: calc($extended-bar-width - 80px);
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -113,19 +112,19 @@ $border-color: white; /*#3b255e*/
 
 @keyframes slide-in-left {
   0% {
-    width: 320px;
+    width: $nav-bar-width;
   }
   100% {
-    width: 480px;
+    width: $extended-bar-width;
   }
 }
 
 @keyframes slide-out-right {
   0% {
-    width: 480px;
+    width: $extended-bar-width;
   }
   100% {
-    width: 320px;
+    width: $nav-bar-width;
   }
 }
 

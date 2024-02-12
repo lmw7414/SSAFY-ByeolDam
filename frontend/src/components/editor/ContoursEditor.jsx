@@ -86,7 +86,7 @@ export default function ContoursEditor({
             index={i}
             points={[x, y, ...points[(i + 1) % points.length]]}
             stroke={'red'}
-            strokeWidth={4}
+            strokeWidth={3}
           />
         ))}
 
@@ -96,7 +96,7 @@ export default function ContoursEditor({
             key={getUuidByPosition(x, y)}
             x={x}
             y={y}
-            radius={6}
+            radius={3}
             fill={'white'}
             stroke={'red'}
             strokeWidth={1}

@@ -14,6 +14,8 @@ export default function ConstellationWriting() {
   const [hovered, setHovered] = useState(-1);
   const [history, setHistory] = useState([]);
 
+  const editorSize = 550;
+
   useEffect(() => {
     fetch('./data/local.json')
       .then((data) => data.json())
@@ -32,7 +34,10 @@ export default function ConstellationWriting() {
                 5,
               );
 
-              return zipped.map(({ x, y }) => [(x * 1200) / width, (y * 1200) / height]);
+              return zipped.map(({ x, y }) => [
+                (x * editorSize) / width,
+                (y * editorSize) / height,
+              ]);
             })
             .filter((dt) => dt.length > 5),
         );
@@ -67,40 +72,55 @@ export default function ConstellationWriting() {
   };
 
   return (
-    <div
-      style={{ display: 'flex', flexDirection: 'row', marginLeft: '360px' }}
-      tabIndex={1}
-      onKeyDown={keyInputHandler}
-    >
-      <ContoursEditor
-        width={1200}
-        height={1200}
-        image={image}
-        points={points}
-        setPoints={setPoints}
-        setHistory={setHistory}
-        history={history}
-      />
-      <div style={{ height: '680px', display: 'flex', flexDirection: 'column' }}>
-        <MaskPreview
-          width={600}
-          height={600}
-          pointList={pointList}
-          setHovered={setHovered}
-          setSelected={setSelected}
-          image={image}
-        />
-        <ContoursPreview
-          width={600}
-          height={600}
-          selected={selected}
-          hovered={hovered}
-          pointList={pointList}
-          points={points}
-          image={image}
-        />
+    <div className="constellation-editor-container" tabIndex={1} onKeyDown={keyInputHandler}>
+      <div className="constellation-editor-box">
+        <div className="constellation-editor-wrapper">
+          <ContoursEditor
+            width={editorSize}
+            height={editorSize}
+            image={image}
+            points={points}
+            setPoints={setPoints}
+            setHistory={setHistory}
+            history={history}
+          />
+          <div className="constellation-editor-preview-container">
+            <div className="constellation-editor-preview-label">AI 디텍션</div>
+            <MaskPreview
+              width={editorSize / 2 - 15}
+              height={editorSize / 2 - 15}
+              pointList={pointList}
+              setHovered={setHovered}
+              setSelected={setSelected}
+              image={image}
+              editorSize={editorSize}
+            />
+            <div className="constellation-editor-preview-label">별자리 미리보기</div>
+            <ContoursPreview
+              width={editorSize / 2 - 15}
+              height={editorSize / 2 - 15}
+              selected={selected}
+              hovered={hovered}
+              pointList={pointList}
+              points={points}
+              image={image}
+              editorSize={editorSize}
+            />
+          </div>
+        </div>
+        <div className="constellation-editor-button-box">
+          <div className="constellation-editor-button-wrapper">
+            <button>사진변경</button>
+            <button>AI 윤곽선 추출</button>
+          </div>
+          <div className="constellation-editor-input-wrapper">
+            <label>별자리 이름 :</label>
+            <input className="constellation-editor-input" type="text" />
+          </div>
+        </div>
+        <button className="constellation-writing-btn">별자리 생성</button>
+        <div id={'save-image'} style={{ display: 'none' }} />
       </div>
-      <div id={'save-image'} style={{ display: 'none' }} />
     </div>
   );
 }
