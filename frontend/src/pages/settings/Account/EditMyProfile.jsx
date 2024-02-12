@@ -28,7 +28,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
       <div className="content-box">
         <form onSubmit={handleSubmit}>
           <div className="profile-image-container">
-            <img className="profile-image" src="/src/assets/images/space.png" alt="profile_image" />
+            <img className="profile-image" src="/images/space.png" alt="profile_image" />
           </div>
           <button>프로필 사진 변경</button>
           <div>

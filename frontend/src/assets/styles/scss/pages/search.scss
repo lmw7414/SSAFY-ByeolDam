@@ -1,7 +1,7 @@
 .search-page-background {
   background-color: $modal-background;
   height: 100%;
-  background-image: url('/src/assets/images/space.jpg'); /* 이미지 경로를 적절히 수정하세요 */
+  background-image: url('/images/space.jpg'); /* 이미지 경로를 적절히 수정하세요 */
   background-size: cover; /* 이미지를 div에 맞게 조절 */
   overflow-y: auto;
   &::-webkit-scrollbar {

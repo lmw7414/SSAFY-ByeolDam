@@ -97,18 +97,14 @@ export default function NavBar() {
       ) : (
         <div className={`nav-bar-big-container ${isNavBarVisible ? '' : 'nav-bar-hidden'}`}>
           <div className="nav-bar-logo" onClick={goHome}>
-            <img src="/src/assets/images/temporary-logo.png" alt="logo" />
+            <img src="/images/temporary-logo.png" alt="logo" />
           </div>
           <div className="nav-bar-container">
             <div className="nav-bar-contents">
               <div className="nav-bar-profile-box">
                 <div className="profile-image-box">
                   <div className="profile-image-container">
-                    <img
-                      className="profile-image"
-                      src="/src/assets/images/space.png"
-                      alt="profile_image"
-                    />
+                    <img className="profile-image" src="/images/space.png" alt="profile_image" />
                   </div>
                 </div>
                 <div className="nickname-memo-container">
@@ -142,18 +138,18 @@ export default function NavBar() {
               <div className="nav-bar-menu-box">
                 <NavBarMenu
                   text={'검색'}
-                  src={'/src/assets/images/nav-bar-menu-icons/search.png'}
+                  src={'/images/nav-bar-menu-icons/search.png'}
                   alt={'search'}
                   onClick={openSearchBar}
                 />
                 <NavBarMenu
                   text={'피드'}
-                  src={'/src/assets/images/nav-bar-menu-icons/feed.png'}
+                  src={'/images/nav-bar-menu-icons/feed.png'}
                   alt={'feed'}
                 />
                 <NavBarMenu
                   text={'알림'}
-                  src={'/src/assets/images/nav-bar-menu-icons/notifications.png'}
+                  src={'/images/nav-bar-menu-icons/notifications.png'}
                   alt={'notifications'}
                   onClick={openNotificationBar}
                 />
@@ -162,8 +158,8 @@ export default function NavBar() {
                     text={'설정'}
                     src={
                       barId === 4
-                        ? '/src/assets/images/nav-bar-menu-icons/settings_activated.png'
-                        : '/src/assets/images/nav-bar-menu-icons/settings.png'
+                        ? '/images/nav-bar-menu-icons/settings_activated.png'
+                        : '/images/nav-bar-menu-icons/settings.png'
                     }
                     alt={'settings'}
                     onClick={openSettingsPage}
@@ -172,7 +168,7 @@ export default function NavBar() {
                 </Link>
                 <NavBarMenu
                   text={'로그아웃'}
-                  src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
+                  src={'/images/nav-bar-menu-icons/logout.png'}
                   alt={'logout'}
                   onClick={() => {
                     logout();
@@ -188,8 +184,8 @@ export default function NavBar() {
               <img
                 src={
                   isNavBarVisible
-                    ? '/src/assets/images/nav-bar-toggle-button/close.png'
-                    : '/src/assets/images/nav-bar-toggle-button/open.png'
+                    ? '/images/nav-bar-toggle-button/close.png'
+                    : '/images/nav-bar-toggle-button/open.png'
                 }
                 alt="toggle_button"
                 className="toggle-button"
