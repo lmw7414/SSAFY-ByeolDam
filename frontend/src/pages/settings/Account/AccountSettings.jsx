@@ -1,5 +1,7 @@
-import axios from '../../../apis/axios';
 import React, { useState, useEffect } from 'react';
+
+import axios from '../../../apis/axios';
+import parseJwt from '../../../utils/parseJwt.js';
 
 import MyProfile from './MyProfile';
 import EditMyProfile from './EditMyProfile';
@@ -16,6 +18,7 @@ export default function AccountSettings() {
     disclosureType: '',
     password: '',
   });
+  const [nickname, setNickname] = useState('');
 
   const changePage = (newId) => {
     setAccountSettingsId(newId);
@@ -23,8 +26,9 @@ export default function AccountSettings() {
   };
 
   const readProfile = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    const { data } = await axios.get(`/users/${nickname}`);
+    const JWTtoken = sessionStorage.getItem('token');
+    const parsed = parseJwt(JWTtoken);
+    const { data } = await axios.get(`/users/${parsed.nickname}`);
     console.log(nickname);
     sessionStorage.setItem('userInfo', data);
     return data;

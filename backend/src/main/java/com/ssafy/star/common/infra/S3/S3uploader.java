@@ -23,20 +23,18 @@ import static com.ssafy.star.common.utils.ImageUtils.*;
 public class S3uploader {
 
     private final AmazonS3 amazonS3;
+    private static final int TARGET_HEIGHT = 1024;
+    private static final int PROFILE_HEIGHT = 128;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
 
-        BufferedImage resizedImage = resizeImage(multipartFile);
+        BufferedImage resizedImage = resizeImage(multipartFile, TARGET_HEIGHT);
         File uploadFile = convert(resizedImage, multipartFile.getOriginalFilename());
 
-        String uuid = UUID.randomUUID().toString();
-        String extension = uploadFile.getName().substring(uploadFile.getName().lastIndexOf(".") + 1);
-        if (extension.equals("blob")) extension = "png";
-        String fileName = dirName + "/" + uuid + "." + extension;
-//        String fileName = dirName + "/" + uploadFile.getName();
+        String fileName = getFileName(uploadFile, dirName);
         String uploadImageUrl = putS3(uploadFile, fileName);
 
         removeNewFile(uploadFile);
@@ -50,15 +48,33 @@ public class S3uploader {
         BufferedImage resizedThumbnail = resizeThumbnail(multipartFile);
         File uploadThumbnail = convert(resizedThumbnail, multipartFile.getOriginalFilename());
 
-        String uuid = UUID.randomUUID().toString();
-        String extension = uploadThumbnail.getName().substring(uploadThumbnail.getName().lastIndexOf(".") + 1);
-        if (extension.equals("blob")) extension = "png";
-        String fileName = dirName + "/" + uuid + "." + extension;
+        String fileName = getFileName(uploadThumbnail, dirName);
         String uploadThumbnailUrl = putS3(uploadThumbnail, fileName);
 
         removeNewFile(uploadThumbnail);
 
         return uploadThumbnailUrl;
+    }
+
+    public String uploadProfile(MultipartFile multipartFile, String dirName) throws IOException {
+
+        BufferedImage resizedProfile = resizeImage(multipartFile, PROFILE_HEIGHT);
+        File uploadProfile = convert(resizedProfile, multipartFile.getOriginalFilename());
+
+        String fileName = getFileName(uploadProfile, dirName);
+        String uploadProfileUrl = putS3(uploadProfile, fileName);
+
+        removeNewFile(uploadProfile);
+
+        return uploadProfileUrl;
+    }
+
+    public String getFileName(File file, String dirName){
+        String uuid = UUID.randomUUID().toString();
+        String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        if (extension.equals("blob")) extension = "png";
+
+        return dirName + "/" + uuid + "." + extension;
     }
 
     private void removeNewFile(File targetFile) {

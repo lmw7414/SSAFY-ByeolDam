@@ -8,6 +8,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.global.oauth.domain.ProviderType;
+import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 public record User(
         Long id,
         String email,
+        Image image,
         ProviderType providerType,
         RoleType roleType,
         String password,
@@ -36,10 +39,11 @@ public record User(
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime deletedAt
 ) {
-    public static User of(Long id, String email, ProviderType providerType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
+    public static User of(Long id, String email, ImageEntity imageEntity, ProviderType providerType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
         return new User(
                 id,
                 email,
+                Image.fromEntity(imageEntity),
                 providerType,
                 RoleType.USER,
                 password,
@@ -58,6 +62,7 @@ public record User(
         return new User(
                 entity.getId(),
                 entity.getEmail(),
+                Image.fromEntity(entity.getImageEntity()),
                 entity.getProviderType(),
                 entity.getRoleType(),
                 entity.getPassword(),
@@ -82,7 +87,8 @@ public record User(
                 nickname,
                 memo,
                 disclosureType,
-                birthday
+                birthday,
+                ImageEntity.fromDto(image)
         );
     }
 
