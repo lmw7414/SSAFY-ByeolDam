@@ -131,15 +131,16 @@ public class ArticleController {
     }
 
     @Operation(
-            summary = "별자리 배정 및 변경",
-            description = "게시물에 별자리를 배정하거나 변경합니다.",
+            summary = "별자리에 게시물 배정",
+            description = "별자리에 게시물을 한개 또는 여러개를 배정합니다. " +
+                          "다른 별자리에 있던 게시물을 현 별자리로 옮길 수도 있습니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "배정 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
     )
-    @PostMapping("/constellation-select/articles/{articleId}")
-    public Response<Void> select(@PathVariable Long articleId, @RequestBody ArticleConstellationSelect articleConstellationSelect, Authentication authentication) {
-        articleService.select(articleId, articleConstellationSelect.constellationId(), authentication.getName());
+    @PostMapping("/articles/constellation-select/{constellationId}")
+    public Response<Void> select(@PathVariable Long constellationId, @RequestBody ArticleConstellationSelect articleConstellationSelect, Authentication authentication) {
+        articleService.select(constellationId, articleConstellationSelect.articleIdSet(), authentication.getName());
         return Response.success();
     }
 

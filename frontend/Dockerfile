@@ -3,7 +3,6 @@ FROM node:20 as build
 WORKDIR /app
 
 COPY package*.json ./
-COPY /home/ubuntu/.env /app/.env
 
 RUN npm install
 

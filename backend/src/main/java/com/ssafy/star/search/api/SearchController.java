@@ -7,7 +7,8 @@ import com.ssafy.star.search.application.ArticleSearchService;
 import com.ssafy.star.search.application.UserSearchService;
 import com.ssafy.star.search.dto.request.SearchRequest;
 import com.ssafy.star.user.dto.User;
-import com.ssafy.star.user.dto.response.UserResponse;
+import com.ssafy.star.user.dto.response.SearchResponse;
+import com.ssafy.star.user.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -66,10 +67,10 @@ public class SearchController {
             }
     )
     @GetMapping("/search/user")
-    public Response<Page<UserResponse>> userSearch(@RequestBody SearchRequest request, Pageable pageable) {
+    public Response<Page<SearchResponse>> userSearch(@RequestBody SearchRequest request, Pageable pageable) {
         log.info("request 정보 : {}", request);
         String keyword = request.keyword();
-        return Response.success(userSearchService.userSearch(keyword,pageable).map(User::fromEntity).map(UserResponse::fromUser));
+        return Response.success(userSearchService.userSearch(keyword,pageable).map(User::fromEntity).map(SearchResponse::fromUser));
     }
 
 }

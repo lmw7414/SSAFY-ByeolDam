@@ -29,7 +29,7 @@ public class S3uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String upload(MultipartFile multipartFile, String dirName, int height) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
 
         BufferedImage resizedImage = resizeImage(multipartFile, TARGET_HEIGHT);
         File uploadFile = convert(resizedImage, multipartFile.getOriginalFilename());
@@ -93,7 +93,6 @@ public class S3uploader {
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
-    //TODO: 이미지 삭제가 실패한 경우 고려
     public void deleteImageFromS3(String filePath){
         String splitStr = ".com/";
         String fileName = filePath.substring(filePath.lastIndexOf(splitStr)+splitStr.length());

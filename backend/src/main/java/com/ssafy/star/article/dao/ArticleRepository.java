@@ -41,5 +41,8 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
          */
         @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
         List<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity);
+
+        @Query(value = "SELECT COUNT(*) FROM ArticleEntity entity WHERE entity.ownerEntity = :ownerEntity")
+        Integer countArticlesByUser(@Param("ownerEntity") UserEntity ownerEntity);
 }
 
