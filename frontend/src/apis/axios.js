@@ -8,6 +8,19 @@ const client = axios.create({
   withCredentials: true,
 });
 
+client.interceptors.request.use(
+  (config) => {
+    const accessToken = sessionStorage['access_token'];
+    config.headers['Authorization'] = `Bearer ${accessToken}`;
+
+    return config;
+  },
+  (e) => {
+    console.log(e);
+    return Promise.reject(e);
+  },
+);
+
 export const setToken = (token) => {
   sessionStorage.setItem('access_token', token);
   client.defaults.headers.Authorization = `Bearer ${token}`;
@@ -28,8 +41,8 @@ const addFailedRequest = (request) => {
 };
 
 export const refreshToken = async () => {
-  const { data } = await axios.get('/users/refresh');
-  return data;
+  const { data } = await client.get('/users/refresh');
+  return data.result.token;
 };
 
 const refreshTokenAndResolveRequests = async (error) => {
@@ -51,6 +64,7 @@ const refreshTokenAndResolveRequests = async (error) => {
       isRefreshing = true;
 
       const token = await refreshToken();
+      console.log('new token : ' + token);
       setToken(token);
       failedRequestQueue.forEach((request) => request(token));
       failedRequestQueue = [];
