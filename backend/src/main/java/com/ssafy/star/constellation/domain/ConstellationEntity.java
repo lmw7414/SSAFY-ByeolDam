@@ -2,7 +2,6 @@ package com.ssafy.star.constellation.domain;
 
 import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.constellation.ConstellationUserRole;
-import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,23 +28,15 @@ public class ConstellationEntity {
     private Long id;
 
     @Setter
-    @Column(name = "name")
     private String name;
 
     @Setter
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "shared")
-    private SharedType shared;
+    @Column(name = "contour_id")
+    private Long contourId;
 
-
-    @Column(name = "outline_id")
-    private String outline_id;
-
-    @Column(name = "hits")
     private Long hits = 0L;
 
     @Setter
-    @Column(name = "description")
     private String description;
 
     @ToString.Exclude
@@ -100,14 +91,12 @@ public class ConstellationEntity {
     protected ConstellationEntity() {
     }
 
-    private ConstellationEntity(String name, SharedType shared, String description) {
+    private ConstellationEntity(String name, String description) {
         this.name = name;
-        this.shared = shared;
         this.description = description;
     }
 
-    public static ConstellationEntity of(String name, SharedType shared, String description) {
-        ConstellationEntity constellationEntity = new ConstellationEntity(name, shared, description);
-        return constellationEntity;
+    public static ConstellationEntity of(String name, String description) {
+        return new ConstellationEntity(name, description);
     }
 }

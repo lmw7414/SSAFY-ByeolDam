@@ -1,23 +1,28 @@
 package com.ssafy.star.constellation.application;
 
+import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
+import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.ConstellationUserRole;
-import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
 
-import com.ssafy.star.constellation.dto.ConstellationUser;
+import com.ssafy.star.contour.domain.ContourEntity;
+import com.ssafy.star.contour.dto.Contour;
+import com.ssafy.star.contour.repository.ContourRepository;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
-import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.image.dto.Image;
+import com.ssafy.star.user.domain.ApprovalStatus;
+import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
+import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,147 +45,312 @@ public class ConstellationService {
     private final ConstellationRepository constellationRepository;
     private final ConstellationUserRepository constellationUserRepository;
     private final UserRepository userRepository;
+    private final ContourRepository contourRepository;
+    private final FollowRepository followRepository;
     private final S3uploader s3uploader;
     private final ImageService imageService;
 
     private static final int ORIGIN_HEIGHT = 1024;
     private static final int THUMB_HEIGHT = 256;
 
-    // 별자리 전체 조회
-    public List<Constellation> list(String myEmail, Pageable pageable) {
 
-        // 사용자 Entity
-        UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
+    /**
+     * 나의 우주 보기 - 별자리 전체 조회
+     * VISIBLE, INVISIBLE 상관 없이, 개인 별자리, 공유 별자리 확인
+     * 내부 게시물은 deletedAt NULL인 경우 확인 가능
+     */
+    @Transactional(readOnly = true)
+    public List<Constellation> myConstellations(String email) {
+        UserEntity userEntity = getUserEntityByEmailOrException(email);
 
-        List<ConstellationUserEntity> constellationUserEntityPage
-                = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable).stream().toList();
-
-        // TODO : 공개되어 있는 별자리거나 내 별자리인 경우
-        return constellationUserEntityPage.stream().map(ConstellationUser::getConstellationEntity).map(Constellation::fromEntity).toList();
+        //TODO : article 포함할 것
+        return constellationRepository.findAllByUserEntity(userEntity)
+                .stream()
+                .map(Constellation::fromEntity)
+                .toList();
     }
 
-    // 유저 별자리 전체 조회
-    public Page<Constellation> userConstellations(String userEmail, String myEmail, Pageable pageable) {
-        UserEntity userEntity = getUserEntityByEmailOrException(userEmail);
-        UserEntity myEntity = getUserEntityByEmailOrException(myEmail);
-
-        // 찾으려는 유저가 접속자라면 전체 조회
-        if(myEntity.getId() == userEntity.getId()) {
-            return constellationRepository.findAllByUserEntity(userEntity, pageable).map(Constellation::fromEntity);
+    /**
+     * 다른 유저의 우주 보기 - 별자리 전체 조회
+     * - 내가 다른 사람의 우주에 접근했을 때
+     */
+    @Transactional(readOnly = true)
+    public List<Constellation> userConstellations(String email, String nickname) {
+        UserEntity userEntity = getUserEntityByNicknameOrException(nickname);  // 타 유저의 계정 이메일
+        UserEntity myEntity = getUserEntityByEmailOrException(email);      // 로그인한 사람의 이메일
+        // 내 계정으로 내 우주를 접근하는 경우
+        if (userEntity.equals(myEntity)) {
+            return myConstellations(email);
         }
 
-        // TODO : 내가 속한 별자리라면 조회
-        // userEntity -> constellationUserEntity
-        Page<ConstellationUserEntity> constellationUserEntityPage = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable);
-        Page<ConstellationEntity> ConstellationEntityPage = constellationUserEntityPage.map(ConstellationUserEntity::getConstellationEntity);
+        if (DisclosureType.INVISIBLE == userEntity.getDisclosureType()) {
+            // 나와 팔로우 관계라면 가능
+            FollowEntity followEntity = followRepository.findByFromUserAndToUserAndStatus(myEntity, userEntity, ApprovalStatus.ACCEPT)
+                    .orElseThrow(() -> new ByeolDamException(ErrorCode.INVALID_PERMISSION));
+        }
 
-
-        //아닐 경우 SHARED라면 조회
-        // 별자리회원 Entity -> 별자리 Entity -> ConstellationDTO -> SharedType SHARED 필터링
-        List<Constellation> constellations = constellationUserEntityPage
-                .map(ConstellationUserEntity::getConstellationEntity)
+        return constellationUserRepository.findConstellationByUserEntity(userEntity)
+                .stream()
                 .map(Constellation::fromEntity)
-                .filter(constellation -> constellation.shared().equals(SharedType.SHARED))
-                .stream().toList();
-
-        return new PageImpl<Constellation>(constellations);
+                .toList();
     }
 
-    // 별자리 상세 조회
-    public Constellation detail(Long constellationId, String myEmail){
-        // 해당 constellation 없을 경우 예외처리
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+    // 별자리에 공유할 유저 추가
+    @Transactional
+    public void addUser(Long constellationId, String nickname, String myEmail) {
+        // user 존재하는지 확인
+        UserEntity userEntity = getUserEntityByNicknameOrException(nickname);
 
-        UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
-        List<ConstellationUserEntity> constellationUserEntities = constellationEntity.getConstellationUserEntities();
-        for (int i = 0; i < constellationUserEntities.size(); i++) {
-            // 사용자의 별자리라면 조회
-            if(constellationUserEntities.get(i).getUserEntity().equals(userEntity)) {
-                constellationEntity.increaseHits();
-                return Constellation.fromEntity(constellationEntity);
+        // 사용자가 admin인지 확인
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
+
+        // 이미 공유 별자리에 포함된 상태라면
+        if (constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).isPresent()) {
+            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s has already added", nickname));
+        }
+
+        // 별자리에 공유할 유저 추가, 권한은 유저로
+        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(constellationEntity, userEntity, USER);
+        constellationEntity.addUser(constellationUserEntity);
+
+        constellationUserRepository.saveAndFlush(constellationUserEntity);
+    }
+
+    /**
+     * 별자리 공유하는 유저 강퇴
+     */
+    @Transactional
+    public void deleteUser(Long constellationId, String nickname, String email) {
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
+        UserEntity myEntity = getUserEntityByEmailOrException(email);
+
+        // Admin 본인 별자리회원 연관관계는 삭제 불가
+        UserEntity userEntity = getUserEntityByNicknameOrException(nickname);
+        if (myEntity.equals(userEntity)) {
+            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, "you cannot delete yourself");
+        }
+
+        // userEntity가 constellationEntity에 속하는지
+        List<ConstellationUserEntity> constellationUserEntities = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity);
+        List<UserEntity> userEntities = constellationUserEntities.stream().map(ConstellationUserEntity::getUserEntity).toList();
+
+        for (UserEntity user : userEntities) {
+            if (user.equals(userEntity)) {
+                // 삭제
+                ConstellationUserEntity constellationUserEntity = constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity)
+                        .orElseThrow(() ->
+                                new ByeolDamException(ErrorCode.INVALID_REQUEST, "wrong gateway"));
+                constellationEntity.deleteUser(constellationUserEntity);
+
+                constellationUserRepository.saveAndFlush(constellationUserEntity);
+                return;
             }
         }
 
-        // 비공개 게시물 예외처리
-        if (constellationEntity.getShared() != SharedType.SHARED) {
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", myEmail, Long.toString(constellationId)));
+        throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s not belongs to %s", "userEmail:" + nickname, "constellationName:" + constellationEntity.getName()));
+    }
+
+    /**
+     * 별자리 공유하는 유저 조회
+     * 공개된 별자리는 모두가 유저 조회할 수 있고, 비공개 별자리는 회원들만 유저 조회 가능
+     */
+    public List<User> findConstellationUsers(Long constellationId, String myEmail) {
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        // 별자리에 속한 user 구하기 : constellationEntity -> constellationUserEntity -> userEntity
+        List<ConstellationUserEntity> constellationUsersByConstellationEntity = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity);
+        List<UserEntity> userEntities = constellationUsersByConstellationEntity.stream().map(ConstellationUserEntity::getUserEntity).toList();
+
+
+        // 비공개된 별자리
+        UserEntity userEntity = getUserEntityByNicknameOrException(myEmail);
+
+        // 접속자가 소유하고 있는 별자리 구하기 : userEntity -> ConstellationUserEntity -> constellationEntity
+        List<ConstellationUserEntity> constellationUsersByUserEntity = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity);
+        List<ConstellationEntity> constellationEntities = constellationUsersByUserEntity.stream().map(ConstellationUserEntity::getConstellationEntity).toList();
+
+        for (ConstellationEntity constellation : constellationEntities) {
+            // 접속자가 소유하고 있는 별자리와 조회하려는 별자리가 일치하는지 확인
+            if (constellation.getId().equals(constellationId)) {
+                return userEntities.stream().map(User::fromEntity).toList();
+            }
         }
 
-        constellationEntity.increaseHits();
-        return Constellation.fromEntity(constellationEntity);
+        throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", myEmail));
+    }
+
+    // 관리자와 유저 UserRole 맞바꾸기
+    public void roleModify(Long constellationId, String userEmail, String myEmail) {
+        // user 존재하는지 확인
+        getUserEntityByNicknameOrException(userEmail);
+
+        // 사용자가 admin이라면 별자리 Entity 반환
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
+        System.out.println("constellation : " + constellationId);
+
+        // 대상 user, ADMIN으로 권한 변경
+        changeRole(userEmail, constellationEntity, ADMIN);
+
+        // ADMIN, USER로 권한 변경
+        try {
+            // 도중 오류 발생 시 user 권한 되돌리기
+            changeRole(myEmail, constellationEntity, USER);
+        } catch (ByeolDamException e) {
+            changeRole(userEmail, constellationEntity, USER);
+        }
+    }
+
+    /**
+     * -> 그룹별 별자리 - 별 사진 보기
+     * 1. 별자리에 포함될 별 선택하기
+     * - 해당 별자리에 있는 사진들
+     * - 미분류 + 그외 별자리에 존재하는 사진들
+     */
+    public List<Article> findAllArticlesGroupByConstellation(String email) {
+        UserEntity userEntity = getUserEntityByNicknameOrException(email);
+        //userEntity.getConstellationUserEntities().
+        return null;
     }
 
 
+    /**
+     * 2. 별자리 추가(생성) -완료
+     * - 사진 3장(원본, 썸네일, 윤곽선) S3 업로드 -> 사진 각각 String url 반환
+     * - key : origin(원본), thumb(썸네일), cthumb(썸네일 + 윤곽선)
+     * - 사진들을 이미지 테이블에 저장
+     * - 몽고 DB 저장(사진 url, 윤곽선 리스트들, 선택된 윤곽선 리스트 하나) -> 저장된 몽고 DB  ID 반환
+     * - 몽고DB의 ID 값을 별자리 테이블에 id 값 저장
+     */
     @Transactional
-    public Constellation create(String name, SharedType shared, String description, String myEmail, MultipartFile origin, MultipartFile thumb, MultipartFile cthumb) throws IOException {
+    public Constellation create(
+            String name,
+            String description,
+            String email,
+            MultipartFile origin,
+            MultipartFile thumb,
+            MultipartFile cthumb,
+            List<List<List<Integer>>> contoursList,
+            List<List<Integer>> ultimate
+    ) throws IOException {
         // 사용자의 user 엔터티 가져오기
-        UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
+        UserEntity userEntity = getUserEntityByNicknameOrException(email);
 
         // 사진들 추가
-        String originUrl = "";
-        String thumbUrl = "";
-        String contourThumbUrl = "";
-
-        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+        String originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
+        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
+        String cThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
 
         // image 테이블에 저장
         imageService.saveImage(origin.getOriginalFilename(), originUrl, null, ImageType.CONSTELLATION);
         imageService.saveImage(thumb.getOriginalFilename(), thumbUrl, null, ImageType.CONSTELLATION);
-        imageService.saveImage(cthumb.getOriginalFilename(), contourThumbUrl, null, ImageType.CONSTELLATION);
+        imageService.saveImage(cthumb.getOriginalFilename(), cThumbUrl, null, ImageType.CONSTELLATION);
+
+        // 몽고 DB에 저장
+        ContourEntity contour = contourRepository.save(ContourEntity.of(originUrl, thumbUrl, cThumbUrl, contoursList, ultimate));
 
         // 별자리 엔터티 생성
         ConstellationEntity constellationEntity = ConstellationEntity.of(
                 name,
-                shared,
                 description
         );
-
-        // ConstellationUserEntity 생성 및 연결
+        // mongo에 저장된 id 반환
+        constellationEntity.setContourId(contour.getId());
         ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(
                 constellationEntity,
                 userEntity,
                 ConstellationUserRole.ADMIN
         );
-
         constellationUserRepository.save(constellationUserEntity);
 
         // 별자리를 데이터베이스에 저장
         ConstellationEntity savedConstellationEntity = constellationRepository.saveAndFlush(constellationEntity);
-
         return Constellation.fromEntity(savedConstellationEntity);
     }
 
-    // 수정요청 로직
+    /**
+     * 3. 별자리 삭제 - 완료
+     * - 별자리 Id 값 받아 조회하기
+     * - 몽고DB 조회해서 사진 url 찾기(3개)
+     * - S3에서 사진 삭제
+     * - 몽고 DB 데이터 삭제
+     * - 별자리에 포함되어 있는 별들의 별자리를 미분류로 변환
+     * - 별자리 정보를 마리아 DB에서 삭제
+     */
+    public void deleteConstellationWithContour(String email, Long constellationId) {
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
+        Long contourId = constellationEntity.getContourId();
 
+        ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND)
+        );
+        // S3에서 사진 삭제
+        s3uploader.deleteImageFromS3(contourEntity.getOriginUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
 
-    // 수정확인
+        // 몽고DB에서 contour 삭제
+        contourRepository.delete(contourEntity);
+
+        // 별자리의 별들을 미분류로 변환
+        constellationEntity.getArticleEntities()
+                .stream()
+                .map(article -> {
+                    article.selectConstellation(null);
+                    return article;
+                });
+        // 별자리 삭제
+        constellationRepository.delete(constellationEntity);
+    }
+
+    //
+
+    /**
+     * 4. 수정요청 로직시 - 현재 윤곽선 정보 반환 - 완료
+     * - 별자리 조회
+     * - 몽고DB ID 조회
+     * - 몽고 DB에서 원본 사진 하나 url
+     * - 전체 윤곽선 리스트들
+     * - 최종 윤곽선 데이터
+     * - 프론트에 원본 사진 띄어주기 (원본 사진 위에 윤곽선이 표시가 돼)
+     */
+    public Contour requestModifyConstellation(String email, Long constellationId) {
+        // 별자리 조회
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
+        Long contourId = constellationEntity.getContourId();
+        // 몽고DB조회해서 반환
+        return Contour.fromEntity(
+                contourRepository.findById(contourId)
+                        .orElseThrow(() ->
+                                new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND, String.format("ContourId : %s is not founded", contourId))
+                        )
+        );
+    }
+
+    // 5. 별자리 수정확정 로직
     public Constellation modify(
             Long constellationId,
             String name,
-            SharedType shared,
             String description,
             String myEmail,                // 사용자의 email
             MultipartFile origin,
             MultipartFile thumb,
-            MultipartFile cthumb
+            MultipartFile cThumb,
+            List<List<List<Integer>>> contoursList,
+            List<List<Integer>> ultimate
     ) throws IOException {
-        // 사용자가 admin인지 확인
+        // 현재 수정하려는 유저가 본인인지 확인
+        UserEntity userEntity = getUserEntityByNicknameOrException(myEmail);
+        // 별자리 가져오기(나의 별자리 범주이고, 내가 Admin인 경우)
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
 
-        // 사진들 추가
-        String originUrl = "";
-        String thumbUrl = "";
-        String contourThumbUrl = "";
+        //TODO
 
-        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+        // 사진들 추가
+        String originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
+        String thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
+        String cThumbUrl = s3uploader.upload(cThumb, "constellation/cthumb", THUMB_HEIGHT);
 
         //TODO : 기존 별자리 조회하여 MongoDB ID 조회하고 사진 url 3장 가져오기
-        // 별자리 조회
-        Constellation constellation =  detail(constellationId, myEmail);
 
         // MongoDB ID 조회
         // 코드 필요
@@ -205,16 +375,13 @@ public class ConstellationService {
         oldThumbImage.toEntity().setName(thumb.getOriginalFilename());
         oldThumbImage.toEntity().setUrl(thumbUrl);
 
-        oldContourThumbImage.toEntity().setName(cthumb.getOriginalFilename());
-        oldContourThumbImage.toEntity().setUrl(contourThumbUrl);
+        oldContourThumbImage.toEntity().setName(cThumb.getOriginalFilename());
+        oldContourThumbImage.toEntity().setUrl(cThumbUrl);
 
         //TODO: 몽고 DB에서 해당 값 수정 코드 필요
 
-        if(name != null) {
+        if (name != null) {
             constellationEntity.setName(name);
-        }
-        if(shared != null) {
-            constellationEntity.setShared(shared);
         }
         constellationEntity.setDescription(description);    // 설명 null 가능
 
@@ -222,142 +389,11 @@ public class ConstellationService {
     }
 
 
-    @Transactional
-    public void delete(Long constellationId, String myEmail) {
-        // 사용자가 admin인지 확인
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-
-        constellationRepository.delete(constellationEntity);
-    }
-
-    // 별자리에 공유할 유저 추가
-    public void addUser(Long constellationId, String userEmail, String myEmail) {
-        // user 존재하는지 확인
-        UserEntity userEntity = getUserEntityByEmailOrException(userEmail);
-
-        // 사용자가 admin인지 확인
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-
-        // 별자리회원 연관관계가 이미 존재한다면
-        if(constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).isPresent()) {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s has already added", userEmail));
-        }
-
-        // 별자리에 공유할 유저 추가, 권한은 유저로
-        ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(constellationEntity, userEntity, USER);
-        constellationEntity.addUser(constellationUserEntity);
-
-        constellationUserRepository.saveAndFlush(constellationUserEntity);
-    }
-
-    /**
-     * 별자리 공유하는 유저 강퇴
-     */
-    @Transactional
-    public void deleteUser(Long constellationId, String userEmail, String myEmail, Pageable pageable) {
-        UserEntity myEntity = getUserEntityByEmailOrException(myEmail);
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-        if(constellationEntity.getAdminEntity().getId() != myEntity.getId()) {
-            // 접속자가 별자리 admin이 아니라면
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", myEmail));
-        }
-
-        // Admin 본인 별자리회원 연관관계는 삭제 불가
-        UserEntity userEntity = getUserEntityByEmailOrException(userEmail);
-        if(myEntity.equals(userEntity)) {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, "you cannot delete yourself");
-        }
-
-        // userEntity가 constellationEntity에 속하는지
-        Page<ConstellationUserEntity> constellationUserEntityPage = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity, pageable);
-        Page<UserEntity> userEntityPage = constellationUserEntityPage.map(ConstellationUserEntity::getUserEntity);
-        int idx = 0;
-        for(UserEntity tmp : userEntityPage) {
-            if(tmp.equals(userEntity)) {
-                break;
-            } else {
-                if(++idx == userEntityPage.getTotalElements()) {
-                    throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s not belongs to %s", "userEmail:"+userEmail, "constellationName:"+constellationEntity.getName()));
-                }
-            }
-        }
-
-        // 삭제
-        ConstellationUserEntity constellationUserEntity = constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity)
+    // 유저가 존재하는지 확인
+    private UserEntity getUserEntityByNicknameOrException(String nickname) {
+        return userRepository.findByNickname(nickname)
                 .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.INVALID_REQUEST, "wrong gateway"));
-        constellationEntity.deleteUser(constellationUserEntity);
-
-        constellationUserRepository.saveAndFlush(constellationUserEntity);
-    }
-
-    /**
-     * 별자리 공유하는 유저 조회
-     * 공개된 별자리는 모두가 유저 조회할 수 있고, 비공개 별자리는 회원들만 유저 조회 가능
-     */
-    public Page<User> findSharedUsers(Long constellationId, String myEmail, Pageable pageable) {
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-
-        // 별자리에 속한 user 구하기 : constellationEntity -> constellationUserEntity -> userEntity
-        Page<ConstellationUserEntity> constellationUserPageByConstellationEntity = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity, pageable);
-        Page<UserEntity> userEntityPage = constellationUserPageByConstellationEntity.map(ConstellationUserEntity::getUserEntity);
-
-        if(constellationEntity.getShared().equals(SharedType.SHARED)) {
-            // 공개된 별자리
-        } else {
-            // 비공개된 별자리
-            UserEntity userEntity = getUserEntityByEmailOrException(myEmail);
-
-            // 접속자가 소유하고 있는 별자리 구하기 : userEntity -> ConstellationUserEntity -> constellationEntity
-            Page<ConstellationUserEntity> constellationUserPageByUserEntity = constellationUserRepository.findConstellationUserEntitiesByUserEntity(userEntity, pageable);
-            Page<ConstellationEntity> constellationEntities = constellationUserPageByUserEntity.map(ConstellationUserEntity::getConstellationEntity);
-
-            int idx = 0;
-            for(ConstellationEntity tmp : constellationEntities) {
-                // 접속자가 소유하고 있는 별자리와 조회하려는 별자리가 일치하는지 확인
-                if(tmp.getId() == constellationId) {
-                    break;
-                } else {
-                    if(++idx == constellationEntities.getTotalElements()) {
-                        throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", myEmail));
-                    }
-                }
-            }
-        }
-
-        return userEntityPage.map(User::fromEntity);
-    }
-
-    // 관리자와 유저 UserRole 맞바꾸기
-    public void roleModify(Long constellationId, String userEmail, String myEmail) {
-        // user 존재하는지 확인
-        getUserEntityByEmailOrException(userEmail);
-
-        // 사용자가 admin이라면 별자리 Entity 반환
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
-        System.out.println("constellation : " + constellationId);
-
-        // 대상 user, ADMIN으로 권한 변경
-        changeRole(userEmail, constellationEntity, ADMIN);
-
-        // ADMIN, USER로 권한 변경
-        try {
-            // 도중 오류 발생 시 user 권한 되돌리기
-            changeRole(myEmail, constellationEntity, USER);
-        } catch(ByeolDamException e) {
-            changeRole(userEmail, constellationEntity,USER);
-        }
-    }
-
-
-    //TODO : 별자리 커스텀
-
-
-    // 별자리가 존재하는지 확인
-    private ConstellationEntity getConstellationEntityOrException(Long constellationId) {
-        return constellationRepository.findById(constellationId)
-                .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, "constellation has not founded"));
+                        new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", nickname)));
     }
 
     // 유저가 존재하는지 확인
@@ -367,20 +403,25 @@ public class ConstellationService {
                         new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
     }
 
-    // 사용자가 admin인지 확인
-    private ConstellationEntity getConstellationEntityIfAdminOrException(Long constellationId, String email){
-        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
+    // 별자리가 존재하는지 확인
+    private ConstellationEntity getConstellationEntityOrException(Long constellationId) {
+        return constellationRepository.findById(constellationId)
+                .orElseThrow(() ->
+                        new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, "constellation has not founded"));
+    }
+
+    // 사용자가 admin인지 확인 - 별자리 생성한 사람이 email로 받은 유저와 동일한지
+    private ConstellationEntity getConstellationEntityIfAdminOrException(Long constellationId, String email) {
+        UserEntity userEntity = getUserEntityByNicknameOrException(email);                                                            // 현재 사용자 user entity
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
         UserEntity adminEntity = constellationEntity.getAdminEntity();
 
-        if(adminEntity != null) {
+        if (adminEntity != null) {
             // admin이어야 삭제 가능
-            if(adminEntity.getId() != userEntity.getId()) {
+            if (!adminEntity.equals(userEntity)) {
                 throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
                         String.format("%s has no permission with %s", email, constellationEntity.getName()));
             }
-
-
             return constellationEntity;
         } else {
             throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s has no admin", constellationEntity.getName()));

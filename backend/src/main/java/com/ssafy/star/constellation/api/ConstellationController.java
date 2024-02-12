@@ -7,6 +7,7 @@ import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
+import com.ssafy.star.user.dto.request.NicknameRequest;
 import com.ssafy.star.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,14 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
 import java.util.List;
 
 @Slf4j
@@ -31,7 +30,6 @@ import java.util.List;
 public class ConstellationController {
 
     private final ConstellationService constellationService;
-
 
 
     @Operation(
@@ -45,20 +43,23 @@ public class ConstellationController {
     public Response<Void> create(@RequestPart("request") ConstellationCreateRequest request, Authentication authentication,
                                  @RequestPart("origin") MultipartFile origin,
                                  @RequestPart("thumb") MultipartFile thumb,
-                                 @RequestPart("cthumb") MultipartFile cthumb
-                                 ) throws IOException {
+                                 @RequestPart("cthumb") MultipartFile cthumb,
+                                 @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
+                                 @RequestPart("ultimate") List<List<Integer>> ultimate
+    ) throws IOException {
         String email = authentication.getName();
         //TODO : 윤곽선은 request에 같이 담아져서 옴, request에서 어떻게 추출해서 MongoDB에 저장할지 고민 필요
 
         // 사용자를 관리자로 만듦
         constellationService.create(
                 request.name(),
-                request.shared(),
                 request.description(),
                 authentication.getName(),
                 origin,
                 thumb,
-                cthumb
+                cthumb,
+                contoursList,
+                ultimate
         );
         return Response.success();
     }
@@ -71,20 +72,26 @@ public class ConstellationController {
             }
     )
     @PutMapping("/constellations/{constellationId}")
-    public Response<ConstellationResponse> modify(@PathVariable Long constellationId, @RequestPart("request") ConstellationModifyRequest request,
-                                                  Authentication authentication, @RequestPart("origin") MultipartFile origin,
-                                                  @RequestPart("thumb") MultipartFile thumb, @RequestPart("cthumb") MultipartFile cthumb
-                                                  ) throws IOException {
-
+    public Response<ConstellationResponse> modify(
+            Authentication authentication,
+            @PathVariable Long constellationId,
+            @RequestPart("request") ConstellationModifyRequest request,
+            @RequestPart("origin") MultipartFile origin,
+            @RequestPart("thumb") MultipartFile thumb,
+            @RequestPart("cthumb") MultipartFile cthumb,
+            @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
+            @RequestPart("ultimate") List<List<Integer>> ultimate
+    ) throws IOException {
         Constellation constellation = constellationService.modify(
                 constellationId,
                 request.name(),
-                request.shared(),
                 request.description(),
                 authentication.getName(),
                 origin,
                 thumb,
-                cthumb
+                cthumb,
+                contoursList,
+                ultimate
         );
         return Response.success(ConstellationResponse.fromConstellation(constellation));
     }
@@ -97,21 +104,21 @@ public class ConstellationController {
             }
     )
     @DeleteMapping("/constellations/{constellationId}")
-    public Response<Void> delete(@PathVariable Long constellationId, Authentication authentication) {
-        constellationService.delete(constellationId, authentication.getName());
+    public Response<Void> deleteConstellationWithContour(Authentication authentication, @PathVariable Long constellationId) {
+        constellationService.deleteConstellationWithContour(authentication.getName(), constellationId);
         return Response.success();
     }
 
     @Operation(
-            summary = "별자리 전체 조회",
+            summary = "나의 우주 보기 - 별자리 전체 조회",
             description = "별자리 전체 조회입니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
     @GetMapping("/constellations")
-    public Response<List<ConstellationResponse>> list(Authentication authentication, Pageable pageable) {
-        return Response.success(constellationService.list(authentication.getName(), pageable).stream().map(ConstellationResponse::fromConstellation).toList());
+    public Response<List<ConstellationResponse>> myConstellations(Authentication authentication) {
+        return Response.success(constellationService.myConstellations(authentication.getName()).stream().map(ConstellationResponse::fromConstellation).toList());
     }
 
     @Operation(
@@ -121,22 +128,16 @@ public class ConstellationController {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
             }
     )
-    @GetMapping("/constellations/user/{email}")
-    public Response<Page<ConstellationResponse>> userConstellations(@PathVariable String email, Authentication authentication, Pageable pageable) {
-        return Response.success(constellationService.userConstellations(email,authentication.getName(),pageable).map(ConstellationResponse::fromConstellation));
+    @GetMapping("/constellations/user/{nickname}")
+    public Response<List<ConstellationResponse>> userConstellations(Authentication authentication, @PathVariable String nickname) {
+        return Response.success(
+                constellationService.userConstellations(nickname, authentication.getName())
+                        .stream()
+                        .map(ConstellationResponse::fromConstellation)
+                        .toList()
+        );
     }
 
-    @Operation(
-            summary = "별자리 상세 조회",
-            description = "별자리 상세 조회입니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
-            }
-    )
-    @GetMapping("/constellations/{constellationId}")
-    public Response<ConstellationResponse> read(@PathVariable Long constellationId, Authentication authentication) {
-        return Response.success(ConstellationResponse.fromConstellation(constellationService.detail(constellationId, authentication.getName())));
-    }
 
     // TODO : 별자리 공유 신청, 수락 로직으로 바꿀 것
     @Operation(
@@ -147,8 +148,8 @@ public class ConstellationController {
             }
     )
     @PostMapping("/add-user/constellations/{constellationId}")
-    public Response<Void> addUser(@PathVariable Long constellationId, @RequestBody UserEmailRequest userEmailRequest, Authentication authentication) {
-        String userEmail = userEmailRequest.userEmail();
+    public Response<Void> addUser(Authentication authentication, @PathVariable Long constellationId, @RequestBody NicknameRequest nicknameRequest) {
+        String userEmail = nicknameRequest.nickname();
         constellationService.addUser(constellationId, userEmail, authentication.getName());
         return Response.success();
     }
@@ -161,9 +162,9 @@ public class ConstellationController {
             }
     )
     @DeleteMapping("/delete-user/constellations/{constellationId}")
-    public Response<Void> deleteUser(@PathVariable Long constellationId, @RequestBody UserEmailRequest userEmailRequest, Authentication authentication, Pageable pageable) {
-        String userEmail = userEmailRequest.userEmail();
-        constellationService.deleteUser(constellationId, userEmail, authentication.getName(), pageable);
+    public Response<Void> deleteUser(Authentication authentication, @PathVariable Long constellationId, @RequestBody NicknameRequest nicknameRequest) {
+        String userEmail = nicknameRequest.nickname();
+        constellationService.deleteUser(constellationId, userEmail, authentication.getName());
         return Response.success();
     }
 
@@ -175,8 +176,12 @@ public class ConstellationController {
             }
     )
     @GetMapping("/users/constellations/{constellationId}")
-    public Response<Page<UserResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
-        return Response.success(constellationService.findSharedUsers(constellationId, authentication.getName(), pageable).map(UserResponse::fromUser));
+    public Response<List<UserResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
+        return Response.success(constellationService.findConstellationUsers(constellationId, authentication.getName())
+                .stream()
+                .map(UserResponse::fromUser)
+                .toList()
+        );
     }
 
     @Operation(

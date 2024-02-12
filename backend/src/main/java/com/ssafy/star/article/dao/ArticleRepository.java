@@ -40,8 +40,9 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
 
         /**
          * 별자리 공개여부와 해당 별자리 공유여부
+         * TODO : 검토 필요
          */
-        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND ((a.disclosure = 'VISIBLE' AND a.constellationEntity.shared = 'SHARED') OR a.ownerEntity = :userEntity)")
+        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
         Page<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity, Pageable pageable);
 }
 
