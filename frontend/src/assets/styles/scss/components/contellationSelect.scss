@@ -91,3 +91,27 @@
 .constellation-select-box-selected {
   background-color: $green;
 }
+
+.article-prev-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: transparent;
+  border: none;
+  color: white;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.article-prev-btn:hover {
+  opacity: 1;
+}
+
+.article-button-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}

@@ -15,10 +15,7 @@ export default function ModalContainer() {
         <div className="modal-container-background">
           <div className="modal-container">
             <div className="modal-header">
-              <img
-                src="/src/assets/images/nav-bar-toggle-button/close.png"
-                className="modal-prev-btn"
-              />
+              <div></div>
               <h1 className="modal-title">{currentModalState.title}</h1>
               <img
                 src="/src/assets/images/base/close-button.png"

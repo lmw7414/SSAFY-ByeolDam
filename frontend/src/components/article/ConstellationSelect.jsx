@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ConstellationSelectList from './ConstellationSelectList';
 
-export default function ConstellationSelect({ writeArticle, article, setArticle }) {
+export default function ConstellationSelect({ writeArticle, article, setArticle, setStep }) {
   const setDisclosureType = (e) => {
     setArticle({
       ...article,
@@ -40,9 +40,19 @@ export default function ConstellationSelect({ writeArticle, article, setArticle 
           <div>비공개</div>
         </label>
       </div>
-      <button className="article-write-btn" type="button" onClick={writeArticle}>
-        별 생성하기
-      </button>
+      <div class="article-button-wrapper">
+        <button
+          className="article-prev-btn"
+          onClick={() => {
+            setStep(1);
+          }}
+        >
+          {'< 이전으로'}
+        </button>
+        <button className="article-write-btn" type="button" onClick={writeArticle}>
+          별 생성하기
+        </button>
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function ImageUpload({ setStep, setFile, setArticle, article }) {
   });
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(false);
-  const [originalFile, setOriginalFile] = useState('fileName');
+  const [originalFile, setOriginalFile] = useState(null);
 
   const stage = useRef();
   const imageRef = useRef();
@@ -66,6 +66,12 @@ export default function ImageUpload({ setStep, setFile, setArticle, article }) {
     const blob = dataURLtoBlob(stage.current.toDataURL({ pixelRatio: 2 }));
     const file = new File([blob], originalFile.name.split('.')[0] + '.png', { type: 'image/png' });
     setFile(file);
+  };
+
+  const nextStep = () => {
+    if (!article.description || !editor.image) return;
+    saveFile();
+    setStep(2);
   };
 
   const loadImage = () => {
@@ -173,14 +179,7 @@ export default function ImageUpload({ setStep, setFile, setArticle, article }) {
           태그
         </label>
         <TagEditor setTags={setTags} />
-        <button
-          className="article-upload-btn"
-          type="button"
-          onClick={() => {
-            saveFile();
-            setStep(2);
-          }}
-        >
+        <button className="article-upload-btn" type="button" onClick={nextStep}>
           다음
         </button>
       </div>

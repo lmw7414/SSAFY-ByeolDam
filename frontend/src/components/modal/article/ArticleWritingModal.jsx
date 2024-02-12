@@ -41,6 +41,7 @@ export default function ArticleWritingModal() {
           writeArticle={writeArticle}
           article={article}
           setArticle={setArticle}
+          setStep={setStep}
         />
       )}
     </div>
