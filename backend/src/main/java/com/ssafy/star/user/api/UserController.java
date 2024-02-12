@@ -35,6 +35,17 @@ public class UserController {
     private final FollowService followService;
     private final ArticleService articleService;
     private final ConstellationService constellationService;
+    
+    @Operation(
+            summary = "이메일로 닉네임 찾기",
+            description = "email의 정보로 닉네임 찾기 - 소셜로그인 때 사용"
+    )
+    @PostMapping("/users/find-nickname")
+    public Response<String> findNickname(@RequestBody EmailRequest request) {
+        User user = userService.loadUserByEmail(request.email()).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND));
+        return Response.success(user.nickname());
+    }
 
     @Operation(
             summary = "이메일 인증코드 요청",
@@ -97,9 +108,8 @@ public class UserController {
                     "만료가 되었다면 리프레시 토큰이 있는지 확인 후 새로 액세스 토큰을 발급해준다. 리프레시 토큰 기간이 3일 이하로 남았다면, 리프레시 토큰도 새롯 생성한다."
     )
     @GetMapping("/users/refresh")
-    public Response<UserLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String token = userService.refreshToken(request, response);
-        return Response.success(new UserLoginResponse(null, token));
+    public Response<UserLoginResponse> refresh(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        return Response.success(userService.refreshToken(authentication.getName(), request, response));
     }
 
     @Operation(

@@ -189,23 +189,26 @@ public class UserService {
      * 12. DB에 업데이트
      * 13. 액세스 토큰 리턴
      */
-    public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public UserLoginResponse refreshToken(String email, HttpServletRequest request, HttpServletResponse response) {
         // 1. 헤더로 부터 액세스 토큰 가져오기
         String accessToken = HeaderUtils.getAccessToken(request);
         AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+        User user = loadUserByEmail(email).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email))
+        );
+        UserDefaultResponse defaultResponse = UserDefaultResponse.fromUser(user, articleService.countArticles(email), constellationService.countConstellations(email), followService.countFollowers(user.nickname()), followService.countFollowings(user.nickname()));
 
         // 2-1. 토큰이 유효한지 체크
         if (authToken.validate()) {   // 유효하다면 지금 토큰 그대로 반환
-            return authToken.getToken();
+            return new UserLoginResponse(defaultResponse, authToken.getToken());
         }
 
         // 2-2. 토큰이 유효하지 않다면 리프레시 토큰이 있는지 확인하자
         Claims claims = authToken.getExpiredClaims();  // 만료되었을 경우 만료 토큰을 가져옴.
         if (claims == null) {
-            return accessToken;  // 아직 만료 안됨
+            return new UserLoginResponse(defaultResponse, accessToken);  // 아직 만료 안됨
         }
 
-        String email = claims.get("email", String.class);
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
         //refresh token
@@ -241,7 +244,9 @@ public class UserService {
             CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
             CookieUtils.addCookie(response, REFRESH_TOKEN, authRefreshToken.getToken(), cookieMaxAge);
         }
-        return newAccessToken.getToken();
+
+
+        return new UserLoginResponse(defaultResponse, newAccessToken.getToken());
     }
 
     // 회원가입 - 이메일 인증
