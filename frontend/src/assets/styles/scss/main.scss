@@ -1,6 +1,8 @@
 @import './base/reset.scss';
 @import './base/text.scss';
 @import './base/color.scss';
+@import './base/radio.scss';
+@import './base/scroll.scss';
 
 @import './pages/universe.scss';
 @import './pages/member.scss';
@@ -11,4 +13,7 @@
 @import './components/extendedBar.scss';
 @import './components/modalContainer.scss';
 @import './components/constellationModal.scss';
+@import './components/imageUpload.scss';
 @import './components/followModal.scss';
+@import './components/tagEditor.scss';
+@import './components/contellationSelect.scss';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import axios from '/src/apis/axios';
+import { logout } from '../apis/member';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -85,9 +85,12 @@ export default function NavBar() {
     setFollowing(followingResult);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   readNickname().then((result) => {
+  //     // console.log(result);
+  //     setNickname(result);
+  //   });
+  // }, []);
 
   // 팔로우 모달
   const openFollowerModal = () => {
@@ -186,6 +189,10 @@ export default function NavBar() {
                   text={'로그아웃'}
                   src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
                   alt={'logout'}
+                  onClick={() => {
+                    logout();
+                    navigate('/');
+                  }}
                 />
               </div>
             </div>
