@@ -1,5 +1,5 @@
 import parseJwt from '../utils/parseJwt';
-import axios from './axios';
+import axios, { setToken } from './axios';
 
 export const login = async ({ email, password }) => {
   const { data } = await axios.post('/users/login', {
@@ -9,7 +9,7 @@ export const login = async ({ email, password }) => {
 
   const token = data?.result?.token;
   sessionStorage.setItem('access_token', token);
-  sessionStorage.setItem('profile', JSON.stringify(parseJwt(token)));
+  sessionStorage.setItem('profile', JSON.stringify(data.result.user));
 
   axios.interceptors.request.use(
     (config) => {
@@ -57,4 +57,10 @@ export const verificateCode = async ({ email, code }) => {
 export const getMyFollwings = async () => {
   if (!sessionStorage.token) return;
   const result = await axios.get('/me/followings');
+};
+
+export const logout = async () => {
+  // cosnt result = await axios.post('/users/logout');
+  if (sessionStorage['access_token']) sessionStorage.clear('access_token');
+  if (sessionStorage['profile']) sessionStorage.clear('profile');
 };

@@ -1,9 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ExtendedBarIcon from './base/ExtendedBarIcon';
 import { useState } from 'react';
 
 export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHome }) {
   const [isClose, setIsClosed] = useState(false);
+  const [filterId, setFilterId] = useState(0);
+  const [inputValue, setInputValue] = useState('');
+
+  const search = (event) => {
+    setInputValue(event.target.value);
+    // console.log(inputValue);
+  };
+
+  const navigate = useNavigate();
 
   const closeExtendedBar = () => {
     setIsClosed(true);
@@ -26,6 +35,15 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
     changeExNav(1);
   };
 
+  const changeFilter = (id) => {
+    setFilterId(id);
+    if (id === 1) {
+      navigate('/search/star');
+    } else if (id === 2) {
+      navigate('/search/constellation');
+    }
+  };
+
   return (
     <div className={isClose ? 'extended-bar-closed' : 'extended-bar-big-container'}>
       <div className="nav-bar-logo" onClick={goHome}>
@@ -34,7 +52,7 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
       <div className={isClose ? 'extended-bar-container-closed' : 'extended-bar-container'}>
         <div className="extended-bar-contents">
           {barId === 1 ? (
-            <input type="text" placeholder="검색" className="search-bar-input" />
+            <input type="text" placeholder="검색" className="search-bar-input" onChange={search} />
           ) : null}
 
           <div className="search-bar-bottom-contents">
@@ -45,16 +63,31 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 }
               >
                 <ExtendedBarIcon
-                  src={'/src/assets/images/search-bar-filter-icons/user.png'}
+                  src={
+                    filterId === 0
+                      ? '/src/assets/images/search-bar-filter-icons/user_activated.png'
+                      : '/src/assets/images/search-bar-filter-icons/user.png'
+                  }
                   alt={'user'}
+                  onClick={() => changeFilter(0)}
                 />
                 <ExtendedBarIcon
-                  src={'/src/assets/images/search-bar-filter-icons/star.png'}
+                  src={
+                    filterId === 1
+                      ? '/src/assets/images/search-bar-filter-icons/star_activated.png'
+                      : '/src/assets/images/search-bar-filter-icons/star.png'
+                  }
                   alt={'star'}
+                  onClick={() => changeFilter(1)}
                 />
                 <ExtendedBarIcon
-                  src={'/src/assets/images/search-bar-filter-icons/constellation.png'}
+                  src={
+                    filterId === 2
+                      ? '/src/assets/images/search-bar-filter-icons/constellation_activated.png'
+                      : '/src/assets/images/search-bar-filter-icons/constellation.png'
+                  }
                   alt={'constellation'}
+                  onClick={() => changeFilter(2)}
                 />
               </div>
 

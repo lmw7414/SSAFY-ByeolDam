@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import axios from '/src/apis/axios';
+import { logout } from '../apis/member';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -9,16 +9,24 @@ import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
 import FollowModal from './modal/Follow/FollowModal';
 
+// import jwt from 'jsonwebtoken';
+import parseJwt from '../utils/parseJwt.js';
+
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
-  const [following, setFollowing] = useState(0);
-  const [follower, setFollower] = useState(0);
+  const [following, setFollowing] = useState('');
+  const [follower, setFollower] = useState('');
   const [modalState, setModalState] = useModal();
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
+  const [profileImgUrl, setProfileImgUrl] = useState('');
+  // const [parsedJwt, setParsedJwt] = useState(null);
 
+  // 네비게이션 바 작동 관련
   const navigate = useNavigate();
+
   const goHome = () => {
     navigate('/home');
     setBarId(0);
@@ -46,40 +54,44 @@ export default function NavBar() {
     setBarId(4);
   };
 
-  const readNickname = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    return nickname;
+  const readProfile = async () => {
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    setNickname(profile.nickname);
+    setEmail(profile.email);
+    return profile;
   };
 
-  useEffect(() => {
-    readNickname().then((result) => {
-      // console.log(result);
-      setNickname(result);
-    });
-  }, []);
+  const readFollowing = async (profile) => {
+    const data = await axios.get(`${profile.nickname}/count-followings`);
+    setFollowing(data.data.result);
+  };
 
-  // console.log('barId : ', barId);
-  // console.log('navEx : ', navEx);
+  const readFollower = async (profile) => {
+    const data = await axios.get(`${profile.nickname}/count-followers`);
+    setFollower(data.data.result);
+  };
 
-  // const readFollowing = async () => {
-  //   const data = await axios.get('immigrant_co/count-followings');
-  //   return data.data.result;
-  // };
-
-  // const readFollower = async () => {
-  //   const data = await axios.get('immigrant_co/count-followers');
-  //   return data.data.result;
-  // };
+  const readStarConstellation = async () => {
+    console.log(email);
+    const constellation = await axios.get(`constellations/user/${email}`);
+    console.log(constellation);
+  };
+  const fetchData = async () => {
+    const data = await readProfile();
+    await readFollower(data);
+    await readFollowing(data);
+    await readStarConstellation();
+  };
 
   // useEffect(() => {
-  //   readFollower().then((result) => {
-  //     setFollower(result);
-  //   });
-  //   readFollowing().then((result) => {
-  //     setFollowing(result);
+  //   readNickname().then((result) => {
+  //     // console.log(result);
+  //     setNickname(result);
   //   });
   // }, []);
 
+  // 팔로우 모달
   const openFollowerModal = () => {
     setModalState({
       isOpen: true,
@@ -176,6 +188,10 @@ export default function NavBar() {
                   text={'로그아웃'}
                   src={'/src/assets/images/nav-bar-menu-icons/logout.png'}
                   alt={'logout'}
+                  onClick={() => {
+                    logout();
+                    navigate('/');
+                  }}
                 />
               </div>
             </div>

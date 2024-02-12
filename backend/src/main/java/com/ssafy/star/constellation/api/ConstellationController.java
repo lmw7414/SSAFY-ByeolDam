@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.api;
 
+import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dto.Constellation;
@@ -7,7 +8,9 @@ import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
-import com.ssafy.star.user.dto.response.UserResponse;
+import com.ssafy.star.user.application.FollowService;
+import com.ssafy.star.user.dto.response.UserDefaultResponse;
+import com.ssafy.star.user.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,8 +31,8 @@ import java.util.List;
 public class ConstellationController {
 
     private final ConstellationService constellationService;
-
-
+    private final ArticleService articleService;
+    private final FollowService followService;
 
     @Operation(
             summary = "별자리 생성",
@@ -159,8 +162,16 @@ public class ConstellationController {
             }
     )
     @GetMapping("/users/constellations/{constellationId}")
-    public Response<Page<UserResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
-        return Response.success(constellationService.findSharedUsers(constellationId, authentication.getName(), pageable).map(UserResponse::fromUser));
+    public Response<Page<UserDefaultResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
+        return Response.success(constellationService.findSharedUsers(constellationId, authentication.getName(), pageable)
+                .map(res ->
+                        UserDefaultResponse.fromUser(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email()),
+                                followService.countFollowers(res.nickname()),
+                                followService.countFollowings(res.nickname())
+                        )));
     }
 
     @Operation(
