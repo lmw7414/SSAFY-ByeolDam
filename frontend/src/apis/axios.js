@@ -1,12 +1,81 @@
 import axios from 'axios';
 
+let failedRequestQueue = [];
+let isRefreshing = false;
+
 const client = axios.create({
   baseURL: '/api',
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${sessionStorage.token}`,
-  },
 });
+
+export const setToken = (token) => {
+  sessionStorage.setItem('access_token', token);
+  client.defaults.headers.Authorization = `Bearer ${token}`;
+};
+
+export const setProfile = (profile) => {
+  const prevProfile = sessionStorage.profile;
+  sessionStorage.setItem('profile', { ...prevProfile, profile });
+};
+
+export const deleteToken = () => {
+  sessionStorage.clear('access_token');
+  client.defaults.headers.Authorization = null;
+};
+
+const addFailedRequest = (request) => {
+  failedRequestQueue.push(request);
+};
+
+export const refreshToken = async () => {
+  const { data } = await axios.get('/users/refresh');
+  return data;
+};
+
+const refreshTokenAndResolveRequests = async (error) => {
+  try {
+    const { response: errorResponse } = error;
+
+    const failedRequest = new Promise((resolve, reject) => {
+      addFailedRequest(async (accessToken) => {
+        try {
+          errorResponse.config.headers['Authorization'] = `Bearer ${accessToken}`;
+          resolve(client(errorResponse.config));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+
+    if (!isRefreshing) {
+      isRefreshing = true;
+
+      const token = await refreshToken();
+      setToken(token);
+      failedRequestQueue.forEach((request) => request(token));
+      failedRequestQueue = [];
+    }
+
+    return failedRequest;
+  } catch (e) {
+    if (sessionStorage['access_token']) sessionStorage.clear('access_token');
+    if (sessionStorage['profile']) sessionStorage.clear('profile');
+    return Promise.reject(e);
+  }
+};
+
+client.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  async function (error) {
+    const { response: errorResponse } = error;
+    if (errorResponse.status === 401) {
+      return await refreshTokenAndResolveRequests(error);
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default client;

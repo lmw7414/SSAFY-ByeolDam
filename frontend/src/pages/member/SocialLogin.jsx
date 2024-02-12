@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from '../../apis/axios';
+import axios, { setToken } from '../../apis/axios';
 import parseJwt from '../../utils/parseJwt';
 
 export default function SocialLogin() {
@@ -20,12 +20,8 @@ export default function SocialLogin() {
       },
     );
 
-    const profile = parseJwt(token);
-    sessionStorage.setItem('access_token', token);
-    sessionStorage.setItem('profile', JSON.stringify(profile));
-    axios.get(`/users/${profile.nickname}`).then((data) => {
-      console.log(data);
-    });
+    setToken(token);
+    sessionStorage.setItem('profile', 'nickname:immigrant_co');
     navigate('/home');
   }, []);
 

@@ -1,5 +1,4 @@
-import parseJwt from '../utils/parseJwt';
-import axios from './axios';
+import axios, { setToken } from './axios';
 
 export const login = async ({ email, password }) => {
   const { data } = await axios.post('/users/login', {
