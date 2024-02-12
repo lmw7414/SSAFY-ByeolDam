@@ -1,6 +1,8 @@
 package com.ssafy.star.article.dto.request;
 
+import java.util.Set;
+
 public record ArticleConstellationSelect (
-        Long constellationId
+        Set<Long> articleIdSet
 ){
 }

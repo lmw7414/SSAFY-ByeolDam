@@ -9,16 +9,23 @@ import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
 import FollowModal from './modal/Follow/FollowModal';
 
+// import jwt from 'jsonwebtoken';
+import parseJwt from '../utils/parseJwt.js';
+
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
-  const [following, setFollowing] = useState(0);
-  const [follower, setFollower] = useState(0);
+  const [following, setFollowing] = useState('');
+  const [follower, setFollower] = useState('');
   const [modalState, setModalState] = useModal();
   const [nickname, setNickname] = useState('');
+  const [profileImgUrl, setProfileImgUrl] = useState('');
+  // const [parsedJwt, setParsedJwt] = useState(null);
 
+  // 네비게이션 바 작동 관련
   const navigate = useNavigate();
+
   const goHome = () => {
     navigate('/home');
     setBarId(0);
@@ -46,40 +53,46 @@ export default function NavBar() {
     setBarId(4);
   };
 
-  const readNickname = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    return nickname;
+  // 네비게이션 바 프로필 정보 표시
+  const readJWT = async () => {
+    const JWTtoken = sessionStorage.getItem('token');
+    const parsed = parseJwt(JWTtoken);
+    // 닉네임 state로 가져오기
+    setNickname(parsed.nickname);
+    // 프로필이미지 URL 가져오기
+    const profile = await axios.get(`/users/${parsed.nickname}`);
+    setProfileImgUrl(profile.data.result.imageUrl);
+    return parsed;
   };
 
-  useEffect(() => {
-    readNickname().then((result) => {
-      // console.log(result);
-      setNickname(result);
-    });
-  }, []);
+  const readFollowing = async (parsed) => {
+    const data = await axios.get(`${parsed.nickname}/count-followings`);
+    return data.data.result;
+  };
 
-  // console.log('barId : ', barId);
-  // console.log('navEx : ', navEx);
+  const readFollower = async (parsed) => {
+    const data = await axios.get(`${parsed.nickname}/count-followers`);
+    return data.data.result;
+  };
 
-  // const readFollowing = async () => {
-  //   const data = await axios.get('immigrant_co/count-followings');
-  //   return data.data.result;
-  // };
+  const fetchData = async () => {
+    const data = await readJWT();
 
-  // const readFollower = async () => {
-  //   const data = await axios.get('immigrant_co/count-followers');
-  //   return data.data.result;
-  // };
+    const followerResult = await readFollower(data);
+    setFollower(followerResult);
+
+    const followingResult = await readFollowing(data);
+    setFollowing(followingResult);
+  };
 
   // useEffect(() => {
-  //   readFollower().then((result) => {
-  //     setFollower(result);
-  //   });
-  //   readFollowing().then((result) => {
-  //     setFollowing(result);
+  //   readNickname().then((result) => {
+  //     // console.log(result);
+  //     setNickname(result);
   //   });
   // }, []);
 
+  // 팔로우 모달
   const openFollowerModal = () => {
     setModalState({
       isOpen: true,

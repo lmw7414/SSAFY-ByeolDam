@@ -1,0 +1,52 @@
+.article-tag-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-grow: 0;
+}
+
+.article-tag-insert-input,
+.article-tag-insert-btn,
+.article-tag-btn {
+  background-color: $secondary;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  padding: 0.6rem;
+  margin: 0.3rem;
+  margin-left: 0;
+  transition: margin 0.1s;
+}
+
+.article-tag-insert-btn {
+  font-size: 1.3rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.article-tag-btn {
+  padding: 0.6rem 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.articel-tag-delete-btn {
+  position: absolute;
+  width: 1.3rem;
+  height: 1.3rem;
+  text-align: center;
+  line-height: 1.3rem;
+  border-radius: 1.3rem;
+  background-color: red;
+  color: white;
+  top: -0.3em;
+  right: -0.6rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.article-tag-selected {
+  margin-right: 0.8rem;
+}
