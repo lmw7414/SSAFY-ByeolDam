@@ -18,8 +18,8 @@ public record UserDefaultResponse(
         DisclosureType disclosureType,
         Integer articleCounts,
         Integer constellationCounts,
-        Long Followers,
-        Long Followings
+        Long followers,
+        Long followings
 ) {
 
     public static UserDefaultResponse fromUser(User dto, int articleCounts, int constellationCounts,Long followers, Long followings) {

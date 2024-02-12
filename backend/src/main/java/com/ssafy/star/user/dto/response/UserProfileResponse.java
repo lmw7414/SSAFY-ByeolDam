@@ -20,8 +20,8 @@ public record UserProfileResponse(
         LocalDate birthday,
         Integer articleCounts,
         Integer constellationCounts,
-        Long Followers,
-        Long Followings
+        Long followers,
+        Long followings
 
 ) {
 
