@@ -6,7 +6,7 @@ import ContoursEditor from '../../components/editor/ContoursEditor';
 import MaskPreview from '../../components/editor/MaskPreview';
 import ContoursPreview from '../../components/editor/ContoursPreview';
 
-import { getAIcontours } from '../../apis/constellation';
+import { addConstellation, getAIcontours } from '../../apis/constellation';
 import { getConstellationThumbnail } from '../../utils/getConstellationThumbnail';
 
 export default function ConstellationWriting() {
@@ -20,6 +20,7 @@ export default function ConstellationWriting() {
   const [originalData, setOriginalData] = useState(null);
   const [convertedPoints, setConvertedPoints] = useState([]);
   const [imageConfig, setImageConfig] = useState(null);
+  const [name, setName] = useState('');
 
   const editorSize = 550;
 
@@ -44,27 +45,6 @@ export default function ConstellationWriting() {
   };
 
   const setContoursData = (data) => {
-    console.log(
-      JSON.stringify(
-        data
-          .map((dt) => {
-            const height = dt.image_height;
-            const width = dt.image_width;
-
-            const zipped = douglasPeucker(
-              dt.contours.map((point) => {
-                const [x, y] = point;
-                return { x, y };
-              }),
-              5,
-            );
-
-            return zipped.map(({ x, y }) => [(x * editorSize) / width, (y * editorSize) / height]);
-          })
-          .filter((dt) => dt.length > 1),
-      ),
-    );
-
     setOriginalData(data);
     setPointList(
       data
@@ -104,10 +84,21 @@ export default function ConstellationWriting() {
   const writeConstellation = () => {
     const { thumb, cthumb } = getConstellationThumbnail({
       imageConfig,
+      originalFile,
       width: editorSize / 2 - 15,
       height: editorSize / 2 - 15,
       points: convertedPoints,
       img: image,
+    });
+
+    addConstellation({
+      name,
+      thumb,
+      cthumb,
+      contoursList: pointList,
+      ultimate: convertedPoints,
+      description: '',
+      origin: originalFile,
     });
   };
 
@@ -165,15 +156,27 @@ export default function ConstellationWriting() {
         </div>
         <div className="constellation-editor-button-box">
           <div className="constellation-editor-button-wrapper">
-            <button>사진변경</button>
-            <button>AI 윤곽선 추출</button>
+            <button type="button" onClick={loadImage}>
+              사진변경
+            </button>
+            <button type="button" onClick={getAIcontoursByImage}>
+              AI 윤곽선 추출
+            </button>
           </div>
           <div className="constellation-editor-input-wrapper">
             <label>별자리 이름 :</label>
-            <input className="constellation-editor-input" type="text" />
+            <input
+              className="constellation-editor-input"
+              type="text"
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
           </div>
         </div>
-        <button className="constellation-writing-btn">별자리 생성</button>
+        <button className="constellation-writing-btn" onClick={writeConstellation}>
+          별자리 생성
+        </button>
         <div id={'save-image'} style={{ display: 'none' }} />
       </div>
     </div>

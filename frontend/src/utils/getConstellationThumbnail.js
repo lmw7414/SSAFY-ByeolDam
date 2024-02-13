@@ -8,7 +8,14 @@ const downloadURI = (uri, name) => {
   link.click();
 };
 
-export const getConstellationThumbnail = ({ width, height, points, img, imageConfig }) => {
+export const getConstellationThumbnail = ({
+  width,
+  height,
+  points,
+  img,
+  imageConfig,
+  originalFile,
+}) => {
   const stage = new Konva.Stage({
     container: 'save-image',
     width: width,
@@ -43,8 +50,10 @@ export const getConstellationThumbnail = ({ width, height, points, img, imageCon
 
   group.add(image);
   stage.draw();
-  downloadURI(stage.toDataURL({ pixelRatio: 256 / width }), 'thumb');
-  const thumb = dataURLtoBlob(stage.toDataURL({ pixelRatio: 256 / width }));
+  const thumbBlob = dataURLtoBlob(stage.toDataURL({ pixelRatio: 256 / width }));
+  const thumb = new File([thumbBlob], originalFile.name.split('.')[0] + '.png', {
+    type: 'image/png',
+  });
 
   const line = new Konva.Line({
     points: points.reduce((prev, [x, y]) => [...prev, x, y], []),
@@ -67,10 +76,10 @@ export const getConstellationThumbnail = ({ width, height, points, img, imageCon
   });
 
   stage.draw();
-  downloadURI(stage.toDataURL({ pixelRatio: 256 / width }), 'cthumb');
-  const cthumb = dataURLtoBlob(stage.toDataURL({ pixelRatio: 256 / width }));
-
-  console.log(JSON.stringify({ width, height, points }));
+  const cthumbBlob = dataURLtoBlob(stage.toDataURL({ pixelRatio: 256 / width }));
+  const cthumb = new File([cthumbBlob], originalFile.name.split('.')[0] + '.png', {
+    type: 'image/png',
+  });
 
   return { thumb, cthumb };
 };

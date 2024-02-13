@@ -5,46 +5,49 @@ import { useFrame } from '@react-three/fiber';
 import { Line, useCursor, Image } from '@react-three/drei';
 import { easing } from 'maath';
 import getUuidByString from 'uuid-by-string';
+import { getConstellationContour } from '../../../apis/constellation';
 
-export default function Constellation({ position = [5, 1.5, 5], name, selected, url, thumbnail }) {
+export default function Constellation({ position = [5, 1.5, 5], name, selected, id }) {
   const group = useRef();
   const imageRef = useRef();
   const [hovered, hover] = useState(false);
   const [pointList, setPointList] = useState([]);
+  const [thumbnail, setThumbnail] = useState(null);
   const uuid = getUuidByString('' + name);
   useCursor(hovered);
 
   const isActive = selected === uuid;
 
   useEffect(() => {
-    group.current.lookAt(new THREE.Vector3(0, 0.03, 0));
+    getConstellationContour(id).then(({ result }) => {
+      const points = result.ultimate;
 
-    fetch(url)
-      .then((data) => data.json())
-      .then((data) => {
-        const [lx, rx] = data.points.reduce(
-          (prev, now) => [Math.min(now[0], prev[0]), Math.max(now[0], prev[1])],
-          [data.width, 0],
-        );
+      const [lx, rx] = points.reduce(
+        (prev, now) => [Math.min(now[0], prev[0]), Math.max(now[0], prev[1])],
+        [260, 0],
+      );
 
-        const [dy, uy] = data.points.reduce(
-          (prev, now) => [Math.min(now[1], prev[0]), Math.max(now[1], prev[1])],
-          [data.height, 0],
-        );
+      const [dy, uy] = points.reduce(
+        (prev, now) => [Math.min(now[1], prev[0]), Math.max(now[1], prev[1])],
+        [260, 0],
+      );
 
-        const width = rx - lx;
-        const height = uy - dy;
-        const size = Math.max(width, height);
+      const width = rx - lx;
+      const height = uy - dy;
+      const size = Math.max(width, height);
 
-        const points = data.points.map(([x, y]) => {
-          const X = (x - lx + (size - width) / 2) / size - 1 / 2;
-          const Y = (y - dy + (size - height) / 2) / size + 1 / 2;
+      const point = points.map(([x, y]) => {
+        const X = (x - lx + (size - width) / 2) / size - 1 / 2;
+        const Y = (y - dy + (size - height) / 2) / size + 1 / 2;
 
-          return [X * 80, (1 - Y) * 80, 0];
-        });
-
-        setPointList(points);
+        return [X * 80, (1 - Y) * 80, 0];
       });
+
+      setPointList(point);
+      setThumbnail(result.thumbUrl);
+    });
+
+    group.current.lookAt(new THREE.Vector3(0, 0.03, 0));
   }, []);
 
   useFrame((state, dt) => {
@@ -69,14 +72,16 @@ export default function Constellation({ position = [5, 1.5, 5], name, selected, 
         <boxGeometry />
         <meshPhongMaterial opacity={0} transparent />
       </mesh>
-      <Image
-        ref={imageRef}
-        url={thumbnail}
-        scale={90}
-        opacity={0.5}
-        transparent
-        raycast={() => null}
-      />
+      {!!thumbnail && (
+        <Image
+          ref={imageRef}
+          url={thumbnail}
+          scale={90}
+          opacity={0.25}
+          transparent
+          raycast={() => null}
+        />
+      )}
       {pointList.map(([x, y, _], i) => (
         <Star
           key={'' + name + i}

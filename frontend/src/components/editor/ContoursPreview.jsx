@@ -52,7 +52,6 @@ export default function ContoursPreview({
             points={convertedPoints.reduce((prev, [x, y]) => [...prev, x, y], [])}
             stroke={'#8E7CAC'}
             strokeWidth={4}
-            strokeWidth={4}
             closed={true}
             tension={0.05}
           />

@@ -9,8 +9,6 @@ import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
 import FollowModal from './modal/Follow/FollowModal';
 
-// import jwt from 'jsonwebtoken';
-import parseJwt from '../utils/parseJwt.js';
 import axios from '../apis/axios';
 
 export default function NavBar() {
@@ -83,6 +81,7 @@ export default function NavBar() {
       children: <FollowModal followSubject={'following'} modalState={modalState} />,
     });
   };
+
   return (
     <div>
       {navEx ? (
