@@ -43,9 +43,6 @@ public class ConstellationService {
     private final S3uploader s3uploader;
     private final ImageService imageService;
 
-    private static final int ORIGIN_HEIGHT = 1024;
-    private static final int THUMB_HEIGHT = 256;
-
     // 별자리 전체 조회
     public List<Constellation> list(String myEmail, Pageable pageable) {
 
@@ -121,9 +118,9 @@ public class ConstellationService {
         String thumbUrl = "";
         String contourThumbUrl = "";
 
-        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+        originUrl = s3uploader.upload(origin, "constellation/origin");
+        thumbUrl = s3uploader.upload(thumb, "constellation/thumb");
+        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb");
 
         // image 테이블에 저장
         imageService.saveImage(origin.getOriginalFilename(), originUrl, null, ImageType.CONSTELLATION);
@@ -174,9 +171,9 @@ public class ConstellationService {
         String thumbUrl = "";
         String contourThumbUrl = "";
 
-        originUrl = s3uploader.upload(origin, "constellation/origin", ORIGIN_HEIGHT);
-        thumbUrl = s3uploader.upload(thumb, "constellation/thumb", THUMB_HEIGHT);
-        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb", THUMB_HEIGHT);
+        originUrl = s3uploader.upload(origin, "constellation/origin");
+        thumbUrl = s3uploader.upload(thumb, "constellation/thumb");
+        contourThumbUrl = s3uploader.upload(cthumb, "constellation/cthumb");
 
         //TODO : 기존 별자리 조회하여 MongoDB ID 조회하고 사진 url 3장 가져오기
         // 별자리 조회
