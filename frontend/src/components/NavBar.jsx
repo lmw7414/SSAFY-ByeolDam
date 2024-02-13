@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { logout } from '../apis/member';
+import { getArticles } from '../apis/articles';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -11,6 +12,7 @@ import FollowModal from './modal/Follow/FollowModal';
 
 // import jwt from 'jsonwebtoken';
 import parseJwt from '../utils/parseJwt.js';
+import ArticleModal from './modal/article/ArticleModal';
 import axios from '../apis/axios';
 
 export default function NavBar() {

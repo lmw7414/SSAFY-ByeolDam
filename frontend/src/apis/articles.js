@@ -1,10 +1,15 @@
 import axios from './axios';
 
-export const getArticles = async (articleId) => {
-  const { data } = await axios.get(`articles/${articleId}`);
-  return { resultCode: data.resultCode, data: data.articles };
-};
+export const getArticles = async (articleId, token = null) => {
+  token =
+    'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcwNzc4ODM0MiwiZXhwIjoxNzA3NzkwMTQyfQ.wKCVmg8eXKhuXLG760c95iGquQmktZO8I7a_0w7hin8';
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
+  const { data } = await axios.get(`articles/${articleId}`, { headers });
+  return data;
+};
 export const addArticle = async (
   { description, articleHashtagSet, disclosureType, imageType },
   file,

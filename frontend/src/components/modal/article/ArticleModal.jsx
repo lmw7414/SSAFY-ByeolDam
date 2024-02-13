@@ -1,32 +1,152 @@
 import { useEffect, useState } from 'react';
 import { getComments } from '../../../apis/comments';
 import Comment from '../../article/Comment';
+import { PositionPoint } from '@react-three/drei';
+import { addComments } from '../../../apis/comments';
+import { Pass } from 'postprocessing';
 
-export default function ArticleModal({ articleId, description, hits, createdAt }) {
-  const [comments, setComments] = useState();
+export default function ArticleModal({
+  articleId,
+  description,
+  hits,
+  createdAt,
+  imgUrl,
+  owner,
+  tags,
+  constellationName,
+  commentList,
+}) {
+  commentList = [
+    {
+      id: 0,
+      articleId: 0,
+      nickName: '작성자',
+      content: '내용',
+      parentId: 0,
+      createdAt: '2024-02-12T12:05:43.959Z',
+      modifiedAt: '2024-02-12T12:05:43.959Z',
+      childrenComments: [
+        {
+          id: 0,
+          nickName: '작성자',
+          content: '내용',
+          createdAt: '2024-02-12T12:05:43.959Z',
+          modifiedAt: '2024-02-12T12:05:43.959Z',
+        },
+        {
+          id: 0,
+          nickName: '작성자',
+          content: '내용',
+          createdAt: '2024-02-12T12:05:43.959Z',
+          modifiedAt: '2024-02-12T12:05:43.959Z',
+        },
+      ],
+    },
+    {
+      id: 0,
+      articleId: 0,
+      nickName: '작성자',
+      content: '내용',
+      parentId: 0,
+      createdAt: '2024-02-12T12:05:43.959Z',
+      modifiedAt: '2024-02-12T12:05:43.959Z',
+      childrenComments: [],
+    },
+  ];
 
-  useEffect(() => {
-    getComments(articleId).then(({ resultCode, result }) => {
-      console.log(resultCode);
-      setComments(result);
+  const [comments, setComments] = useState(commentList);
+  const [constellation, setConstellation] = useState(constellationName);
+  const [liked, setLiked] = useState(false);
+  const [content, setContent] = useState('');
+
+  constellation === null ? setConstellation("없음") : Pass;
+
+  const createComment = (e) => {
+    e.preventDefault();
+    setContent(content.trim());
+    addComments(articleId, content).then((result) => {
+      console.log('댓글이 생성되었습니다:', content);
     });
-  }, [articleId]);
+    setContent("")
+  };
+  
+  tags = ['#태극기', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한'];
+  const likeCount = 1;
 
   return (
-    <div>
-      <div>내용 : {description}</div>
-      <div>조회수 : {hits}</div>
-      <div>작성일 : {createdAt}</div>
-      <div>
-        {comments.map((comment) => (
-          <Comment
-            id={comment.id}
-            nickName={comment.nickName}
-            createAt={comment.createAt}
-            parentId={comment.parentId}
-            childrenComments={comment.childrenComments}
+    <div className="modal-box">
+      <div className="article-img-box">
+        <img src={imgUrl} alt="사용자 게시물 이미지" />
+        <p className="nickname">
+          현재 속한 별자리:
+          <li>
+            {constellation}
+            <i class="down"></i>
+            <div class="dropdown">
+              <a class="drop-link" href="#">
+                Link1
+              </a>
+              <a class="drop-link" href="#">
+                Link2
+              </a>
+              <a class="drop-link" href="#">
+                Link3
+              </a>
+            </div>
+          </li>
+        </p>
+      </div>
+
+      <div className="modal-right-box">
+        <div className="modal-describe-box">
+          <p className="nickname article-owner">{owner}</p>
+          <div id="tags">
+            {tags.map((tag) => (
+              <p className="nickname">{tag}</p>
+            ))}
+          </div>
+          <div id="like-area">
+            <img
+              src={liked ? '/images/heart_activated.png' : '/images/heart.png'}
+              alt="좋아요"
+              onClick={() => {
+                setLiked(!liked);
+              }}
+            />
+            <p className="nickname">좋아요 {likeCount}개</p>
+          </div>
+        </div>
+
+        <hr className="settings-detail-divide" />
+        <div id="comment-area">
+          {comments.map((comment) => (
+            <Comment
+              id={comment.id}
+              nickName={comment.nickName}
+              content={comment.content}
+              createAt={comment.createAt}
+              parentId={comment.parentId}
+              childrenComments={comment.childrenComments}
+            />
+          ))}
+        </div>
+
+        <div className="create-comment-area">
+          <textarea
+            type="text"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            name="content"
+            id="content"
+            placeholder="댓글 입력"
+            onKeyUp={(e) => {
+              if (e.key === 'Enter') {
+                createComment(e);
+              }
+            }}
           />
-        ))}
+          <img src="images/comment_create_btn.png" alt="댓글 생성 버튼" onClick={createComment} />
+        </div>
       </div>
     </div>
   );
