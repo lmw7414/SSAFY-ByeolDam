@@ -3,7 +3,19 @@ import { Stage, Layer, Image, Line } from 'react-konva';
 
 import generateColor from '../../utils/generateColor';
 
-export default function MaskPreview({ width, height, pointList, setHovered, setSelected, image }) {
+export default function MaskPreview({
+  width,
+  height,
+  pointList,
+  setHovered,
+  setSelected,
+  image,
+  editorSize,
+  convertedPoints,
+  setConvertedPoints,
+  imageConfig,
+  setImageConfig,
+}) {
   const preview = useRef();
 
   return (
@@ -16,7 +28,10 @@ export default function MaskPreview({ width, height, pointList, setHovered, setS
             <Line
               key={i}
               index={i}
-              points={data.reduce((prev, [x, y]) => [...prev, x / 2, y / 2], [])}
+              points={data.reduce(
+                (prev, [x, y]) => [...prev, (x * width) / editorSize, (y * height) / editorSize],
+                [],
+              )}
               stroke={color}
               fill={color}
               closed={true}

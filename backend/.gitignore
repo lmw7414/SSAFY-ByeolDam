@@ -230,7 +230,7 @@ gradle-app.setting
 
 # Docker관련
 **/database/data/
-
+**/mongodb/data/
 ###
 .env
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,windows,macos,visualstudiocode

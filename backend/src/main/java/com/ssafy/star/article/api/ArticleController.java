@@ -10,6 +10,7 @@ import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.user.dto.response.LikeUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -178,6 +179,47 @@ public class ArticleController {
     @PutMapping("/articles/trashcan/undo")
     public Response<ArticleResponse> undoDeletion(@RequestBody ArticleDeletionUndo articleDeletionUndo, Authentication authentication) {
         return Response.success(ArticleResponse.fromArticle(articleService.undoDeletion(articleDeletionUndo.articleId(), authentication.getName())));
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 요청",
+            description = "게시물 좋아요를 요청합니다."
+    )
+    @PostMapping("/articles/{articleId}/likes")
+    public Response<Void> like(Authentication authentication, @PathVariable Long articleId) {
+        articleService.like(articleId, authentication.getName());
+        return Response.success();
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 상태 확인",
+            description = "게시물 좋아요 상태를 확인합니다."
+    )
+    @GetMapping("/articles/{articleId}/likes")
+    public Response<Boolean> checkLike(Authentication authentication, @PathVariable Long articleId) {
+        return Response.success(articleService.checkLike(articleId, authentication.getName()));
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 갯수 확인",
+            description = "게시물 좋아요의 개수를 확인합니다."
+    )
+    @GetMapping("/articles/{articleId}/likeCount")
+    public Response<Integer> likeCount(@PathVariable Long articleId) {
+        return Response.success(articleService.likeCount(articleId));
+    }
+
+    @Operation(
+            summary = "게시물을 좋아요한 사람의 목록 확인",
+            description = "게시물을 좋아요한 사람의 목록을 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
+            }
+
+    )
+    @GetMapping("/articles/{articleId}/likeList")
+    public Response<List<LikeUserResponse>> likeList(@PathVariable Long articleId) {
+        return Response.success(articleService.likeList(articleId).stream().map(LikeUserResponse::fromUser).toList());
     }
 
 }

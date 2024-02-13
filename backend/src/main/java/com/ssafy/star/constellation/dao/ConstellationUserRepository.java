@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.dao;
 
+import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.user.domain.UserEntity;
@@ -31,4 +32,5 @@ public interface ConstellationUserRepository extends JpaRepository<Constellation
     @Query(value = "SELECT COUNT(*) FROM ConstellationUserEntity entity WHERE entity.userEntity = :userEntity")
     Integer countConstellationByUser(@Param("userEntity") UserEntity userEntity);
 
+    List<ConstellationUserEntity> findByUserEntityAndConstellationUserRole(UserEntity userEntity, ConstellationUserRole constellationUserRole);
 }

@@ -21,6 +21,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
         /**
          * 유저 게시물 전체 조회(지워지지 않은)
           */
+        // TODO : 유저 여러명 게시물 한꺼번에 가져오기
         // userEntity, deletedAt == Null, VISIBLE
         @Query("SELECT a FROM ArticleEntity a WHERE a.ownerEntity = :ownerEntity AND a.deletedAt IS NULL AND a.disclosure = 'VISIBLE'")
         List<ArticleEntity> findAllByOwnerEntityAndNotDeletedAndDisclosure(@Param("ownerEntity") UserEntity ownerEntity);
@@ -35,10 +36,8 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
         @Query("SELECT a FROM ArticleEntity a WHERE a.ownerEntity = :ownerEntity AND a.deletedAt IS NOT NULL")
         Page<ArticleEntity> findAllByOwnerEntityAndDeleted(@Param("ownerEntity") UserEntity ownerEntity, Pageable pageable);
 
-        /**
-         * 별자리 공개여부와 해당 별자리 공유여부
-         * TODO : 검토 필요
-         */
+        List<ArticleEntity> findAllByOwnerEntity(UserEntity userEntity);
+
         @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
         List<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity);
 
