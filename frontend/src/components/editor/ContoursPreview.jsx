@@ -17,8 +17,8 @@ export default function ContoursPreview({
   useEffect(() => {
     if (!points.length) setImageConfig(null);
     if (!image || !points.length) return;
-    setConvertedPoints(convertPoints(points, 1200, 1200, width, height));
-    setImageConfig(getImageConfig(image, points, 1200, 1200, width, height));
+    setConvertedPoints(convertPoints(points, editorSize, editorSize, width, height));
+    setImageConfig(getImageConfig(image, points, editorSize, editorSize, width, height));
   }, [points]);
 
   return (
@@ -51,6 +51,7 @@ export default function ContoursPreview({
           <Line
             points={convertedPoints.reduce((prev, [x, y]) => [...prev, x, y], [])}
             stroke={'#8E7CAC'}
+            strokeWidth={4}
             strokeWidth={4}
             closed={true}
             tension={0.05}

@@ -176,7 +176,6 @@ export default function ConstellationWriting() {
         <button className="constellation-writing-btn">별자리 생성</button>
         <div id={'save-image'} style={{ display: 'none' }} />
       </div>
-      <div id={'save-image'} style={{ display: 'none' }} />
     </div>
   );
 }
