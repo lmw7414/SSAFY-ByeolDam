@@ -21,7 +21,6 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
         /**
          * 유저 게시물 전체 조회(지워지지 않은)
           */
-        // TODO : 유저 여러명 게시물 한꺼번에 가져오기
         // userEntity, deletedAt == Null, VISIBLE
         @Query("SELECT a FROM ArticleEntity a WHERE a.ownerEntity = :ownerEntity AND a.deletedAt IS NULL AND a.disclosure = 'VISIBLE'")
         List<ArticleEntity> findAllByOwnerEntityAndNotDeletedAndDisclosure(@Param("ownerEntity") UserEntity ownerEntity);

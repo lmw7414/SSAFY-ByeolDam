@@ -27,13 +27,13 @@ public class ConstellationEntity {
     private String name;
 
     @Setter
+    private String title;
+
+    @Setter
     @Column(name = "contour_id")
     private Long contourId;
 
     private Long hits = 0L;
-
-    @Setter
-    private String description;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "constellationEntity", orphanRemoval = true, cascade = CascadeType.ALL)
@@ -85,12 +85,12 @@ public class ConstellationEntity {
     protected ConstellationEntity() {
     }
 
-    private ConstellationEntity(String name, String description) {
+    private ConstellationEntity(String title, String name) {
+        this.title = title;
         this.name = name;
-        this.description = description;
     }
 
-    public static ConstellationEntity of(String name, String description) {
-        return new ConstellationEntity(name, description);
+    public static ConstellationEntity of(String title, String name) {
+        return new ConstellationEntity(title, name);
     }
 }

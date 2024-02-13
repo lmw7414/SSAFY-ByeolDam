@@ -14,7 +14,6 @@ import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
-import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.constellation.dto.ConstellationWithArticle;
 import com.ssafy.star.constellation.dto.response.ConstellationForUserResponse;
@@ -74,9 +73,9 @@ public class ConstellationService {
             return new ConstellationWithArticle(
                     constellationEntity.getId(),
                     constellationEntity.getName(),
+                    constellationEntity.getTitle(),
                     Contour.fromEntity(contourEntity),
                     constellationEntity.getHits(),
-                    constellationEntity.getDescription(),
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt(),
@@ -111,9 +110,9 @@ public class ConstellationService {
             return new ConstellationWithArticle(
                     constellationEntity.getId(),
                     constellationEntity.getName(),
+                    constellationEntity.getTitle(),
                     Contour.fromEntity(contourEntity),
                     constellationEntity.getHits(),
-                    constellationEntity.getDescription(),
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt(),
@@ -251,7 +250,7 @@ public class ConstellationService {
     public void create(
             String email,
             String name,
-            String description,
+            String title,
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cthumb,
@@ -276,8 +275,8 @@ public class ConstellationService {
 
         // 별자리 엔터티 생성
         ConstellationEntity constellationEntity = ConstellationEntity.of(
-                name,
-                description
+                title,
+                name
         );
         // mongo에 저장된 id 반환
         constellationEntity.setContourId(contour.get_id());
@@ -377,11 +376,11 @@ public class ConstellationService {
      * - 별자리 이름, 태그 등 변경 내용이 있으면 수정
      */
     @Transactional
-    public Constellation modify(
+    public void modify(
             String email,                // 사용자의 email
             Long constellationId,
             String name,
-            String description,
+            String title,
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cThumb,
@@ -446,8 +445,8 @@ public class ConstellationService {
         if (name != null) {
             constellationEntity.setName(name);
         }
-        constellationEntity.setDescription(description);    // 설명 null 가능
-        return Constellation.fromEntity(constellationRepository.save(constellationEntity));
+        constellationEntity.setTitle(title);
+        constellationRepository.save(constellationEntity);
     }
 
 
@@ -469,7 +468,7 @@ public class ConstellationService {
     private ConstellationEntity getConstellationEntityOrException(Long constellationId) {
         return constellationRepository.findById(constellationId)
                 .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, "constellation has not founded"));
+                        new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, String.format("constellation %d has not founded", constellationId)));
     }
 
     // 사용자가 admin인지 확인 - 별자리 생성한 사람이 email로 받은 유저와 동일한지
@@ -482,11 +481,11 @@ public class ConstellationService {
             // admin이어야 삭제 가능
             if (!adminEntity.equals(userEntity)) {
                 throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                        String.format("%s has no permission with %s", email, constellationEntity.getName()));
+                        String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
             }
             return constellationEntity;
         } else {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s has no admin", constellationEntity.getName()));
+            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%d has no admin. it's very dangerous", constellationId));
         }
     }
 
@@ -494,7 +493,7 @@ public class ConstellationService {
         // role 데이터를 저장하고 있는 별자리회원 Entity
         ConstellationUserEntity constellationUserEntity = constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity)
                 .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, %s has no constellationUserEntity", userEntity.getNickname(), constellationEntity.getName())));
+                        new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, constellation %s has no constellationUserEntity", userEntity.getNickname(), constellationEntity.getId())));
         constellationUserEntity.setConstellationUserRole(role);
         constellationUserRepository.saveAndFlush(constellationUserEntity);
     }

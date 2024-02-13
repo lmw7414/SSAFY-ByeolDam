@@ -7,7 +7,6 @@ import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
-import com.ssafy.star.constellation.dto.response.ConstellationResponse;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.notification.application.NotificationService;
 import com.ssafy.star.notification.dto.response.NotificationResponse;
@@ -364,18 +363,7 @@ public class UserController {
     public Response<Page<ArticleResponse>> likeArticleList(Authentication authentication, Pageable pageable) {
         return Response.success(userService.likeArticleList(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
     }
-
-    @Operation(
-            summary = "내가 좋아요한 별자리 목록 확인",
-            description = "내가 좋아요한 별자리 목록을 확인합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "내가 좋아요한 별자리 정보 반환", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
-            }
-    )
-    @GetMapping("/me/like-constellations")
-    public Response<Page<ConstellationResponse>> likeConstellationList(Authentication authentication, Pageable pageable) {
-        return Response.success(userService.likeConstellationList(authentication.getName(), pageable).map(ConstellationResponse::fromConstellation));
-    }
+    
     @Operation(
             summary = "나의 알림 리스트를 확인한다.",
             description = "나의 알림 리스트를 확인합니다.",
