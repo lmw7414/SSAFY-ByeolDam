@@ -323,8 +323,7 @@ public class ConstellationService {
         ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND)
         );
-
-        // TODO : 삭제 로직 민우와 같이 볼 것 (원인 : constellationId와 ConstellationEntity mapping 문제였음)
+        
         // 몽고DB에서 contour 삭제
         contourRepository.delete(contourEntity);
 
@@ -338,11 +337,6 @@ public class ConstellationService {
         // 별자리 삭제
         constellationRepository.delete(constellationEntity);
 
-        // S3에서 사진 삭제
-        s3uploader.deleteImageFromS3(contourEntity.getOriginUrl());
-        s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
-        s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
-
         ImageEntity origin = imageService.getImageUrl(contourEntity.getOriginUrl());
         ImageEntity thumb = imageService.getImageUrl(contourEntity.getThumbUrl());
         ImageEntity cThumb = imageService.getImageUrl(contourEntity.getCThumbUrl());
@@ -350,6 +344,11 @@ public class ConstellationService {
         imageRepository.delete(origin);
         imageRepository.delete(thumb);
         imageRepository.delete(cThumb);
+
+        // S3에서 사진 삭제
+        s3uploader.deleteImageFromS3(contourEntity.getOriginUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
     }
 
     //
