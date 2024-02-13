@@ -34,8 +34,7 @@ public class NotificationService {
         UserEntity userEntity = userRepository.findById(receiverId).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND));
         String fromNickname = userRepository.findById(args.getFromUserId()).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND)).getNickname();
         NotificationEntity notificationEntity = NotificationEntity.of(type, args, userEntity, fromNickname);
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        notificationRepository.save(notificationEntity);
+            notificationRepository.save(notificationEntity);
         emitterRepository.get(receiverId).ifPresentOrElse(it -> {
                     try {
                         it.send(SseEmitter.event()

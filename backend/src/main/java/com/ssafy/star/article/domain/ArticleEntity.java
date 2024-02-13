@@ -76,6 +76,7 @@ public class ArticleEntity {
     @JoinColumn(name = "image")
     private ImageEntity imageEntity;
 
+    // TODO : modifiedAt 생성시 초기화되는 것 해결
     @PrePersist
     void createdAt() { this.createdAt = LocalDateTime.from(LocalDateTime.now()); }
 

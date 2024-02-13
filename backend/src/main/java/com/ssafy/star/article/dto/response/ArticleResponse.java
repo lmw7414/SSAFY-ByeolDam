@@ -16,7 +16,7 @@ public record ArticleResponse (
         String description,
         DisclosureType disclosure,
         Set<String> articleHashtags,
-        String constellationEntityName,
+        Long constellationId,
         String ownerEntityNickname,
         List<CommentDto> commentList,
         LocalDateTime createdAt,
@@ -27,6 +27,11 @@ public record ArticleResponse (
 
     public static ArticleResponse fromArticle(Article article) {
 
+        Long constellationId = null;
+        if(article.constellation() != null) {
+            constellationId = article.constellation().id();
+        }
+
         return new ArticleResponse(
                 article.id(),
                 article.title(),
@@ -34,7 +39,7 @@ public record ArticleResponse (
                 article.description(),
                 article.disclosure(),
                 article.articleHashtags(),
-                article.constellation().name(),
+                constellationId,
                 article.user().nickname(),
                 article.commentList(),
                 article.createdAt(),

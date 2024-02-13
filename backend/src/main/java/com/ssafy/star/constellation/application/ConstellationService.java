@@ -2,6 +2,7 @@ package com.ssafy.star.constellation.application;
 
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.article.dto.HoverArticle;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
@@ -14,7 +15,9 @@ import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
+import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.constellation.dto.ConstellationWithArticle;
+import com.ssafy.star.constellation.dto.response.ConstellationForUserResponse;
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.contour.repository.ContourRepository;
@@ -34,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ssafy.star.constellation.ConstellationUserRole.ADMIN;
@@ -63,7 +67,22 @@ public class ConstellationService {
     @Transactional(readOnly = true)
     public List<ConstellationWithArticle> myConstellations(String email) {
         UserEntity userEntity = getUserEntityByEmailOrException(email);
-        return constellationRepository.findAllByUserEntity(userEntity).stream().map(ConstellationWithArticle::fromEntity).toList();
+        return constellationRepository.findAllByUserEntity(userEntity).stream().map(constellationEntity -> {
+            ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
+                    .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));
+            // ConstellationWithArticle DTO 생성
+            return new ConstellationWithArticle(
+                    constellationEntity.getId(),
+                    constellationEntity.getName(),
+                    Contour.fromEntity(contourEntity),
+                    constellationEntity.getHits(),
+                    constellationEntity.getDescription(),
+                    constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
+                    constellationEntity.getCreatedAt(),
+                    constellationEntity.getModifiedAt(),
+                    constellationEntity.getArticleEntities().stream().map(HoverArticle::fromEntity).toList()
+            );
+        }).toList();
     }
 
     /**
@@ -71,7 +90,7 @@ public class ConstellationService {
      * - 내가 다른 사람의 우주에 접근했을 때
      */
     @Transactional(readOnly = true)
-    public List<ConstellationWithArticle> userConstellations(String email, String nickname) {
+    public List<ConstellationWithArticle> userConstellations(String nickname, String email) {
         UserEntity userEntity = getUserEntityByNicknameOrException(nickname);  // 타 유저의 계정 이메일
         UserEntity myEntity = getUserEntityByEmailOrException(email);      // 로그인한 사람의 이메일
         // 내 계정으로 내 우주를 접근하는 경우
@@ -85,17 +104,32 @@ public class ConstellationService {
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.INVALID_PERMISSION));
         }
 
-        return constellationUserRepository.findConstellationByUserEntity(userEntity).stream().map(ConstellationWithArticle::fromEntity).toList();
+        return constellationUserRepository.findConstellationByUserEntity(userEntity).stream().map(constellationEntity -> {
+            ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
+                    .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));
+            // ConstellationWithArticle DTO 생성
+            return new ConstellationWithArticle(
+                    constellationEntity.getId(),
+                    constellationEntity.getName(),
+                    Contour.fromEntity(contourEntity),
+                    constellationEntity.getHits(),
+                    constellationEntity.getDescription(),
+                    constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
+                    constellationEntity.getCreatedAt(),
+                    constellationEntity.getModifiedAt(),
+                    constellationEntity.getArticleEntities().stream().map(HoverArticle::fromEntity).toList()
+            );
+        }).toList();
     }
 
     // 별자리에 공유할 유저 추가
     @Transactional
-    public void addUser(Long constellationId, String nickname, String myEmail) {
+    public void addUser(Long constellationId, String nickname, String email) {
         // user 존재하는지 확인
         UserEntity userEntity = getUserEntityByNicknameOrException(nickname);
 
         // 사용자가 admin인지 확인
-        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, myEmail);
+        ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
 
         // 이미 공유 별자리에 포함된 상태라면
         if (constellationUserRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).isPresent()) {
@@ -146,14 +180,27 @@ public class ConstellationService {
     /**
      * 공유 별자리 유저 조회
      */
-    public List<User> findConstellationUsers(Long constellationId, String email) {
+    public List<ConstellationForUserResponse> findConstellationUsers(Long constellationId) {
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
 
         // 별자리에 속한 user 구하기 : constellationEntity -> constellationUserEntity -> userEntity
         List<ConstellationUserEntity> constellationUsersByConstellationEntity = constellationUserRepository.findConstellationUserEntitiesByConstellationEntity(constellationEntity);
-        List<UserEntity> userEntities = constellationUsersByConstellationEntity.stream().map(ConstellationUserEntity::getUserEntity).toList();
-
-        return userEntities.stream().map(User::fromEntity).toList();
+        List<ConstellationForUserResponse> constellationForUserResponses = new ArrayList<>();
+        for (ConstellationUserEntity constellationUserEntity : constellationUsersByConstellationEntity) {
+            UserEntity userEntity = constellationUserEntity.getUserEntity();
+            String imageUrl = null;
+            if(userEntity.getImageEntity() != null) {
+                imageUrl = userEntity.getImageEntity().getUrl();
+            }
+            constellationForUserResponses.add(
+                    new ConstellationForUserResponse(
+                    imageUrl,
+                    userEntity.getName(),
+                    userEntity.getNickname(),
+                    constellationUserEntity.getConstellationUserRole()
+            ));
+        }
+        return constellationForUserResponses;
     }
 
     // 관리자와 유저 UserRole 맞바꾸기
@@ -259,23 +306,12 @@ public class ConstellationService {
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
         constellationLikeRepository.deleteAllByConstellationEntity(constellationEntity);
         Long contourId = constellationEntity.getContourId();
+        System.out.println("contourId : " + contourId);
 
         ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND)
         );
-        // S3에서 사진 삭제
-        s3uploader.deleteImageFromS3(contourEntity.getOriginUrl());
-        s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
-        s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
-
-        ImageEntity origin = imageService.getImageUrl(contourEntity.getOriginUrl());
-        ImageEntity thumb = imageService.getImageUrl(contourEntity.getThumbUrl());
-        ImageEntity cThumb = imageService.getImageUrl(contourEntity.getCThumbUrl());
-        // 이미지 테이블에서 관련 이미지 삭제
-        imageRepository.delete(origin);
-        imageRepository.delete(thumb);
-        imageRepository.delete(cThumb);
-
+        
         // 몽고DB에서 contour 삭제
         contourRepository.delete(contourEntity);
 
@@ -289,6 +325,19 @@ public class ConstellationService {
         // 별자리 삭제
 
         constellationRepository.delete(constellationEntity);
+
+        ImageEntity origin = imageService.getImageUrl(contourEntity.getOriginUrl());
+        ImageEntity thumb = imageService.getImageUrl(contourEntity.getThumbUrl());
+        ImageEntity cThumb = imageService.getImageUrl(contourEntity.getCThumbUrl());
+        // 이미지 테이블에서 관련 이미지 삭제
+        imageRepository.delete(origin);
+        imageRepository.delete(thumb);
+        imageRepository.delete(cThumb);
+
+        // S3에서 사진 삭제
+        s3uploader.deleteImageFromS3(contourEntity.getOriginUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getThumbUrl());
+        s3uploader.deleteImageFromS3(contourEntity.getCThumbUrl());
     }
 
     //
@@ -402,14 +451,14 @@ public class ConstellationService {
     }
 
 
-    // 유저가 존재하는지 확인
+    // 유저가 존재하는지 확인(nickname)
     private UserEntity getUserEntityByNicknameOrException(String nickname) {
         return userRepository.findByNickname(nickname)
                 .orElseThrow(() ->
                         new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", nickname)));
     }
 
-    // 유저가 존재하는지 확인
+    // 유저가 존재하는지 확인(email)
     private UserEntity getUserEntityByEmailOrException(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->

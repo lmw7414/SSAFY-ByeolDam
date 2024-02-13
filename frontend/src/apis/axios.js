@@ -4,14 +4,14 @@ let failedRequestQueue = [];
 let isRefreshing = false;
 
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
 });
 
 client.interceptors.request.use(
   (config) => {
     const accessToken = sessionStorage['access_token'];
-    config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
     return config;
   },

@@ -52,8 +52,8 @@ export const addConstellation = async ({
   return result;
 };
 
-export const getMyConstellations = async () => {
-  const { data } = await axios.get('/constellations');
+export const getMyConstellations = async (nickname) => {
+  const { data } = await axios.get(`/constellations/user/${nickname}`);
 
   return data;
 };
