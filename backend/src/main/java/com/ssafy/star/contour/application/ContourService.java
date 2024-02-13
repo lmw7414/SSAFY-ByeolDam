@@ -13,7 +13,7 @@ public class ContourService {
 
     // 서버에서 넘어오는 데이터 받아서 mongoDB에 저장 그리고 ID 리턴
     public Long insertContour(ContourEntity entity) {
-        //contourRepository.
+        contourRepository.save(entity);
         return null;
     }
 

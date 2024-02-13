@@ -17,10 +17,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -106,8 +109,11 @@ public class ArticleController {
             }
     )
     @GetMapping("/articles/user/{userEmail}")
-    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String userEmail, Authentication authentication, Pageable pageable) {
-        return Response.success(articleService.userArticlePage(userEmail, authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String userEmail, Authentication authentication,Pageable pageable) {
+        List<ArticleResponse> articleResponses = articleService.userArticleList(userEmail, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), articleResponses.size());
+        return Response.success(new PageImpl<>(articleResponses.subList(start, end), pageable, articleResponses.size()));
     }
 
     @Operation(
@@ -146,8 +152,8 @@ public class ArticleController {
             }
     )
     @GetMapping("/articles/constellation/{constellationId}")
-    public Response<Page<ArticleResponse>> articlesInConstellation(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
-        return Response.success(articleService.articlesInConstellation(constellationId, authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    public Response<List<ArticleResponse>> articlesInConstellation(@PathVariable Long constellationId, Authentication authentication) {
+        return Response.success(articleService.articlesInConstellation(constellationId, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
     }
 
     @Operation(
