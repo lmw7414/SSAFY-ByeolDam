@@ -33,16 +33,7 @@ export default function SignUp() {
 
   const userSignUp = (e) => {
     e.preventDefault();
-    console.log(
-      email,
-      password,
-      checkPassword,
-      birthDate,
-      name,
-      isDuplicatedNickname,
-      isDuplicatedEmail,
-      isEndValidation,
-    );
+
     if (
       !email.trim() ||
       !password.trim() ||
