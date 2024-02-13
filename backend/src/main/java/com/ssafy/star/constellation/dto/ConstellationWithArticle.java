@@ -9,7 +9,6 @@ import java.util.List;
 public record ConstellationWithArticle(
         Long id,
         String name,
-        String title,
         Contour contour,
         long hits,
         List<ConstellationUser> constellationUsers,
@@ -20,7 +19,6 @@ public record ConstellationWithArticle(
     public static ConstellationWithArticle of(
             Long id,
             String name,
-            String title,
             Contour contour,
             long hits,
             List<ConstellationUser> constellationUsers,
@@ -31,7 +29,6 @@ public record ConstellationWithArticle(
         return new ConstellationWithArticle(
                 id,
                 name,
-                title,
                 contour,
                 hits,
                 constellationUsers,
