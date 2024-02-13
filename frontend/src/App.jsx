@@ -12,6 +12,9 @@ import { useEffect, useState } from 'react';
 import ConstellationWriting from './pages/constellation/ConstellationWriting';
 import SignUp from './pages/member/SignUp';
 import SocialLogin from './pages/member/SocialLogin';
+import SearchStar from './pages/search/SearchStar';
+import SearchConstellation from './pages/search/SearchConstellation';
+import FeedList from './pages/feed/FeedList';
 
 export default function App() {
   return (
@@ -53,9 +56,12 @@ function NavApp() {
         <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
           <NavBar />
           <Routes>
-            <Route path="/home" element={<Universe />} />
+            <Route path="/home/*" element={<Universe />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/search/star" element={<SearchStar />} />
+            <Route path="/search/constellation" element={<SearchConstellation />} />
             <Route path="/constellation" element={<ConstellationWriting />} />
+            <Route path="/feed" element={<FeedList />}></Route>
           </Routes>
           <ModalContainer modalState={modalState} />
         </ModalContext.Provider>

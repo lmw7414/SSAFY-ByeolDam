@@ -127,11 +127,13 @@ spring:
       repositories:
         enabled: false
     mongodb:
-      uri: mongodb://localhost:27017/byeol_dam?authSource=admin
+      host: localhost
+      # uri: mongodb://localhost:27017/byeol_dam
       username: ${SPRING_DATASOURCE_USERNAME}
       password: ${SPRING_DATASOURCE_PASSWORD}
-      database: byeol_dam
       authentication-database: admin
+      port: 27017
+      database: byeol_dam
 
 ---
 
@@ -159,5 +161,13 @@ spring:
       url: redis://byeoldam-redis:6379
       repositories:
         enabled: false
+    mongodb:
+      host: byeoldam-mongodb
+      # uri: mongodb://localhost:27017/byeol_dam
+      username: ${SPRING_DATASOURCE_USERNAME}
+      password: ${SPRING_DATASOURCE_PASSWORD}
+      authentication-database: admin
+      port: 27017
+      database: byeol_dam
 server:
   port: 8081

@@ -28,7 +28,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
       <div className="content-box">
         <form onSubmit={handleSubmit}>
           <div className="profile-image-container">
-            <img className="profile-image" src="/src/assets/images/space.png" alt="profile_image" />
+            <img className="profile-image" src="/images/space.png" alt="profile_image" />
           </div>
           <button>프로필 사진 변경</button>
           <div>
@@ -48,7 +48,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
               <input type="text" name="email" value={editedProfile.email} disabled />
             </label>
           </div>
-          <div>
+          {/* <div>
             <label>
               비밀번호 수정
               <input
@@ -58,7 +58,7 @@ export default function EditMyProfile({ profileData, changePage, setProfileupdat
                 onChange={handleChange}
               />
             </label>
-          </div>
+          </div> */}
           <div>
             <label>
               이름

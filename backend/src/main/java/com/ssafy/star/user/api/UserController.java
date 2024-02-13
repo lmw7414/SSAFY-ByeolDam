@@ -1,9 +1,11 @@
 package com.ssafy.star.user.api;
 
+import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.response.Response;
+import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.user.application.FollowService;
@@ -11,9 +13,7 @@ import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.dto.request.*;
-import com.ssafy.star.user.dto.response.UserJoinResponse;
-import com.ssafy.star.user.dto.response.UserLoginResponse;
-import com.ssafy.star.user.dto.response.UserResponse;
+import com.ssafy.star.user.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,6 +37,19 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final FollowService followService;
+    private final ArticleService articleService;
+    private final ConstellationService constellationService;
+
+    @Operation(
+            summary = "이메일로 닉네임 찾기",
+            description = "email의 정보로 닉네임 찾기 - 소셜로그인 때 사용"
+    )
+    @PostMapping("/users/find-nickname")
+    public Response<String> findNickname(@RequestBody EmailRequest request) {
+        User user = userService.loadUserByEmail(request.email()).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND));
+        return Response.success(user.nickname());
+    }
 
     @Operation(
             summary = "이메일 인증코드 요청",
@@ -80,11 +93,7 @@ public class UserController {
     )
     @PostMapping("/users/login")
     public Response<UserLoginResponse> login(HttpServletRequest request, HttpServletResponse response, @RequestBody UserLoginRequest userLoginRequest) {
-        UserResponse userResponse = UserResponse.fromUser(userService.loadUserByEmail(userLoginRequest.email()).orElseThrow(
-                () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND)
-        ));
-        String token = userService.login(request, response, userLoginRequest.email(), userLoginRequest.password());
-        return Response.success(new UserLoginResponse(userResponse, token));
+        return Response.success(userService.login(request, response, userLoginRequest.email(), userLoginRequest.password()));
     }
 
     @Operation(
@@ -103,9 +112,8 @@ public class UserController {
                     "만료가 되었다면 리프레시 토큰이 있는지 확인 후 새로 액세스 토큰을 발급해준다. 리프레시 토큰 기간이 3일 이하로 남았다면, 리프레시 토큰도 새롯 생성한다."
     )
     @GetMapping("/users/refresh")
-    public Response<UserLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String token = userService.refreshToken(request, response);
-        return Response.success(new UserLoginResponse(null, token));
+    public Response<UserLoginResponse> refresh(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        return Response.success(userService.refreshToken(authentication.getName(), request, response));
     }
 
     @Operation(
@@ -130,12 +138,12 @@ public class UserController {
             summary = "프로필 보기",
             description = "프로필, 이름, 닉네임, 메모 등의 정보 등을 보여준다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "프로필 보기", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "프로필 보기", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("/users/{nickname}")
-    public Response<UserResponse> myProfile(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        return Response.success(UserResponse.fromUser(userService.my(nickname)));
+    public Response<UserProfileResponse> myProfile(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
+        return Response.success(userService.my(nickname));
     }
 
     @Operation(
@@ -143,19 +151,8 @@ public class UserController {
             description = "프로필, 비밀번호, 이름, 닉네임, 메모 계정 공개/비공개, 생일 등의 정보 등을 수정한다."
     )
     @PutMapping("/users")
-    public Response<UserResponse> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
-
-        return Response.success(
-                UserResponse.fromUser(userService.updateMyProfile(
-                        authentication.getName(),
-                        request.password(),
-                        request.name(),
-                        request.nickname(),
-                        request.memo(),
-                        request.disclosureType(),
-                        request.birthday())
-                )
-        );
+    public Response<UserProfileResponse> updateMyProfile(Authentication authentication, @RequestBody UserModifyRequest request) {
+        return Response.success(userService.updateMyProfile(authentication.getName(), request));
     }
 
     @Operation(
@@ -163,15 +160,8 @@ public class UserController {
             description = "프로필 이미지를 수정한다."
     )
     @PutMapping("/users/profile-image")
-    public Response<UserResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
-        return Response.success(
-                UserResponse.fromUser(
-                        userService.updateProfileImage(
-                                authentication.getName(),
-                                multipartFile,
-                                ImageType.PROFILE)
-                )
-        );
+    public Response<UserDefaultResponse> updateProfileImage(@RequestPart("imageFile") MultipartFile multipartFile, Authentication authentication) {
+        return Response.success(userService.updateProfileImage(authentication.getName(), multipartFile, ImageType.PROFILE));
     }
 
     @Operation(
@@ -179,8 +169,8 @@ public class UserController {
             description = "프로필 이미지를 수정한다."
     )
     @PutMapping("/users/default-image")
-    public Response<UserResponse> updateDefaultProfileImage(Authentication authentication) {
-        return Response.success(UserResponse.fromUser(userService.updateProfileDefault(authentication.getName())));
+    public Response<UserDefaultResponse> updateDefaultProfileImage(Authentication authentication) {
+        return Response.success(userService.updateProfileDefault(authentication.getName()));
     }
 
     @Operation(
@@ -228,14 +218,20 @@ public class UserController {
             description = "나의 프로필이 비공개인 경우 다른 사람이 팔로우를 신청했을 때 해당 리스트를 볼 수 있다. " +
                     "나의 프로필이 공개일 경우 팔로우 요청 시 바로 팔로잉 관계가 되기 때문에 해당 API는 의미가 없다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "팔로우 신청한 사람들 정보", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "팔로우 신청한 사람들 정보", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("me/request-follow")
-    public Response<List<UserResponse>> requestFollowList(Authentication authentication) {
+    public Response<List<FollowResponse>> requestFollowList(Authentication authentication) {
         return Response.success(followService.requestFollowList(authentication.getName())
                 .stream()
-                .map(UserResponse::fromUser)
+                .map(res ->
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        )
+                )
                 .toList());
     }
 
@@ -257,49 +253,81 @@ public class UserController {
             summary = "내 팔로워 확인하기",
             description = "나의 팔로워 리스트를 확인한다. 로그인한 유저만 접근 가능하다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "팔로워한 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "팔로워한 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("/me/followers")
-    public Response<List<UserResponse>> followers(Authentication authentication) {
-        return Response.success(followService.followers(authentication.getName()).stream().map(UserResponse::fromUser).toList());
+    public Response<List<FollowResponse>> followers(Authentication authentication) {
+        return Response.success(followService.followers(authentication.getName())
+                .stream()
+                .map(res ->
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        )
+                )
+                .toList());
     }
 
     @Operation(
             summary = "내 팔로잉 확인하기",
             description = "나의 팔로잉 리스트를 확인한다. 로그인한 유저만 접근 가능하다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "팔로잉한 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "팔로잉한 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("/me/followings")
-    public Response<List<UserResponse>> followings(Authentication authentication) {
-        return Response.success(followService.followings(authentication.getName()).stream().map(UserResponse::fromUser).toList());
+    public Response<List<FollowResponse>> followings(Authentication authentication) {
+        return Response.success(followService.followings(authentication.getName())
+                .stream()
+                .map(res ->
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        ))
+                .toList());
     }
 
     @Operation(
             summary = "남의 팔로워 확인하기",
             description = "남의 팔로워 리스트를 확인한다. 해당 유저의 프로필이 공개이거나, 비공개 상태일 경우 팔로잉 상태일 경우만 볼 수 있다. 그 외의 경우 INVALID_PERMISSION 예외상황이 발생",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "팔로워중인 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "팔로워중인 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("/{nickname}/followers")
-    public Response<List<UserResponse>> otherFollowers(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        return Response.success(followService.otherFollowers(authentication.getName(), nickname).stream().map(UserResponse::fromUser).toList());
-
+    public Response<List<FollowResponse>> otherFollowers(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
+        return Response.success(followService.otherFollowers(authentication.getName(), nickname)
+                .stream()
+                .map(res ->
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        ))
+                .toList());
     }
 
     @Operation(
             summary = "남의 팔로잉 확인하기",
             description = "남의 팔로잉 리스트를 확인한다. 해당 유저의 프로필이 공개이거나, 비공개 상태일 경우 팔로잉 상태일 경우만 볼 수 있다. 그 외의 경우 INVALID_PERMISSION 예외상황이 발생",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "팔로워중인 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "팔로워중인 유저들의 정보 반환", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
             }
     )
     @GetMapping("/{nickname}/followings")
-    public Response<List<UserResponse>> otherFollowings(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
-        return Response.success(followService.otherFollowings(authentication.getName(), nickname).stream().map(UserResponse::fromUser).toList());
+    public Response<List<FollowResponse>> otherFollowings(Authentication authentication, @PathVariable(name = "nickname") String nickname) {
+        return Response.success(followService.otherFollowings(authentication.getName(), nickname)
+                .stream()
+                .map(res ->
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        ))
+                .toList());
     }
 
     @Operation(

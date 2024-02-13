@@ -10,7 +10,7 @@ export default function MyProfile({ profileData, changePage }) {
       <h2>내 프로필</h2>
       <div className="content-box">
         <div className="profile-image-container">
-          <img className="profile-image" src="/src/assets/images/space.png" alt="profile_image" />
+          <img className="profile-image" src="/images/space.png" alt="profile_image" />
         </div>
         <div>
           <label>

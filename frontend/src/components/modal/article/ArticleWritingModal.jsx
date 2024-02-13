@@ -1,46 +1,47 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import ImageUpload from '../../article/ImageUpload';
-import AddDescription from '../../article/AddDescription';
-import SelectConstellation from '../../article/SelectConstellation';
+import ConstellationSelect from '../../article/ConstellationSelect';
 import { addArticle } from '../../../apis/articles';
+import useModal from '../../../hooks/useModal';
 
-export default function ArticleWritingModal({ nickName }) {
+export default function ArticleWritingModal() {
   const [step, setStep] = useState(1);
   const [file, setFile] = useState(null);
-  const [details, setDetails] = useState({
+  const [article, setArticle] = useState({
     description: '',
-    tags: '',
-  });
-  const [settings, setSettings] = useState({
-    disclosure: '',
+    articleHashtagSet: [],
+    disclosureType: 'VISIBLE',
+    imageType: 'ARTICLE',
     constellation: '',
   });
+  const [modalState, setModalState] = useModal();
 
-  const writeArticle = async () => {
-    if (!image || !details.description?.trim()) return;
-
-    const { resultCode } = addArticle({
-      nickName,
-      image,
-      disclosure: settings.disclosure,
-      articleName: details.description,
-      tagName: details.tags,
+  const writeArticle = () => {
+    addArticle(article, file).then((result) => {
+      useModal({
+        ...modalState,
+        isOpen: false,
+      });
+      alert('별이 생성되었습니다.');
     });
-
-    return resultCode;
   };
 
   return (
     <div>
-      {step == 1 && <ImageUpload setStep={setStep} setFile={setFile} />}
-      {step == 2 && (
-        <AddDescription setStep={setStep} setDetails={setDetails} details={details} image={image} />
+      {step == 1 && (
+        <ImageUpload
+          setStep={setStep}
+          setFile={setFile}
+          setArticle={setArticle}
+          article={article}
+        />
       )}
-      {step == 3 && (
-        <SelectConstellation
-          addArticle={writeArticle}
-          settings={settings}
-          setSettings={setSettings}
+      {step == 2 && (
+        <ConstellationSelect
+          writeArticle={writeArticle}
+          article={article}
+          setArticle={setArticle}
+          setStep={setStep}
         />
       )}
     </div>

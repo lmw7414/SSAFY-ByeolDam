@@ -5,28 +5,35 @@ export const getArticles = async (articleId) => {
   return { resultCode: data.resultCode, data: data.articles };
 };
 
-export const addArticle = async ({ nickname, articleName, tagName, disclosure, image }) => {
+export const addArticle = async (
+  { description, articleHashtagSet, disclosureType, imageType },
+  file,
+) => {
   const formData = new FormData();
 
-  formData.append(
-    'requests',
-    JSON.stringify({
-      nickname,
-      articleName,
-      tagName,
-      disclosure,
-    }),
+  const request = new Blob(
+    [
+      JSON.stringify({
+        description,
+        articleHashtagSet,
+        disclosureType,
+        imageType,
+        title: description,
+      }),
+    ],
+    { type: 'application/json' },
   );
 
-  formData.append('image', image);
+  formData.append('request', request);
+  formData.append('imageFile', file);
 
-  const { data } = await axios.post('articles', formData, {
+  const result = await axios.post('articles', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
 
-  return { resultCode: data.resultCode };
+  return result;
 };
 
 export const deleteArticle = async (articleId) => {
@@ -44,3 +51,11 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
 
   return { resultCode: data.resultCode };
 };
+
+// feed 받아오는 axios
+// async 안에 인자에 뭐가 들어가야 할지 잘 모르겠음
+export const getFeeds = async () => {
+  const { data } = await axios.get(`articles/follow`);
+  //return pageable
+  //jpa pagination axios 검색
+}

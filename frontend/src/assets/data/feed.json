@@ -1,0 +1,127 @@
+{
+    "feedData" : [
+        {
+            "id" : 0,
+            "title" : "bird",
+            "hits" : 0,
+            "description" : "새 사진입니다!",
+            "articleHashtags" : [
+                "새", "오목눈이", "귀여움", "날개"
+            ],
+            "like" : false,
+            "constellationEntityName" : "bird",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "bird",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/b027048b-a9a1-4ead-ab82-7cfe0e4b06c9.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 1,
+            "title" : "dog",
+            "hits" : 0,
+            "description" : "개 사진입니다!",
+            "articleHashtags" : [
+                "개", "말티즈", "귀여움", "뛰는중"
+            ],
+            "like" : true,
+            "constellationEntityName" : "dog",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "dog",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/8b58a8ab-45cc-45f2-8ba5-903174d2f176.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 2,
+            "title" : "cat",
+            "hits" : 0,
+            "description" : "고양이 사진입니다!",
+            "articleHashtags" : [
+                "고양이", "하얌", "귀여움", "빵굽는중"
+            ],
+            "like" : false,
+            "constellationEntityName" : "cat",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "cat",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/91c672f0-1644-4f00-91a6-0fb26d3de274.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 3,
+            "title" : "lion",
+            "hits" : 0,
+            "description" : "사자 사진입니다!",
+            "articleHashtags" : [
+                "큰 고양이", "사자", "귀여움", "빵굽는중"
+            ],
+            "like" : true,
+            "constellationEntityName" : "lion",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "lion",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/dc489772-3a49-487f-9e97-6c9f330a8afd.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 4,
+            "title" : "Chazz",
+            "hits" : 0,
+            "description" : "차즈 사진입니다!",
+            "articleHashtags" : [
+                "차즈", "불 좀 꺼줄래", "하루만 너의 별자리의 별이 되고 싶어"
+            ],
+            "constellationEntityName" : "Chazz",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "Chazz",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/c71ff5d9-c912-4c62-a7bd-4e91cf310913.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 5,
+            "title" : "Chazz",
+            "hits" : 0,
+            "description" : "차즈 사진입니다!",
+            "articleHashtags" : [
+                "차즈", "불 좀 꺼줄래", "하루만 너의 별자리의 별이 되고 싶어"
+            ],
+            "constellationEntityName" : "Chazz",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "Chazz",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/eb6fb748-3317-44ce-8cff-e1e6a76c0953.jpg",
+                "imageType" : "ARTICLE"
+            }
+        },
+        {
+            "id" : 6,
+            "title" : "Chaker",
+            "hits" : 0,
+            "description" : "차즈 사진입니다!",
+            "articleHashtags" : [
+                "차즈", "불 좀 꺼줄래", "하루만 너의 별자리의 별이 되고 싶어"
+            ],
+            "constellationEntityName" : "Chazz",
+            "ownerEntityNickname" : "이민우",
+            "createdAt" : "2024-02-11T07:28:05.060Z",
+            "imageResponse" : {
+                "imageName" : "Chazz",
+                "imageUrl" : "https://byeoldam.s3.ap-northeast-2.amazonaws.com/articles/59c01057-2e92-4ac4-9074-84f0e76d4c00.jpg",
+                "imageType" : "ARTICLE"
+            }
+        }
+    ]
+}

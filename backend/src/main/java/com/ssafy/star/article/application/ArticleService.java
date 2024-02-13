@@ -1,6 +1,5 @@
 package com.ssafy.star.article.application;
 
-import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dao.ArticleHashtagRelationRepository;
 import com.ssafy.star.article.dao.ArticleLikeRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
@@ -11,7 +10,7 @@ import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
-import com.ssafy.star.constellation.SharedType;
+import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.image.ImageType;
@@ -50,11 +49,6 @@ public class ArticleService {
     private final ArticleHashtagRelationService articleHashtagRelationService;
     private final ArticleLikeRepository articleLikeRepository;
 
-    // 트랜잭션 처리를 하고 롤백 처리를 하려면 controller가 아니라 서비스단에서 upload를 호출해야할듯하다
-    // try catch문을 통해서 사진 업로드 이후 save를 하고
-    // 문제가 발생했을 경우(게시글이 정상적으로 생성되지 않았을 경우)
-    // 롤백을 해준다 (문제가 발생했으면 앞서 저장된 이미지 삭제
-
     /**
      * 게시물 등록
       */
@@ -72,7 +66,8 @@ public class ArticleService {
         String thumbnailUrl = "";
         UserEntity userEntity = getUserEntityOrException(email);
 
-        try {
+        try{
+
             url = s3uploader.upload(imageFile, "articles");
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
             ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);
@@ -88,8 +83,6 @@ public class ArticleService {
             articleRepository.save(articleEntity);
 
             articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
-            // TODO :articleHashtagRepository에서 String이 같은 것이 있다면 추가 X, 없다면 추가 O
-            // => 해시태그 tagName 속성은 unique
         } catch (IOException e) {
             s3uploader.deleteImageFromS3(url);
             s3uploader.deleteImageFromS3(thumbnailUrl);
@@ -204,33 +197,23 @@ public class ArticleService {
     }
 
     /**
-     * 게시물 전체 조회
-     */
-    @Transactional(readOnly = true)
-    public Page<Article> list(String email, Pageable pageable) {
-        UserEntity userEntity = getUserEntityOrException(email);
-        // Not deleted 상태이고, DisclosureType이 VISIBLE이거나 자신의 게시물이라면 보여주기
-        return articleRepository.findAllByNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
-    }
-
-    /**
      * 유저의 게시물 전체 조회
      */
     @Transactional(readOnly = true)
-    public Page<Article> userArticlePage(String userEmail, String myEmail, Pageable pageable) {
+    public List<Article> userArticleList(String userEmail, String myEmail) {
         // 찾는 유저가 접속자라면 전체 조회한다
         UserEntity myEntity = getUserEntityOrException(myEmail);
         UserEntity userEntity = getUserEntityOrException(userEmail);
         if(!myEntity.equals(userEntity)) {
 
-            // following 중이라면 전체 조회한다
             if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
 
                 // disclosureType에 따라 조회여부 판단
-                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
+                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(Article::fromEntity).toList();
             }
+            // following 중이라면 전체 조회한다
         }
-        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity).stream().map(Article::fromEntity).toList();
     }
 
     /**
@@ -241,9 +224,7 @@ public class ArticleService {
         UserEntity userEntity = getUserEntityOrException(email);
 
         // 해당 article이 없을 경우 예외처리
-        ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() ->
-                        new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", "articleId:" + Long.toString(articleId))));
+        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
 
         // articleId AND deletedAt == null AND (내 게시물이거나 VISIBLE)
         if(articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
@@ -262,37 +243,49 @@ public class ArticleService {
     }
 
     /**
-     * 별자리 배정 및 변경
+     * 별자리에 게시물 배정
      */
     @Transactional
-    public void select(Long articleId, Long constellationId, String email) {
-        ArticleEntity articleEntity = getArticleOwnerOrException(articleId, email);
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+    public void select(Long constellationId, Set<Long> articleIdSet, String email) {
+        UserEntity userEntity = getUserEntityOrException(email);                      // 현재 사용자 user entity
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
 
-        // 선택한 별자리가 기존의 constellationEntity인 경우 Error 반환
-        if(articleEntity.getConstellationEntity() == null) {
-
-        } else if (articleEntity.getConstellationEntity().equals(constellationEntity)) {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is already constellation %s", "articleId:" + Long.toString(articleId), "constellationId:" + Long.toString(constellationId)));
+        // 별자리 회원인지 확인하기
+        if(constellationEntity.getAdminEntity() != userEntity) {
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                    String.format("%s has no permission with %s", "email:"+email, "constellationId:" + Long.toString(constellationId)));
         }
 
-        articleEntity.selectConstellation(constellationEntity);
+        // 반복문을 통해 Set에 있는 article 전부 별자리에 배정
+        for(Long articleId : articleIdSet) {
+            ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+            UserEntity ownerEntity = articleEntity.getOwnerEntity();                  // admin의 user entity
+
+            // article이 휴지통에 있다면 예외처리
+            if(articleEntity.getDeletedAt() != null) {
+                throw new ByeolDamException(ErrorCode.ARTICLE_DELETED,
+                        String.format("%s deleted", "articleId:"+Long.toString(articleId)));
+            }
+
+            // article 본인 것이 아니라면 예외처리
+            if(ownerEntity != userEntity) {
+                throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                        String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+            }
+
+            articleEntity.selectConstellation(constellationEntity);
+        }
     }
 
     /**
      * 별자리의 전체 게시물 조회
      */
     @Transactional
-    public Page<Article> articlesInConstellation(Long constellationId, String email, Pageable pageable) {
+    public List<Article> articlesInConstellation(Long constellationId, String email) {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
         UserEntity userEntity = getUserEntityOrException(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-
-        if(constellationEntity.getShared() == SharedType.NONSHARED) {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, "constellation is Non-Shared");
-        }
-
-        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
     }
 
     // 포스트가 존재하는지
@@ -372,4 +365,9 @@ public class ArticleService {
                 .toList();
     }
 
+
+    public int countArticles(String email){
+        UserEntity userEntity = getUserEntityOrException(email);
+        return articleRepository.countArticlesByUser(userEntity);
+    }
 }

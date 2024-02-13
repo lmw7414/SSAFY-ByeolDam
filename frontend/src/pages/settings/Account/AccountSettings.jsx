@@ -1,5 +1,7 @@
-import axios from '../../../apis/axios';
 import React, { useState, useEffect } from 'react';
+
+import axios from '../../../apis/axios';
+import parseJwt from '../../../utils/parseJwt.js';
 
 import MyProfile from './MyProfile';
 import EditMyProfile from './EditMyProfile';
@@ -14,27 +16,29 @@ export default function AccountSettings() {
     birthday: '',
     memo: '',
     disclosureType: '',
-    password: '',
   });
 
   const changePage = (newId) => {
     setAccountSettingsId(newId);
-    console.log(accountSettingsId);
+    // console.log(accountSettingsId);
   };
 
+  // const readProfile = async () => {
+  //   const JWTtoken = sessionStorage.getItem('access_token');
+  //   const parsed = parseJwt(JWTtoken);
+  //   const { data } = await axios.get(`/users/${parsed.nickname}`);
+  //   console.log(nickname);
+  //   sessionStorage.setItem('userInfo', data);
+  //   return data;
+  // };
   const readProfile = async () => {
-    const { nickname } = JSON.parse(sessionStorage.getItem('userInfo'));
-    const { data } = await axios.get(`/users/${nickname}`);
-    console.log(nickname);
-    sessionStorage.setItem('userInfo', data);
-    return data;
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    setProfileData(profile);
   };
 
   useEffect(() => {
-    readProfile().then(({ result }) => {
-      setProfileData(result);
-      setProfileupdate(0);
-    });
+    readProfile();
   }, [profileUpdate]);
 
   return (
