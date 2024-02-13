@@ -90,7 +90,7 @@ public class ConstellationService {
      * - 내가 다른 사람의 우주에 접근했을 때
      */
     @Transactional(readOnly = true)
-    public List<ConstellationWithArticle> userConstellations(String email, String nickname) {
+    public List<ConstellationWithArticle> userConstellations(String nickname, String email) {
         UserEntity userEntity = getUserEntityByNicknameOrException(nickname);  // 타 유저의 계정 이메일
         UserEntity myEntity = getUserEntityByEmailOrException(email);      // 로그인한 사람의 이메일
         // 내 계정으로 내 우주를 접근하는 경우
@@ -104,23 +104,6 @@ public class ConstellationService {
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.INVALID_PERMISSION));
         }
 
-//        List<ConstellationEntity> constellationEntities = constellationUserRepository.findConstellationByUserEntity(userEntity);
-//        List<ConstellationWithArticle> result = new ArrayList<>();
-//        for (ConstellationEntity entity : constellationEntities) {
-//            ContourEntity contour = contourRepository.findById(entity.getContourId()).orElseThrow(() ->
-//                    new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND)
-//            );
-//            result.add(new ConstellationWithArticle(entity.getId(),
-//                    entity.getName(),
-//                    Contour.fromEntity(contour),
-//                    entity.getHits(),
-//                    entity.getDescription(),
-//                    entity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
-//                    entity.getCreatedAt(),
-//                    entity.getModifiedAt(),
-//                    entity.getArticleEntities().stream().map(HoverArticle::fromEntity).toList()));
-//        }
-//        return result;
         return constellationUserRepository.findConstellationByUserEntity(userEntity).stream().map(constellationEntity -> {
             ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));

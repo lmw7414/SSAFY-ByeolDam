@@ -331,7 +331,7 @@ public class ArticleService {
     @Transactional
     public void like(Long articleId, String email) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         // 좋아요 상태인지 확인
         articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
@@ -344,7 +344,7 @@ public class ArticleService {
     @Transactional
     public Boolean checkLike(Long articleId, String email) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         //좋아요 상태인지 확인
         return articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).isPresent();
