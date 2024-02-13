@@ -11,7 +11,7 @@ const client = axios.create({
 client.interceptors.request.use(
   (config) => {
     const accessToken = sessionStorage['access_token'];
-    config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (!accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
     return config;
   },
