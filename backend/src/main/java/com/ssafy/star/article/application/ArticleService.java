@@ -198,16 +198,6 @@ public class ArticleService {
     }
 
     /**
-     * 게시물 전체 조회
-     */
-    @Transactional(readOnly = true)
-    public Page<Article> list(String email, Pageable pageable) {
-        UserEntity userEntity = getUserEntityOrException(email);
-        // Not deleted 상태이고, DisclosureType이 VISIBLE이거나 자신의 게시물이라면 보여주기
-        return articleRepository.findAllByNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
-    }
-
-    /**
      * 유저의 게시물 전체 조회
      */
     @Transactional(readOnly = true)

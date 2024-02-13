@@ -43,20 +43,22 @@ public class ConstellationController {
             }
     )
     @PostMapping("/constellations")
-    public Response<Void> create(@RequestPart("request") ConstellationCreateRequest request, Authentication authentication,
-                                 @RequestPart("origin") MultipartFile origin,
-                                 @RequestPart("thumb") MultipartFile thumb,
-                                 @RequestPart("cthumb") MultipartFile cthumb,
-                                 @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
-                                 @RequestPart("ultimate") List<List<Integer>> ultimate
+    public Response<Void> create(
+            Authentication authentication,
+            @RequestPart("request") ConstellationCreateRequest request,
+            @RequestPart("origin") MultipartFile origin,
+            @RequestPart("thumb") MultipartFile thumb,
+            @RequestPart("cthumb") MultipartFile cthumb,
+            @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
+            @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
         //TODO : 윤곽선은 request에 같이 담아져서 옴, request에서 어떻게 추출해서 MongoDB에 저장할지 고민 필요
-
+        log.info("contoursList : {} contoursList : {}", contoursList, ultimate);
         // 사용자를 관리자로 만듦
         constellationService.create(
+                authentication.getName(),
                 request.name(),
                 request.description(),
-                authentication.getName(),
                 origin,
                 thumb,
                 cthumb,
