@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.ssafy.star.article.DisclosureType.VISIBLE;
+import static com.ssafy.star.common.types.DisclosureType.VISIBLE;
+
 
 @RequiredArgsConstructor
 @Transactional

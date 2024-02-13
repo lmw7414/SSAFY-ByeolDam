@@ -1,6 +1,5 @@
 package com.ssafy.star.article.application;
 
-import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dao.ArticleHashtagRelationRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
@@ -9,7 +8,7 @@ import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
-import com.ssafy.star.constellation.SharedType;
+import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.image.ImageType;
@@ -195,21 +194,20 @@ public class ArticleService {
      * 유저의 게시물 전체 조회
      */
     @Transactional(readOnly = true)
-    public Page<Article> userArticlePage(String userEmail, String myEmail, Pageable pageable) {
+    public List<Article> userArticleList(String userEmail, String myEmail) {
+        // 찾는 유저가 접속자라면 전체 조회한다
         UserEntity myEntity = getUserEntityOrException(myEmail);
         UserEntity userEntity = getUserEntityOrException(userEmail);
-
         if(!myEntity.equals(userEntity)) {
 
             if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
 
                 // disclosureType에 따라 조회여부 판단
-                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity, pageable).map(Article::fromEntity);
+                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(Article::fromEntity).toList();
             }
             // following 중이라면 전체 조회한다
         }
-        // 찾는 유저가 접속자라면 전체 조회한다
-        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity).stream().map(Article::fromEntity).toList();
     }
 
     /**
@@ -277,16 +275,11 @@ public class ArticleService {
      * 별자리의 전체 게시물 조회
      */
     @Transactional
-    public Page<Article> articlesInConstellation(Long constellationId, String email, Pageable pageable) {
+    public List<Article> articlesInConstellation(Long constellationId, String email) {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
         UserEntity userEntity = getUserEntityOrException(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-
-        if(constellationEntity.getShared() == SharedType.NONSHARED) {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, "constellation is Non-Shared");
-        }
-
-        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
     }
 
     // 포스트가 존재하는지
