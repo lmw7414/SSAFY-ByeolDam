@@ -57,7 +57,6 @@ public class ConstellationController {
         constellationService.create(
                 authentication.getName(),
                 request.name(),
-                request.title(),
                 origin,
                 thumb,
                 cthumb,
@@ -89,7 +88,6 @@ public class ConstellationController {
                 authentication.getName(),
                 constellationId,
                 request.name(),
-                request.title(),
                 origin,
                 thumb,
                 cthumb,
