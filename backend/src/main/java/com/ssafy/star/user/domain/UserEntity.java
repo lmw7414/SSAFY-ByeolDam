@@ -2,11 +2,11 @@ package com.ssafy.star.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleLikeEntity;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.image.domain.ImageEntity;
-import com.ssafy.star.like.domain.ArticleLikeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

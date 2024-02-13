@@ -70,8 +70,8 @@ public class CommentService {
             }
         } else {
             // 댓글 알림 - 게시글 작성자와 댓글 작성자가 다른 경우 알람 보내기
-            if (!articleEntity.getUser().equals(userEntity)) {
-                notificationProducer.send(new NotificationEvent(NotificationType.NEW_COMMENT_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getUser().getId()));
+            if (!articleEntity.getOwnerEntity().equals(userEntity)) {
+                notificationProducer.send(new NotificationEvent(NotificationType.NEW_COMMENT_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getOwnerEntity().getId()));
             }
         }
         return CommentDto.from(commentEntity);

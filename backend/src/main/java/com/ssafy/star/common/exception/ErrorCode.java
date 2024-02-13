@@ -34,8 +34,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image Not Founded"),
     CONTOUR_NOT_FOUND(HttpStatus.NOT_FOUND, "Contour Not Founded"),
-    ALREADY_DEFAULT_IMAGE(HttpStatus.CONFLICT, "Profile already Default");
     NOTIFICATION_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connect to notification occurs error"),
+    ALREADY_DEFAULT_IMAGE(HttpStatus.CONFLICT, "Profile already Default");
 
     final private HttpStatus status;
     final private String message;

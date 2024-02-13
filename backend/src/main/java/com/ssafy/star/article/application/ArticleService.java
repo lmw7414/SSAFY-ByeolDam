@@ -16,17 +16,14 @@ import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.domain.ImageEntity;
-import com.ssafy.star.user.domain.FollowEntity;
-import com.ssafy.star.like.domain.ArticleLikeEntity;
-import com.ssafy.star.like.repository.ArticleLikeRepository;
 import com.ssafy.star.notification.dto.NotificationArgs;
 import com.ssafy.star.notification.dto.NotificationEvent;
 import com.ssafy.star.notification.dto.NotificationType;
 import com.ssafy.star.notification.producer.NotificationProducer;
+import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
-import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +38,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -56,10 +52,11 @@ public class ArticleService {
     private final ImageService imageService;
     private final ArticleHashtagRelationService articleHashtagRelationService;
     private final ArticleLikeRepository articleLikeRepository;
+    private final NotificationProducer notificationProducer;
 
     /**
      * 게시물 등록
-      */
+     */
     @Transactional
     public void create(
             String title,
@@ -74,7 +71,7 @@ public class ArticleService {
         String thumbnailUrl = "";
         UserEntity userEntity = getUserEntityOrException(email);
 
-        try{
+        try {
 
             url = s3uploader.upload(imageFile, "articles");
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
@@ -125,7 +122,7 @@ public class ArticleService {
     public void delete(Long articleId, String email) {
         // 게시물 owner가 맞는지 확인
         ArticleEntity articleEntity = getArticleOwnerOrException(articleId, email);
-        if(articleEntity.getDeletedAt() != null) {
+        if (articleEntity.getDeletedAt() != null) {
             throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %s has already deleted", articleId));
         } else {
             System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
@@ -152,11 +149,11 @@ public class ArticleService {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         UserEntity userEntity = getUserEntityOrException(email);
 
-        if(!articleEntity.getOwnerEntity().equals(userEntity)) {
+        if (!articleEntity.getOwnerEntity().equals(userEntity)) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", "email:" + email));
         }
 
-        if(articleEntity.getDeletedAt() != null) {
+        if (articleEntity.getDeletedAt() != null) {
             System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
             articleEntity.undoDeletion();
             articleLikeRepository.findAllByArticleEntity(articleEntity).forEach(ArticleLikeEntity::undoDeletion);
@@ -180,7 +177,7 @@ public class ArticleService {
 
         List<ArticleEntity> articleEntityList = new ArrayList<>();
         // ID별 모든 게시글 가져오기
-        for(UserEntity tmpUserEntity : userEntitySet) {
+        for (UserEntity tmpUserEntity : userEntitySet) {
             List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities();
             articleEntityList.addAll(tmpArticleEntities);
         }
@@ -212,9 +209,9 @@ public class ArticleService {
         // 찾는 유저가 접속자라면 전체 조회한다
         UserEntity myEntity = getUserEntityOrException(myEmail);
         UserEntity userEntity = getUserEntityOrException(userEmail);
-        if(!myEntity.equals(userEntity)) {
+        if (!myEntity.equals(userEntity)) {
 
-            if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
+            if (!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
 
                 // disclosureType에 따라 조회여부 판단
                 return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(Article::fromEntity).toList();
@@ -235,18 +232,18 @@ public class ArticleService {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
 
         // articleId AND deletedAt == null AND (내 게시물이거나 VISIBLE)
-        if(articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
+        if (articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
             articleEntity.addHits();
 
             return Article.fromEntity(articleRepository.save(articleEntity));
         } else {
             // Deletion 예외처리
-            if(articleEntity.getDeletedAt() != null) {
+            if (articleEntity.getDeletedAt() != null) {
                 throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("%s deleted", "articleId:" + Long.toString(articleId)));
             }
 
             // 볼 수 있는 권한이 없다(내 게시물이 아니거나 INVISIBLE)
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", "email:" + email, "articleId:" + Long.toString(articleId)));
         }
     }
 
@@ -259,26 +256,26 @@ public class ArticleService {
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
 
         // 별자리 회원인지 확인하기
-        if(constellationEntity.getAdminEntity() != userEntity) {
+        if (constellationEntity.getAdminEntity() != userEntity) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with %s", "email:"+email, "constellationId:" + Long.toString(constellationId)));
+                    String.format("%s has no permission with %s", "email:" + email, "constellationId:" + Long.toString(constellationId)));
         }
 
         // 반복문을 통해 Set에 있는 article 전부 별자리에 배정
-        for(Long articleId : articleIdSet) {
+        for (Long articleId : articleIdSet) {
             ArticleEntity articleEntity = getArticleEntityOrException(articleId);
             UserEntity ownerEntity = articleEntity.getOwnerEntity();                  // admin의 user entity
 
             // article이 휴지통에 있다면 예외처리
-            if(articleEntity.getDeletedAt() != null) {
+            if (articleEntity.getDeletedAt() != null) {
                 throw new ByeolDamException(ErrorCode.ARTICLE_DELETED,
-                        String.format("%s deleted", "articleId:"+Long.toString(articleId)));
+                        String.format("%s deleted", "articleId:" + Long.toString(articleId)));
             }
 
             // article 본인 것이 아니라면 예외처리
-            if(ownerEntity != userEntity) {
+            if (ownerEntity != userEntity) {
                 throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                        String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+                        String.format("%s has no permission with %s", "email:" + email, "articleId:" + Long.toString(articleId)));
             }
 
             articleEntity.selectConstellation(constellationEntity);
@@ -308,8 +305,8 @@ public class ArticleService {
                 () -> {
                     articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity));
                     // 자신의 게시물이 아닌경우, 좋아요 알람보내기
-                    if (!articleEntity.getUser().equals(userEntity)) {
-                        notificationProducer.send(new NotificationEvent(NotificationType.NEW_LIKE_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getUser().getId()));
+                    if (!articleEntity.getOwnerEntity().equals(userEntity)) {
+                        notificationProducer.send(new NotificationEvent(NotificationType.NEW_LIKE_ON_POST, new NotificationArgs(userEntity.getId(), articleId), articleEntity.getOwnerEntity().getId()));
                     }
                 });
     }
@@ -323,7 +320,7 @@ public class ArticleService {
     // 유저가 존재하는지
     private UserEntity getUserEntityOrException(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "email:" +email)));
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "email:" + email)));
     }
 
     // 별자리가 존재하는지
@@ -333,31 +330,18 @@ public class ArticleService {
     }
 
     // 게시물 owner인지 확인
-    private ArticleEntity getArticleOwnerOrException(Long articleId, String email){
+    private ArticleEntity getArticleOwnerOrException(Long articleId, String email) {
         UserEntity userEntity = getUserEntityOrException(email);                                    // 현재 사용자 user entity
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         UserEntity ownerEntity = articleEntity.getOwnerEntity();                              // admin의 user entity
 
         // admin이어야 삭제 가능
-        if(ownerEntity != userEntity) {
+        if (ownerEntity != userEntity) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+                    String.format("%s has no permission with %s", "email:" + email, "articleId:" + Long.toString(articleId)));
         }
 
         return articleEntity;
-    }
-
-    //게시물 좋아요 요청
-    @Transactional
-    public void like(Long articleId, String email) {
-        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
-
-        // 좋아요 상태인지 확인
-        articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
-                articleLikeRepository::delete,
-                () -> articleLikeRepository.save(ArticleLikeEntity.of(userEntity, articleEntity))
-        );
     }
 
     //게시물 좋아요 상태 확인
@@ -392,7 +376,7 @@ public class ArticleService {
     }
 
 
-    public int countArticles(String email){
+    public int countArticles(String email) {
         UserEntity userEntity = getUserEntityOrException(email);
         return articleRepository.countArticlesByUser(userEntity);
     }
