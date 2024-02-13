@@ -64,7 +64,7 @@ public class ArticleService {
     ) {
         String url = "";
         String thumbnailUrl = "";
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         try{
 
@@ -132,7 +132,7 @@ public class ArticleService {
      */
     @Transactional
     public Page<Article> trashcan(String email, Pageable pageable) {
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         return articleRepository.findAllByOwnerEntityAndDeleted(userEntity, pageable).map(Article::fromEntity);
     }
 
@@ -142,7 +142,7 @@ public class ArticleService {
     @Transactional
     public Article undoDeletion(Long articleId, String email) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         if(!articleEntity.getOwnerEntity().equals(userEntity)) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", "email:" + email));
@@ -167,7 +167,7 @@ public class ArticleService {
     // 팔로우한 사람들의 게시물들을 최신순으로 나열해서 보여준다
     @Transactional(readOnly = true)
     public Page<Article> followFeed(String email, Pageable pageable) {
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         Set<UserEntity> userEntitySet = userEntity.getFollowEntities().stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
 
         List<ArticleEntity> articleEntityList = new ArrayList<>();
@@ -200,10 +200,10 @@ public class ArticleService {
      * 유저의 게시물 전체 조회
      */
     @Transactional(readOnly = true)
-    public List<Article> userArticleList(String userEmail, String myEmail) {
+    public List<Article> userArticleList(String nickname, String email) {
         // 찾는 유저가 접속자라면 전체 조회한다
-        UserEntity myEntity = getUserEntityOrException(myEmail);
-        UserEntity userEntity = getUserEntityOrException(userEmail);
+        UserEntity myEntity = getUserEntityOrExceptionByEmail(email);
+        UserEntity userEntity = getUserEntityOrExceptionByNickname(nickname);
         if(!myEntity.equals(userEntity)) {
 
             if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
@@ -221,7 +221,7 @@ public class ArticleService {
      */
     @Transactional(readOnly = true)
     public Article detail(Long articleId, String email) {
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         // 해당 article이 없을 경우 예외처리
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
@@ -230,7 +230,7 @@ public class ArticleService {
         if(articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
             articleEntity.addHits();
 
-            return Article.fromEntity(articleRepository.save(articleEntity));
+            return Article.fromEntity(articleRepository.saveAndFlush(articleEntity));
         } else {
             // Deletion 예외처리
             if(articleEntity.getDeletedAt() != null) {
@@ -247,7 +247,7 @@ public class ArticleService {
      */
     @Transactional
     public void select(Long constellationId, Set<Long> articleIdSet, String email) {
-        UserEntity userEntity = getUserEntityOrException(email);                      // 현재 사용자 user entity
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);                      // 현재 사용자 user entity
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
 
         // 별자리 회원인지 확인하기
@@ -283,7 +283,7 @@ public class ArticleService {
     @Transactional
     public List<Article> articlesInConstellation(Long constellationId, String email) {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
         return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
     }
@@ -294,10 +294,16 @@ public class ArticleService {
                 new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", "articleId:" + Long.toString(articleId))));
     }
 
-    // 유저가 존재하는지
-    private UserEntity getUserEntityOrException(String email) {
+    // 유저가 존재하는지(email)
+    private UserEntity getUserEntityOrExceptionByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
                 new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "email:" +email)));
+    }
+
+    // 유저가 존재하는지(nickname)
+    private UserEntity getUserEntityOrExceptionByNickname(String nickname) {
+        return userRepository.findByNickname(nickname).orElseThrow(() ->
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "nickname:" +nickname)));
     }
 
     // 별자리가 존재하는지
@@ -308,7 +314,7 @@ public class ArticleService {
 
     // 게시물 owner인지 확인
     private ArticleEntity getArticleOwnerOrException(Long articleId, String email){
-        UserEntity userEntity = getUserEntityOrException(email);                                    // 현재 사용자 user entity
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);                                    // 현재 사용자 user entity
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
         UserEntity ownerEntity = articleEntity.getOwnerEntity();                              // admin의 user entity
 
@@ -325,7 +331,7 @@ public class ArticleService {
     @Transactional
     public void like(Long articleId, String email) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         // 좋아요 상태인지 확인
         articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).ifPresentOrElse(
@@ -338,7 +344,7 @@ public class ArticleService {
     @Transactional
     public Boolean checkLike(Long articleId, String email) {
         ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         //좋아요 상태인지 확인
         return articleLikeRepository.findByUserEntityAndArticleEntity(userEntity, articleEntity).isPresent();
@@ -367,7 +373,7 @@ public class ArticleService {
 
 
     public int countArticles(String email){
-        UserEntity userEntity = getUserEntityOrException(email);
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         return articleRepository.countArticlesByUser(userEntity);
     }
 }

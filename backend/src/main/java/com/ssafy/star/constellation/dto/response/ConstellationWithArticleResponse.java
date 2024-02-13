@@ -3,6 +3,7 @@ package com.ssafy.star.constellation.dto.response;
 import com.ssafy.star.article.dto.HoverArticle;
 import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.constellation.dto.ConstellationWithArticle;
+import com.ssafy.star.contour.dto.ContourResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public record ConstellationWithArticleResponse(
         Long id,
         String name,
-        Long contourId,
+        ContourResponse contourResponse,
         long hits,
         String description,
         List<ConstellationUser> constellationUserEntities,
@@ -22,7 +23,7 @@ public record ConstellationWithArticleResponse(
         return new ConstellationWithArticleResponse(
                 dto.id(),
                 dto.name(),
-                dto.contourId(),
+                ContourResponse.fromContour(dto.contour()),
                 dto.hits(),
                 dto.description(),
                 dto.constellationUsers(),
