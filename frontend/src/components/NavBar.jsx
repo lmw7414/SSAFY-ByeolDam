@@ -104,11 +104,7 @@ export default function NavBar() {
               <div className="nav-bar-profile-box">
                 <div className="profile-image-box">
                   <div className="profile-image-container">
-                    <img
-                      className="profile-image"
-                      src="/src/assets/images/space.png"
-                      alt="profile_image"
-                    />
+                    <img className="profile-image" src={profile.imageUrl} alt="profile_image" />
                   </div>
                 </div>
                 <div className="nickname-memo-container">

@@ -19,10 +19,11 @@ export default function EditMyProfile({
 
     try {
       const response = await axios.put('/users', editedProfile);
-      setProfileUpdate(1);
       console.log('내 정보 수정 성공');
       changePage(0);
       setProfileData(editedProfile);
+      setProfileUpdate(1);
+      window.location.reload();
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -94,11 +95,8 @@ export default function EditMyProfile({
         </div>
       </div>
       <div>
-        <button type="submit" className="profile-image-edit">
+        <button type="submit" className="update-profile-button">
           적용
-        </button>
-        <button type="button" onClick={() => changePage(0)}>
-          [임시]프로필로가기
         </button>
       </div>
     </form>

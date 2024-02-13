@@ -34,6 +34,7 @@ export default function MyProfile({
           'Content-Type': 'multipart/form-data', // 필요한 경우에만 추가
         },
       });
+      setProfileUpdate(1);
       // setProfileData({ ...profileData, imageUrl: imageUrl });
     } catch (error) {
       console.error('Error updating profile image:', error);
@@ -63,13 +64,6 @@ export default function MyProfile({
           </div>
         </div>
       </div>
-      {/* <div className="account-profile-image-container">
-          <img
-            className="account-profile-image"
-            src="/src/assets/images/space.png"
-            alt="profile_image"
-          />
-        </div> */}
 
       <hr className="settings-detail-divide" />
 
