@@ -1,6 +1,16 @@
 package com.ssafy.star.user.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.global.oauth.domain.ProviderType;
+import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
+import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 
 import java.time.LocalDate;
@@ -8,20 +18,34 @@ import java.time.LocalDateTime;
 public record User(
         Long id,
         String email,
+        Image image,
+        ProviderType providerType,
+        RoleType roleType,
         String password,
         String name,
         String nickname,
         String memo,
         DisclosureType disclosureType,
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        @JsonSerialize(using = LocalDateSerializer.class)
         LocalDate birthday,
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime createdAt,
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime modifiedAt,
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime deletedAt
 ) {
-    public static User of(Long id, String email, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
+    public static User of(Long id, String email, ImageEntity imageEntity, ProviderType providerType, String password, String name, String nickname, String memo, DisclosureType disclosureType, LocalDate birthday, LocalDateTime createdAt, LocalDateTime modifiedAt, LocalDateTime deletedAt) {
         return new User(
                 id,
                 email,
+                Image.fromEntity(imageEntity),
+                providerType,
+                RoleType.USER,
                 password,
                 name,
                 nickname,
@@ -38,6 +62,9 @@ public record User(
         return new User(
                 entity.getId(),
                 entity.getEmail(),
+                Image.fromEntity(entity.getImageEntity()),
+                entity.getProviderType(),
+                entity.getRoleType(),
                 entity.getPassword(),
                 entity.getName(),
                 entity.getNickname(),
@@ -53,12 +80,15 @@ public record User(
     public UserEntity toEntity() {
         return UserEntity.of(
                 email,
+                providerType,
+                roleType,
                 name,
                 password,
                 nickname,
                 memo,
                 disclosureType,
-                birthday
+                birthday,
+                ImageEntity.fromDto(image)
         );
     }
 

@@ -1,16 +1,15 @@
 package com.ssafy.star.article.dto.request;
 
-import com.ssafy.star.article.DisclosureType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.image.ImageType;
+
+import java.util.Set;
 
 public record ArticleCreateRequest (
 
     String title,
-    String tag,
-   String description,
-    DisclosureType disclosureType
-//    private image;
-){
-}
+    String description,
+    DisclosureType disclosureType,
+    ImageType imageType,
+    Set<String> articleHashtagSet
+){}

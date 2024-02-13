@@ -1,26 +1,31 @@
 package com.ssafy.star.article.domain;
 
-import com.ssafy.star.article.DisclosureType;
-import com.ssafy.star.like.domain.ArticleLikeEntity;
+import com.ssafy.star.comment.domain.CommentEntity;
+import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.constellation.domain.ConstellationEntity;
+import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "\"article\"")
+@Table(name = "article")
 @Getter
-@Setter
+@NoArgsConstructor
 @SQLDelete(sql = "UPDATE `article` SET deleted_at = NOW() where id=?")
-@Where(clause = "deleted_at is NULL")
+//@Where(clause = "deleted_at is NULL")
 public class ArticleEntity {
 
+    // TODO : Article 인덱싱 ownerEntity 기준으로
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +34,9 @@ public class ArticleEntity {
     @Column(name = "title", nullable = false, length = 105)
     private String title;
 
-    @Column(name = "tag", length = 255)
-    private String tag;
-
-    // TODO : ConstellationId, Image
+    @ToString.Exclude
+    @OneToMany(mappedBy = "articleEntity", cascade = CascadeType.ALL)
+    private Set<ArticleHashtagRelationEntity> articleHashtagRelationEntities = new HashSet<>();
 
     @Column(name = "hits", nullable = false)
     private long hits;
@@ -40,11 +44,24 @@ public class ArticleEntity {
     @Column(name = "description", length = 300)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "disclosure", nullable = false)
     private DisclosureType disclosure;
 
-    @OneToMany(mappedBy = "articleEntity", orphanRemoval = true)
-    private List<ArticleLikeEntity> articleLikes = new ArrayList<>();
+    @ToString.Exclude
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "constellation_id")
+    private ConstellationEntity constellationEntity;
+
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity ownerEntity;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "articleEntity", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<CommentEntity> commentEntities;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -55,23 +72,9 @@ public class ArticleEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    //Image(사진) Table의 FK
-    //1:1관계
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "Image")
-//    private ImageEntity imageEntity;
-
-    //Constellation(별자리) Table의 FK
-    //N:1관계
-//    @ManyToOne
-//    @JoinColumn(name = "Constellation")
-//    private ConstellationEntity constellationEntity;
-
-//    User(회원) Table의 FK
-//    0~N:1관계
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image")
+    private ImageEntity imageEntity;
 
     @PrePersist
     void createdAt() { this.createdAt = LocalDateTime.from(LocalDateTime.now()); }
@@ -81,13 +84,53 @@ public class ArticleEntity {
         this.modifiedAt = LocalDateTime.from(LocalDateTime.now());
     }
 
-    public static ArticleEntity of(String title, String tag, String description, DisclosureType disclosure, UserEntity userEntity){
-        ArticleEntity entity = new ArticleEntity();
-        entity.setTitle(title);
-        entity.setTag(tag);
-        entity.setDescription(description);
-        entity.setDisclosure(disclosure);
-        entity.setUser(userEntity);
+    // 삭제 취소
+    public void undoDeletion(){
+        this.deletedAt = null;
+    }
+
+    public void addHits() { this.hits++; }
+
+    public void selectConstellation(ConstellationEntity constellationEntity) { this.constellationEntity = constellationEntity; }
+
+    public void update(String title, String description, DisclosureType disclosure) {
+        this.title = title;
+        this.description = description;
+        this.disclosure = disclosure;
+    }
+
+    private ArticleEntity(
+            String title,
+            String description,
+            DisclosureType disclosure,
+            UserEntity ownerEntity,
+            ConstellationEntity constellationEntity,
+            ImageEntity imageEntity
+    ) {
+        this.title = title;
+        this.description = description;
+        this.disclosure = disclosure;
+        this.ownerEntity = ownerEntity;
+        this.constellationEntity = constellationEntity;
+        this.imageEntity = imageEntity;
+    }
+
+    public static ArticleEntity of(
+            String title,
+            String description,
+            DisclosureType disclosure,
+            UserEntity ownerEntity,
+            ConstellationEntity constellationEntity,
+            ImageEntity imageEntity
+    ){
+        ArticleEntity entity = new ArticleEntity(
+                title,
+                description,
+                disclosure,
+                ownerEntity,
+                constellationEntity,
+                imageEntity
+        );
         return entity;
     }
 

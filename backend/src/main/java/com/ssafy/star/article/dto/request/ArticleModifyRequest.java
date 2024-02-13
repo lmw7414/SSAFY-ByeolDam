@@ -1,14 +1,15 @@
 package com.ssafy.star.article.dto.request;
 
-import com.ssafy.star.article.DisclosureType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.ssafy.star.common.types.DisclosureType;
+
+import java.util.Set;
 
 
 public record ArticleModifyRequest (
     String title,
-    String tag,
     String description,
-    DisclosureType disclosureType)
-{
+    DisclosureType disclosureType,
+    Set<String> articleHashtagSet
+
+) {
 }

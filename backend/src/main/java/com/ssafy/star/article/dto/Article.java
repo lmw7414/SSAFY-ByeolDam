@@ -1,46 +1,64 @@
 package com.ssafy.star.article.dto;
 
-import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleHashtagEntity;
+import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
+import com.ssafy.star.comment.dto.CommentDto;
+import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.constellation.dto.Constellation;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.dto.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Getter
-@AllArgsConstructor
-public class Article {
 
-    private Long id;
-    private String title;
-    private String tag;
-    //    private Long constellationId;
-//    private imageResponse image;
-    private long hits;
-    private String description;
-    private DisclosureType disclosure;
-    private User user;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
-    private LocalDateTime deletedAt;
+public record Article(
+        Long id,
+        String title,
+        long hits,
+        String description,
+        DisclosureType disclosure,
+        Set<String> articleHashtags,
+        Constellation constellation,
+        User user,
+        List<CommentDto> commentList,
+        LocalDateTime createdAt,
+        LocalDateTime modifiedAt,
+        LocalDateTime deletedAt,
+        Image image
 
+) {
 
     public static Article fromEntity(ArticleEntity entity) {
+
+        Set<String> hashtags = entity.getArticleHashtagRelationEntities()
+                .stream()
+                .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
+                .map(ArticleHashtagEntity::getTagName)
+                .collect(Collectors.toSet());
+
+        List<CommentDto> comments = entity.getCommentEntities()
+                .stream()
+                .map(CommentDto::from)
+                .collect(Collectors.toList());
+
         return new Article(
                 entity.getId(),
                 entity.getTitle(),
-                entity.getTag(),
-//                entity.getConstellationId(),
-//                Image.fromEntity(entity.getImage()),
                 entity.getHits(),
                 entity.getDescription(),
                 entity.getDisclosure(),
-                User.fromEntity(entity.getUser()),
+                hashtags,
+                Constellation.fromEntity(entity.getConstellationEntity()),
+                User.fromEntity(entity.getOwnerEntity()),
+                comments,
                 entity.getCreatedAt(),
                 entity.getModifiedAt(),
-                entity.getDeletedAt()
+                entity.getDeletedAt(),
+                Image.fromEntity(entity.getImageEntity())
         );
     }
 }
