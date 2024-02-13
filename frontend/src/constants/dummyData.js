@@ -10,74 +10,87 @@
 // ];
 
 const R = 40;
-const size = 15;
+const size = 2;
+// const data = [
+//   {
+//     id: 'bread',
+//     url: './data/춤2.json',
+//     thumbnail: './images/sample/춤2.jpg',
+//   },
+//   { id: 'car', url: './data/car.json', thumbnail: './images/sample/car.jpg' },
+//   { id: 'cat', url: './data/cat.json', thumbnail: './images/sample/cat.jpg' },
+//   {
+//     id: 'chicken',
+//     url: './data/싸피.json',
+//     thumbnail: './images/sample/싸피.png',
+//   },
+//   {
+//     id: 'coffee',
+//     url: './data/삼성.json',
+//     thumbnail: './images/sample/삼성.png',
+//   },
+//   {
+//     id: 'couple',
+//     url: './data/couple.json',
+//     thumbnail: './images/sample/couple.jpg',
+//   },
+//   {
+//     id: 'diary',
+//     url: './data/diary.json',
+//     thumbnail: './images/sample/diary.jpg',
+//   },
+//   {
+//     id: 'family',
+//     url: './data/family.json',
+//     thumbnail: './images/sample/family.jpg',
+//   },
+//   {
+//     id: 'food',
+//     url: './data/food.json',
+//     thumbnail: './images/sample/food.jpg',
+//   },
+//   {
+//     id: 'redpanda',
+//     url: './data/redpanda.json',
+//     thumbnail: './images/sample/redpanda.jpg',
+//   },
+//   {
+//     id: 'running',
+//     url: './data/running.json',
+//     thumbnail: './images/sample/running.jpg',
+//   },
+//   {
+//     id: 'scenery',
+//     url: './data/여행2.json',
+//     thumbnail: './images/sample/여행2.jpg',
+//   },
+//   {
+//     id: 'selfie',
+//     url: './data/강아지3.json',
+//     thumbnail: './images/sample/강아지3.jpg',
+//   },
+//   {
+//     id: 'sports',
+//     url: './data/sports.json',
+//     thumbnail: './images/sample/sports.jpg',
+//   },
+//   {
+//     id: 'friend',
+//     url: './data/friend.json',
+//     thumbnail: './images/sample/friend.jpg',
+//   },
+// ];
+
 const data = [
   {
-    id: 'bread',
-    url: './data/춤2.json',
-    thumbnail: './images/sample/춤2.jpg',
-  },
-  { id: 'car', url: './data/car.json', thumbnail: './images/sample/car.jpg' },
-  { id: 'cat', url: './data/cat.json', thumbnail: './images/sample/cat.jpg' },
-  {
-    id: 'chicken',
-    url: './data/싸피.json',
-    thumbnail: './images/sample/싸피.png',
+    id: 1,
+    url: '/data/extracted/1.json',
+    thumbnail: '/data/extracted/thumb-1.png',
   },
   {
-    id: 'coffee',
-    url: './data/삼성.json',
-    thumbnail: './images/sample/삼성.png',
-  },
-  {
-    id: 'couple',
-    url: './data/couple.json',
-    thumbnail: './images/sample/couple.jpg',
-  },
-  {
-    id: 'diary',
-    url: './data/diary.json',
-    thumbnail: './images/sample/diary.jpg',
-  },
-  {
-    id: 'family',
-    url: './data/family.json',
-    thumbnail: './images/sample/family.jpg',
-  },
-  {
-    id: 'food',
-    url: './data/food.json',
-    thumbnail: './images/sample/food.jpg',
-  },
-  {
-    id: 'redpanda',
-    url: './data/redpanda.json',
-    thumbnail: './images/sample/redpanda.jpg',
-  },
-  {
-    id: 'running',
-    url: './data/running.json',
-    thumbnail: './images/sample/running.jpg',
-  },
-  {
-    id: 'scenery',
-    url: './data/여행2.json',
-    thumbnail: './images/sample/여행2.jpg',
-  },
-  {
-    id: 'selfie',
-    url: './data/강아지3.json',
-    thumbnail: './images/sample/강아지3.jpg',
-  },
-  {
-    id: 'sports',
-    url: './data/sports.json',
-    thumbnail: './images/sample/sports.jpg',
-  },
-  {
-    id: 'friend',
-    url: './data/friend.json',
-    thumbnail: './images/sample/friend.jpg',
+    id: 2,
+    url: '/data/extracted/2.json',
+    thumbnail: '/data/extracted/thumb-2.png',
   },
 ];
 

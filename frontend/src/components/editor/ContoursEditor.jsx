@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Layer, Stage, Image as KonvaImage, Line, Circle } from 'react-konva';
 import getUuidByString from 'uuid-by-string';
 import getSegmentDistance from '../../utils/getSegmentDistance';
@@ -39,7 +39,7 @@ export default function ContoursEditor({
     if (e.evt.button === 0) {
       const x = e.evt.offsetX;
       const y = e.evt.offsetY;
-      let nearestLineIdx = -1;
+      let nearestLineIdx = 0;
       let minDist = Infinity;
 
       for (let i = 0; i < points.length; i++) {
@@ -50,7 +50,7 @@ export default function ContoursEditor({
         }
       }
 
-      if (nearestLineIdx > 0 && nearestLineIdx < points.length) addPoint(x, y, nearestLineIdx);
+      if (nearestLineIdx <= points.length) addPoint(x, y, nearestLineIdx);
     }
   };
 
@@ -70,6 +70,18 @@ export default function ContoursEditor({
         editor.current.container().style.cursor = 'auto';
       }}
     >
+      {/* 
+{!!image && (
+          <KonvaImage
+            ref={imageRef}
+            image={image}
+            opacity={0.6}
+            x={(width - (width * image.width) / Math.max(image.width, image.height)) / 2}
+            y={(height - (height * image.height) / Math.max(image.width, image.height)) / 2}
+            width={(width * image.width) / Math.max(image.width, image.height)}
+            height={(height * image.height) / Math.max(image.width, image.height)}
+          />
+        )} */}
       <Layer>
         <KonvaImage
           ref={imageRef}
@@ -96,7 +108,7 @@ export default function ContoursEditor({
             key={getUuidByPosition(x, y)}
             x={x}
             y={y}
-            radius={6}
+            radius={4}
             fill={'white'}
             stroke={'red'}
             strokeWidth={1}

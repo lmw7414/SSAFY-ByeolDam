@@ -84,6 +84,10 @@ export default function NavBar() {
     });
   };
 
+  useEffect(() => {
+    refreshToken();
+  }, []);
+
   return (
     <div>
       {navEx ? (

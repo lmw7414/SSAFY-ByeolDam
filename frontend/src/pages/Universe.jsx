@@ -71,7 +71,7 @@ export default function Universe() {
         <Suspense fallback={null}>
           <Land />
           <Stars saturation={1} speed={0.7} fade />
-          <Stars saturation={2} speed={1.2} fade />
+          {/* <Stars saturation={2} speed={1.2} fade /> */}
           <ConstellationControls controller={controller} constellationList={constellationList} />
         </Suspense>
       </Canvas>
