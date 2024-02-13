@@ -16,12 +16,12 @@ export default function NavBar() {
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
   const [modalState, setModalState] = useModal();
+  const [profile, setProfile] = useState({});
   // const [follower, setFollower] = useState('');
   // const [following, setFollowing] = useState('');
   // const [nickname, setNickname] = useState('');
   // const [email, setEmail] = useState('');
-  const [profile, setProfile] = useState({});
-  const [profileImgUrl, setProfileImgUrl] = useState('');
+  // const [profileImgUrl, setProfileImgUrl] = useState('');
   // const [parsedJwt, setParsedJwt] = useState(null);
 
   // 네비게이션 바 작동 관련
