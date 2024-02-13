@@ -7,12 +7,13 @@ import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.ConstellationUserRole;
+import com.ssafy.star.constellation.dao.ConstellationLikeRepository;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
+import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
-import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.constellation.dto.ConstellationWithArticle;
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.dto.Contour;
@@ -21,7 +22,6 @@ import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.dao.ImageRepository;
 import com.ssafy.star.image.domain.ImageEntity;
-import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.ApprovalStatus;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
@@ -53,6 +53,7 @@ public class ConstellationService {
     private final S3uploader s3uploader;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
+    private final ConstellationLikeRepository constellationLikeRepository;
 
     /**
      * 나의 우주 보기 - 별자리 전체 조회
@@ -256,6 +257,7 @@ public class ConstellationService {
     @Transactional
     public void deleteConstellationWithContour(String email, Long constellationId) {
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
+        constellationLikeRepository.deleteAllByConstellationEntity(constellationEntity);
         Long contourId = constellationEntity.getContourId();
 
         ContourEntity contourEntity = contourRepository.findById(contourId).orElseThrow(() ->
@@ -285,6 +287,7 @@ public class ConstellationService {
                     return article;
                 });
         // 별자리 삭제
+
         constellationRepository.delete(constellationEntity);
     }
 
@@ -445,6 +448,50 @@ public class ConstellationService {
                         new ByeolDamException(ErrorCode.CONSTELLATION_USER_NOT_FOUND, String.format("%s, %s has no constellationUserEntity", userEntity.getNickname(), constellationEntity.getName())));
         constellationUserEntity.setConstellationUserRole(role);
         constellationUserRepository.saveAndFlush(constellationUserEntity);
+    }
+
+    //별자리 좋아요 요청
+    @Transactional
+    public void like(Long constellationId, String email) {
+        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        // 좋아요 상태인지 확인
+        constellationLikeRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).ifPresentOrElse(
+                constellationLikeRepository::delete,
+                () -> constellationLikeRepository.save(ConstellationLikeEntity.of(userEntity, constellationEntity))
+        );
+    }
+
+    //별자리 좋아요 상태 확인
+    @Transactional
+    public Boolean checkLike(Long constellationId, String email) {
+        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        //좋아요 상태인지 확인
+        return constellationLikeRepository.findByUserEntityAndConstellationEntity(userEntity, constellationEntity).isPresent();
+    }
+
+    //별자리 좋아요 갯수 확인
+    @Transactional
+    public Integer likeCount(Long constellationId) {
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+
+        //좋아요 갯수 확인
+        return constellationLikeRepository.countByConstellationEntity(constellationEntity);
+    }
+
+    //별자리 좋아요한 사람들의 목록 확인
+    @Transactional
+    public List<User> likeList(Long constellationId) {
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
+        //목록 확인
+        return constellationLikeRepository.findAllByConstellationEntity(constellationEntity)
+                .stream()
+                .map(ConstellationLikeEntity::getUserEntity)
+                .map(User::fromEntity)
+                .toList();
     }
 
     public int countConstellations(String email){

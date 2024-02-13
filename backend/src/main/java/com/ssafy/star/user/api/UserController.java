@@ -1,10 +1,12 @@
 package com.ssafy.star.user.api;
 
 import com.ssafy.star.article.application.ArticleService;
+import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
+import com.ssafy.star.constellation.dto.response.ConstellationResponse;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
@@ -20,6 +22,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,7 +39,7 @@ public class UserController {
     private final FollowService followService;
     private final ArticleService articleService;
     private final ConstellationService constellationService;
-    
+
     @Operation(
             summary = "이메일로 닉네임 찾기",
             description = "email의 정보로 닉네임 찾기 - 소셜로그인 때 사용"
@@ -222,11 +226,11 @@ public class UserController {
         return Response.success(followService.requestFollowList(authentication.getName())
                 .stream()
                 .map(res ->
-                    FollowResponse.fromFollow(
-                            res,
-                            articleService.countArticles(res.email()),
-                            constellationService.countConstellations(res.email())
-                            )
+                        FollowResponse.fromFollow(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email())
+                        )
                 )
                 .toList());
     }
@@ -262,7 +266,7 @@ public class UserController {
                                 articleService.countArticles(res.email()),
                                 constellationService.countConstellations(res.email())
                         )
-                        )
+                )
                 .toList());
     }
 
@@ -342,5 +346,29 @@ public class UserController {
     @GetMapping("/{nickname}/count-followings")
     public Response<Long> countFollowings(@PathVariable(name = "nickname") String nickname) {
         return Response.success(followService.countFollowings(nickname));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 게시글 목록 확인",
+            description = "내가 좋아요한 게시글 목록을 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내가 좋아요한 게시글 정보 반환", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/me/like-articles")
+    public Response<Page<ArticleResponse>> likeArticleList(Authentication authentication, Pageable pageable) {
+        return Response.success(userService.likeArticleList(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 별자리 목록 확인",
+            description = "내가 좋아요한 별자리 목록을 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내가 좋아요한 별자리 정보 반환", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
+            }
+    )
+    @GetMapping("/me/like-constellations")
+    public Response<Page<ConstellationResponse>> likeConstellationList(Authentication authentication, Pageable pageable) {
+        return Response.success(userService.likeConstellationList(authentication.getName(), pageable).map(ConstellationResponse::fromConstellation));
     }
 }
