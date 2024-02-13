@@ -27,6 +27,7 @@ import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +39,7 @@ import static com.ssafy.star.constellation.ConstellationUserRole.ADMIN;
 import static com.ssafy.star.constellation.ConstellationUserRole.USER;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ConstellationService {
 
@@ -50,10 +52,6 @@ public class ConstellationService {
     private final S3uploader s3uploader;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
-
-    private static final int ORIGIN_HEIGHT = 1024;
-    private static final int THUMB_HEIGHT = 256;
-
 
     /**
      * 나의 우주 보기 - 별자리 전체 조회
@@ -232,7 +230,7 @@ public class ConstellationService {
                 description
         );
         // mongo에 저장된 id 반환
-        constellationEntity.setContourId(contour.getId());
+        constellationEntity.setContourId(contour.get_id());
         ConstellationUserEntity constellationUserEntity = ConstellationUserEntity.of(
                 constellationEntity,
                 userEntity,
@@ -253,6 +251,7 @@ public class ConstellationService {
      * - 별자리에 포함되어 있는 별들의 별자리를 미분류로 변환
      * - 별자리 정보를 마리아 DB에서 삭제
      */
+    @Transactional
     public void deleteConstellationWithContour(String email, Long constellationId) {
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
         Long contourId = constellationEntity.getContourId();
@@ -298,6 +297,7 @@ public class ConstellationService {
      * - 최종 윤곽선 데이터
      * - 프론트에 원본 사진 띄어주기 (원본 사진 위에 윤곽선이 표시가 돼)
      */
+    @Transactional(readOnly = true)
     public Contour requestModifyConstellation(String email, Long constellationId) {
         // 별자리 조회
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
@@ -322,11 +322,12 @@ public class ConstellationService {
      * - 몽고DB에서 해당 id로 들어가 값을 수정
      * - 별자리 이름, 태그 등 변경 내용이 있으면 수정
      */
+    @Transactional
     public Constellation modify(
+            String email,                // 사용자의 email
             Long constellationId,
             String name,
             String description,
-            String email,                // 사용자의 email
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cThumb,
@@ -352,21 +353,29 @@ public class ConstellationService {
         String oldCThumbUrl = contourEntity.getCThumbUrl();
 
         ImageEntity oldOriginImage = imageService.getImageUrl(oldOriginUrl);
+        log.info("oldOriginImage : {}", oldOriginImage);
         ImageEntity oldThumbImage = imageService.getImageUrl(oldThumbUrl);
+        log.info("oldThumbImage : {}", oldThumbImage);
         ImageEntity oldContourThumbImage = imageService.getImageUrl(oldCThumbUrl);
-
+        log.info("oldContourThumbImage : {}", oldContourThumbImage);
         // 기존 이미지 삭제
         s3uploader.deleteImageFromS3(oldOriginUrl);
         s3uploader.deleteImageFromS3(oldThumbUrl);
         s3uploader.deleteImageFromS3(oldCThumbUrl);
 
         // 몽고DB에 반영하기
-        contourEntity.setOriginUrl(originUrl);
-        contourEntity.setThumbUrl(thumbUrl);
-        contourEntity.setCThumbUrl(cThumbUrl);
-        contourEntity.setContoursList(contoursList);
-        contourEntity.setUltimate(ultimate);
-        contourRepository.save(contourEntity);
+        contourRepository.delete(contourEntity);
+//        contourEntity.setOriginUrl(originUrl);
+//        contourEntity.setThumbUrl(thumbUrl);
+//        contourEntity.setCThumbUrl(cThumbUrl);
+//        contourEntity.setContoursList(contoursList);
+//        contourEntity.setUltimate(ultimate);
+        // TODO : 기존 ID 값이 아닌 새로운 ID가 생성되는 문제 발생
+
+        ContourEntity newContourEntity = contourRepository.save(ContourEntity.of(originUrl, thumbUrl, cThumbUrl, contoursList, ultimate));
+        //contourRepository.delete(contourEntity);
+        //constellationEntity.setContourId(newContourEntity.getId());
+        constellationEntity.setContourId(newContourEntity.get_id());
 
         oldOriginImage.setName(origin.getOriginalFilename());
         oldOriginImage.setUrl(originUrl);
@@ -384,7 +393,7 @@ public class ConstellationService {
             constellationEntity.setName(name);
         }
         constellationEntity.setDescription(description);    // 설명 null 가능
-        return Constellation.fromEntity(constellationRepository.saveAndFlush(constellationEntity));
+        return Constellation.fromEntity(constellationRepository.save(constellationEntity));
     }
 
 
@@ -411,7 +420,7 @@ public class ConstellationService {
 
     // 사용자가 admin인지 확인 - 별자리 생성한 사람이 email로 받은 유저와 동일한지
     private ConstellationEntity getConstellationEntityIfAdminOrException(Long constellationId, String email) {
-        UserEntity userEntity = getUserEntityByNicknameOrException(email);                                                            // 현재 사용자 user entity
+        UserEntity userEntity = getUserEntityByEmailOrException(email);                                                            // 현재 사용자 user entity
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
         UserEntity adminEntity = constellationEntity.getAdminEntity();
 

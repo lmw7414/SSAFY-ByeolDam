@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class ContourEntity {
     public static final String SEQUENCE_NAME = "contours_sequence";
 
     @Id
-    private Long id;
+    private Long _id;
 
     private String originUrl; // 원본 사진 저장 url
     private String thumbUrl;  // 썸네일 사진 저장 url

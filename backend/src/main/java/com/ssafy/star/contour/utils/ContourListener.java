@@ -15,6 +15,6 @@ public class ContourListener extends AbstractMongoEventListener<ContourEntity> {
     // 참고 : https://zzang9ha.tistory.com/384
     @Override
     public void onBeforeConvert(BeforeConvertEvent<ContourEntity> event) {
-        event.getSource().setId(generatorService.generateSequence(ContourEntity.SEQUENCE_NAME));
+        event.getSource().set_id(generatorService.generateSequence(ContourEntity.SEQUENCE_NAME));
     }
 }

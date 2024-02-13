@@ -9,6 +9,7 @@ import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
 import com.ssafy.star.constellation.dto.response.ConstellationWithArticleResponse;
+import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.dto.request.NicknameRequest;
 import com.ssafy.star.user.dto.response.UserDefaultResponse;
@@ -87,10 +88,10 @@ public class ConstellationController {
             @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
         Constellation constellation = constellationService.modify(
+                authentication.getName(),
                 constellationId,
                 request.name(),
                 request.description(),
-                authentication.getName(),
                 origin,
                 thumb,
                 cthumb,
@@ -127,10 +128,7 @@ public class ConstellationController {
 
     @Operation(
             summary = "유저의 별자리 전체 조회",
-            description = "유저의 별자리 전체 조회입니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
-            }
+            description = "유저의 별자리 전체 조회입니다."
     )
     @GetMapping("/constellations/user/{nickname}")
     public Response<List<ConstellationWithArticleResponse>> userConstellations(Authentication authentication, @PathVariable String nickname) {
@@ -142,6 +140,17 @@ public class ConstellationController {
         );
     }
 
+    @Operation(
+            summary = "별자리 윤곽선 수정 요청을 보내면 현재 윤곽선 정보를 반환",
+            description = "관련 이미지 3장, 윤곽선 리스트, 현재 선택되어 있는 윤곽선 반환",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
+            }
+    )
+    @PostMapping("/constellations/{constellationId}/request-contour")
+    public Response<Contour> requestModifyConstellation(Authentication authentication, @PathVariable Long constellationId) {
+        return Response.success(constellationService.requestModifyConstellation(authentication.getName(), constellationId));
+    }
 
     // TODO : 별자리 공유 신청, 수락 로직으로 바꿀 것
     @Operation(

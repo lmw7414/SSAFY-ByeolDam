@@ -21,7 +21,7 @@ public class SequenceGeneratorService {
     public Long generateSequence(String seqName) {
         AutoIncrementSequence counter = mongoOperations.findAndModify(
                 Query.query(
-                        where("id")
+                        where("_id")
                                 .is(seqName)
                 ),
                 new Update().inc("seq", 1),
