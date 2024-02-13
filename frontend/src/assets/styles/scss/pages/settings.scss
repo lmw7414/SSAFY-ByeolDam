@@ -1,4 +1,10 @@
 $nav-bar-width: 20rem;
+.account-settings-container {
+  overflow: auto;
+}
+
+.content-container {
+}
 
 .settings-container {
   background-color: $page-background;
@@ -83,7 +89,7 @@ $nav-bar-width: 20rem;
   margin: 5rem 11rem;
 }
 
-.norification-menu-box {
+.notification-menu-box {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -171,3 +177,16 @@ $nav-bar-width: 20rem;
   border: 1px solid white;
   box-shadow: inset 0 0 0 0.2rem $modal-background;
 }
+
+// .profile-image-change-btn {
+//   background-color: rgb(142, 124, 172);
+//   border: none;
+//   border-radius: 0.4rem;
+//   height: 2rem;
+//   width: 10rem;
+//   cursor: pointer;
+//   color: white;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// }

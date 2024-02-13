@@ -4,7 +4,7 @@ export default function NotificationSettings() {
       <h1 className="nickname settings-title">알림</h1>
       <div className="notification-settings-menu">
         <h2 className="nickname">푸시 알림</h2>
-        <div className="norification-menu-box">
+        <div className="notification-menu-box">
           <div className="toggle-slide-box">
             <h3 className="nickname">모두 일시 중단</h3>
             <div className="toggle">
@@ -18,7 +18,7 @@ export default function NotificationSettings() {
 
       <div className="notification-settings-menu">
         <h2 className="nickname">좋아요</h2>
-        <div className="norification-menu-box">
+        <div className="notification-menu-box">
           <div className="radio-box">
             <input type="radio" name="like-alarm" />
             <p className="nickname">해제</p>
@@ -37,7 +37,7 @@ export default function NotificationSettings() {
 
       <div className="notification-settings-menu">
         <h2 className="nickname">댓글</h2>
-        <div className="norification-menu-box">
+        <div className="notification-menu-box">
           <div className="radio-box">
             <input type="radio" name="comment-alarm" />
             <p className="nickname">해제</p>
