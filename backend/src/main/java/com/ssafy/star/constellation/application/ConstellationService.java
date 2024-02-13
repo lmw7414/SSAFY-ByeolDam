@@ -12,6 +12,7 @@ import com.ssafy.star.constellation.dao.ConstellationUserRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.constellation.dto.Constellation;
+import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.constellation.dto.ConstellationWithArticle;
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.dto.Contour;
@@ -183,7 +184,8 @@ public class ConstellationService {
      * - 미분류 + 그외 별자리에 존재하는 사진들
      */
     public List<Article> findAllArticlesGroupByConstellation(String email) {
-        UserEntity userEntity = getUserEntityByNicknameOrException(email);
+        UserEntity userEntity = getUserEntityByEmailOrException(email);
+        List<ConstellationUserEntity> constellationUserList = userEntity.getConstellationUserEntities();
         //userEntity.getConstellationUserEntities().
         return null;
     }

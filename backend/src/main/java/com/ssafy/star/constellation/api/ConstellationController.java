@@ -53,7 +53,6 @@ public class ConstellationController {
             @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
             @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
-        //TODO : 윤곽선은 request에 같이 담아져서 옴, request에서 어떻게 추출해서 MongoDB에 저장할지 고민 필요
         log.info("contoursList : {} contoursList : {}", contoursList, ultimate);
         // 사용자를 관리자로 만듦
         constellationService.create(
