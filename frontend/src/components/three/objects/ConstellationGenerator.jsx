@@ -1,5 +1,5 @@
 import { Image } from '@react-three/drei';
-import cat from '/src/assets/images/cat.png';
+import cat from '/images/cat.png';
 
 export default function ConstellationGenerator({ controllerRef }) {
   const controller = controllerRef;

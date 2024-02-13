@@ -1,5 +1,4 @@
-import parseJwt from '../utils/parseJwt';
-import axios, { setToken } from './axios';
+import axios from './axios';
 
 export const login = async ({ email, password }) => {
   const { data } = await axios.post('/users/login', {
@@ -8,7 +7,8 @@ export const login = async ({ email, password }) => {
   });
 
   const token = data?.result?.token;
-  setToken(token);
+  sessionStorage.setItem('access_token', token);
+  sessionStorage.setItem('profile', JSON.stringify(data.result.user));
 };
 
 export const signup = async ({ email, password, name, nickname }) => {

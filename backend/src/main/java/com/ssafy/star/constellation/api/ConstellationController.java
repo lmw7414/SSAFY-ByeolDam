@@ -1,5 +1,6 @@
 package com.ssafy.star.constellation.api;
 
+import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dto.Constellation;
@@ -7,7 +8,9 @@ import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.request.UserEmailRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationResponse;
-import com.ssafy.star.user.dto.response.UserResponse;
+import com.ssafy.star.user.application.FollowService;
+import com.ssafy.star.user.dto.response.UserDefaultResponse;
+import com.ssafy.star.user.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import java.util.List;
 
@@ -28,8 +34,8 @@ import java.util.List;
 public class ConstellationController {
 
     private final ConstellationService constellationService;
-
-
+    private final ArticleService articleService;
+    private final FollowService followService;
 
     @Operation(
             summary = "별자리 생성",
@@ -39,16 +45,23 @@ public class ConstellationController {
             }
     )
     @PostMapping("/constellations")
-    public Response<Void> create(@RequestBody ConstellationCreateRequest request, Authentication authentication) {
+    public Response<Void> create(@RequestPart("request") ConstellationCreateRequest request, Authentication authentication,
+                                 @RequestPart("origin") MultipartFile origin,
+                                 @RequestPart("thumb") MultipartFile thumb,
+                                 @RequestPart("cthumb") MultipartFile cthumb
+                                 ) throws IOException {
         String email = authentication.getName();
-        //TODO : 윤곽선
+        //TODO : 윤곽선은 request에 같이 담아져서 옴, request에서 어떻게 추출해서 MongoDB에 저장할지 고민 필요
 
         // 사용자를 관리자로 만듦
         constellationService.create(
                 request.name(),
                 request.shared(),
                 request.description(),
-                authentication.getName()
+                authentication.getName(),
+                origin,
+                thumb,
+                cthumb
         );
         return Response.success();
     }
@@ -61,14 +74,20 @@ public class ConstellationController {
             }
     )
     @PutMapping("/constellations/{constellationId}")
-    public Response<ConstellationResponse> modify(@PathVariable Long constellationId, @RequestBody ConstellationModifyRequest request, Authentication authentication) {
+    public Response<ConstellationResponse> modify(@PathVariable Long constellationId, @RequestPart("request") ConstellationModifyRequest request,
+                                                  Authentication authentication, @RequestPart("origin") MultipartFile origin,
+                                                  @RequestPart("thumb") MultipartFile thumb, @RequestPart("cthumb") MultipartFile cthumb
+                                                  ) throws IOException {
 
         Constellation constellation = constellationService.modify(
                 constellationId,
                 request.name(),
                 request.shared(),
                 request.description(),
-                authentication.getName()
+                authentication.getName(),
+                origin,
+                thumb,
+                cthumb
         );
         return Response.success(ConstellationResponse.fromConstellation(constellation));
     }
@@ -159,8 +178,16 @@ public class ConstellationController {
             }
     )
     @GetMapping("/users/constellations/{constellationId}")
-    public Response<Page<UserResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
-        return Response.success(constellationService.findSharedUsers(constellationId, authentication.getName(), pageable).map(UserResponse::fromUser));
+    public Response<Page<UserDefaultResponse>> userCheck(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
+        return Response.success(constellationService.findSharedUsers(constellationId, authentication.getName(), pageable)
+                .map(res ->
+                        UserDefaultResponse.fromUser(
+                                res,
+                                articleService.countArticles(res.email()),
+                                constellationService.countConstellations(res.email()),
+                                followService.countFollowers(res.nickname()),
+                                followService.countFollowings(res.nickname())
+                        )));
     }
 
     @Operation(

@@ -51,3 +51,11 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
 
   return { resultCode: data.resultCode };
 };
+
+// feed 받아오는 axios
+// async 안에 인자에 뭐가 들어가야 할지 잘 모르겠음
+export const getFeeds = async () => {
+  const { data } = await axios.get(`articles/follow`);
+  //return pageable
+  //jpa pagination axios 검색
+}

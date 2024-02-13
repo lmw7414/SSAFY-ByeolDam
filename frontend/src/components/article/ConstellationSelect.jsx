@@ -40,7 +40,7 @@ export default function ConstellationSelect({ writeArticle, article, setArticle,
           <div>비공개</div>
         </label>
       </div>
-      <div class="article-button-wrapper">
+      <div className="article-button-wrapper">
         <button
           className="article-prev-btn"
           onClick={() => {

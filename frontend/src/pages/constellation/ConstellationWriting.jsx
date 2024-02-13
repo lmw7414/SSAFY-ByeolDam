@@ -15,7 +15,7 @@ export default function ConstellationWriting() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch('./src/assets/data/local.json')
+    fetch('./data/local.json')
       .then((data) => data.json())
       .then((data) => {
         setPointList(
@@ -39,7 +39,7 @@ export default function ConstellationWriting() {
       });
 
     const img = new Image();
-    img.src = './src/assets/images/sample/animals.jpg';
+    img.src = './images/sample/animals.jpg';
     img.onload = () => {
       setImage(img);
     };

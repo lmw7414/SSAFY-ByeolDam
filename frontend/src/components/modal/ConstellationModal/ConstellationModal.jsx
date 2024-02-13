@@ -55,13 +55,13 @@ export default function ConstellationModal() {
       </div>
       <div className="constellation_main_buttons_box">
         <img
-          src="/src/assets/images/constellation-modal/constellation_create_button.png"
+          src="/images/constellation-modal/constellation_create_button.png"
           alt="post_create_button"
           className="constellation-main-button"
           // onClick={openConstellationModal}
         />
         <img
-          src="/src/assets/images/constellation-modal/post_create_button.png"
+          src="/images/constellation-modal/post_create_button.png"
           alt="post_create_button"
           className="constellation-main-button"
           // onClick={openConstellationModal}
