@@ -47,6 +47,7 @@ $nav-menu-font-size: 1.7rem;
   align-items: center;
   justify-content: center;
   flex-grow: 1;
+  margin-bottom: 1rem;
 }
 
 .profile-image-container {
@@ -55,7 +56,6 @@ $nav-menu-font-size: 1.7rem;
   overflow: hidden;
   border-radius: 50%; // 반지름이 컨테이너 크기의 50%인 원형으로 만듭니다.
   border: 2px solid $text-primary; // 원 테두리 추가
-  margin-bottom: 2rem;
 }
 
 .nav-bar-contents {
@@ -68,7 +68,7 @@ $nav-menu-font-size: 1.7rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .profile-image {
@@ -77,9 +77,27 @@ $nav-menu-font-size: 1.7rem;
   object-fit: cover; // 이미지가 컨테이너에 맞게 조절되도록 합니다.
 }
 
+.nickname-memo-container {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
 .nickname {
   color: white;
   margin-bottom: 2rem;
+}
+
+.real-nickname {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bolder;
+  margin-bottom: 0.8rem;
+}
+
+.memo {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: lighter;
 }
 
 .profile-info {
@@ -106,7 +124,7 @@ $nav-menu-font-size: 1.7rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 1.5rem;
+  margin-top: 2.5rem;
 }
 
 .nav-bar-menu {
@@ -174,7 +192,8 @@ $nav-menu-font-size: 1.7rem;
 }
 
 .nav-bar-divide-line {
-  width: 90%;
+  width: 100%;
+  border: solid 1px $secondary;
 }
 
 .link-setting {

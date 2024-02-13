@@ -63,7 +63,8 @@ public class ArticleService {
         String thumbnailUrl = "";
         UserEntity userEntity = getUserEntityOrException(email);
 
-        try {
+        try{
+
             url = s3uploader.upload(imageFile, "articles");
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
             ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);

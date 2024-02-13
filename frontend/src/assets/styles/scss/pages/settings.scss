@@ -19,14 +19,21 @@ $nav-bar-width: 20rem;
 .settings-menu {
   display: flex;
   justify-content: center;
-  margin-bottom: 2.5rem;
-  width: 50%;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 70%;
+  height: 4rem;
   padding: 0.5rem 0;
+  border-radius: 1rem;
+}
+
+.settings-menu:hover {
+  background-color: rgba(34, 15, 65, 0.5);
 }
 
 .settings-menu.selected {
   background-color: $modal-background;
-  border-radius: 5px;
+  border-radius: 1rem;
 }
 
 .settings-menu.selected > .settings-menu-text {

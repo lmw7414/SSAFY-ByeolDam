@@ -37,9 +37,9 @@ public class ConstellationEntity {
     @Column(name = "shared")
     private SharedType shared;
 
-    // TODO : outline
-//    @Column(name = "outline")
-//    private NoSQL outline;
+
+    @Column(name = "outline_id")
+    private String outline_id;
 
     @Column(name = "hits")
     private Long hits = 0L;

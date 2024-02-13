@@ -9,15 +9,20 @@ import ProfileInfo from './base/ProfileInfo';
 import NavBarMenu from './base/NavBarMenu';
 import FollowModal from './modal/Follow/FollowModal';
 
+// import jwt from 'jsonwebtoken';
+import parseJwt from '../utils/parseJwt.js';
+import axios from '../apis/axios';
+
 export default function NavBar() {
   const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
-  const [following, setFollowing] = useState('');
-  const [follower, setFollower] = useState('');
   const [modalState, setModalState] = useModal();
-  const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
+  // const [follower, setFollower] = useState('');
+  // const [following, setFollowing] = useState('');
+  // const [nickname, setNickname] = useState('');
+  // const [email, setEmail] = useState('');
+  const [profile, setProfile] = useState({});
   const [profileImgUrl, setProfileImgUrl] = useState('');
   // const [parsedJwt, setParsedJwt] = useState(null);
 
@@ -54,39 +59,13 @@ export default function NavBar() {
   const readProfile = async () => {
     const profileStr = sessionStorage.getItem('profile');
     const profile = JSON.parse(profileStr);
-    setNickname(profile.nickname);
-    setEmail(profile.email);
-    return profile;
+    const data = await axios.get(`/users/${profile.nickname}`);
+    setProfile(data.data.result);
   };
 
-  const readFollowing = async (profile) => {
-    const data = await axios.get(`${profile.nickname}/count-followings`);
-    setFollowing(data.data.result);
-  };
-
-  const readFollower = async (profile) => {
-    const data = await axios.get(`${profile.nickname}/count-followers`);
-    setFollower(data.data.result);
-  };
-
-  const readStarConstellation = async () => {
-    console.log(email);
-    const constellation = await axios.get(`constellations/user/${email}`);
-    console.log(constellation);
-  };
-  const fetchData = async () => {
-    const data = await readProfile();
-    await readFollower(data);
-    await readFollowing(data);
-    await readStarConstellation();
-  };
-
-  // useEffect(() => {
-  //   readNickname().then((result) => {
-  //     // console.log(result);
-  //     setNickname(result);
-  //   });
-  // }, []);
+  useEffect(() => {
+    readProfile();
+  }, []);
 
   // 팔로우 모달
   const openFollowerModal = () => {
@@ -128,17 +107,27 @@ export default function NavBar() {
                     <img className="profile-image" src="/images/space.png" alt="profile_image" />
                   </div>
                 </div>
-                <div className="nickname title">
-                  <p>{nickname}</p>
+                <div className="nickname-memo-container">
+                  <p className="real-nickname">{profile.nickname}</p>
+                  <p className="memo">{profile.memo}</p>
                 </div>
+
                 <div className="profile-info-box">
-                  <ProfileInfo text={'별'} num={26} />
+                  <ProfileInfo text={'별'} num={profile.articleCounts} />
 
-                  <ProfileInfo text={'별자리'} num={4} />
+                  <ProfileInfo text={'별자리'} num={profile.constellationCounts} />
 
-                  <ProfileInfo text={'팔로워'} num={following} onClick={openFollowerModal} />
+                  <ProfileInfo
+                    text={'팔로워'}
+                    num={profile.followings}
+                    onClick={openFollowerModal}
+                  />
 
-                  <ProfileInfo text={'팔로잉'} num={follower} onClick={openFollowingModal} />
+                  <ProfileInfo
+                    text={'팔로잉'}
+                    num={profile.followers}
+                    onClick={openFollowingModal}
+                  />
                 </div>
               </div>
 
