@@ -4,6 +4,7 @@ import Comment from '../../article/Comment';
 import { PositionPoint } from '@react-three/drei';
 import { addComments } from '../../../apis/comments';
 import { Pass } from 'postprocessing';
+import axios from '../../../apis/axios';
 
 export default function ArticleModal({
   articleId,
@@ -58,8 +59,33 @@ export default function ArticleModal({
   const [constellation, setConstellation] = useState(constellationName);
   const [liked, setLiked] = useState(false);
   const [content, setContent] = useState('');
+  const [profile, setProfile] = useState({});
+  const [constellationList, setConstellationList] = useState([])
 
-  constellation === null ? setConstellation("없음") : Pass;
+  const readProfile = async () => {
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    const data = await axios.get(`/users/${profile.nickname}`);
+    setProfile(data.data.result)
+  };
+
+  const readConstellationList = async () => {
+    try {
+      const response = await axios.get(`/constellations/user/${profile.nickname}`);
+      const data = response.data;
+      // console.log('데이터 가져오기 성공:', data);
+    } catch (error) {
+      // console.log('데이터 가져오기 실패:', error);
+    }
+  };
+
+
+  useEffect(() => {
+    readProfile();
+    readConstellationList();
+  }, []);
+
+  constellation === null  ? setConstellation("없음") : Pass;
 
   const createComment = (e) => {
     e.preventDefault();
