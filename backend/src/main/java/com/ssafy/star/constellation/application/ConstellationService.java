@@ -211,7 +211,7 @@ public class ConstellationService {
             List<List<Integer>> ultimate
     ) throws IOException {
         // 사용자의 user 엔터티 가져오기
-        UserEntity userEntity = getUserEntityByNicknameOrException(email);
+        UserEntity userEntity = getUserEntityByEmailOrException(email);
 
         // 사진들 추가
         String originUrl = s3uploader.upload(origin, "constellation/origin");
