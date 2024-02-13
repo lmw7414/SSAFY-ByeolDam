@@ -7,7 +7,7 @@ import MyProfile from './MyProfile';
 
 export default function AccountSettings() {
   const [accountSettingsId, setAccountSettingsId] = useState(0);
-  const [profileUpdate, setProfileupdate] = useState(0);
+  const [profileUpdate, setProfileUpdate] = useState(0);
   const [profileData, setProfileData] = useState({
     nickname: '',
     email: '',
@@ -47,6 +47,8 @@ export default function AccountSettings() {
           profileData={profileData}
           changePage={changePage}
           accountSettingsId={accountSettingsId}
+          setProfileUpdate={setProfileUpdate}
+          setProfileData={setProfileData}
         />
       </div>
     </div>

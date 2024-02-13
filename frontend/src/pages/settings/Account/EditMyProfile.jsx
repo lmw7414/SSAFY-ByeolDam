@@ -4,7 +4,7 @@ import axios from '/src/apis/axios';
 export default function EditMyProfile({
   profileData,
   changePage,
-  setProfileupdate,
+  setProfileUpdate,
   setProfileData,
 }) {
   const [editedProfile, setEditedProfile] = useState({ ...profileData });
@@ -19,9 +19,10 @@ export default function EditMyProfile({
 
     try {
       const response = await axios.put('/users', editedProfile);
-      setProfileupdate(1);
+      setProfileUpdate(1);
       console.log('내 정보 수정 성공');
       changePage(0);
+      setProfileData(editedProfile);
     } catch (error) {
       console.error('Error updating profile:', error);
     }

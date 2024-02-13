@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import EditMyProfile from './EditMyProfile';
 
-export default function MyProfile({ profileData, changePage, accountSettingsId }) {
+import axios from '/src/apis/axios';
+
+export default function MyProfile({
+  profileData,
+  changePage,
+  accountSettingsId,
+  setProfileUpdate,
+  setProfileData,
+}) {
   // if (!profileData) {
   //   return null; // 또는 로딩 상태를 나타내는 다른 JSX를 반환할 수 있습니다.
   // }
@@ -14,11 +22,19 @@ export default function MyProfile({ profileData, changePage, accountSettingsId }
   const onChangeImage = async (e) => {
     const file = e.target.files[0];
     const imageUrl = URL.createObjectURL(file);
-    setUploadedImage(imageUrl);
-    console.log(imageUrl);
-    setProfileData({ ...profileData, [imageUrl]: imageUrl });
+    // console.log(imageUrl);
+    // setProfileData({ ...profileData, [imageUrl]: imageUrl });
+
     try {
-      await axios.put('users/profile-image', { imageFile: imageUrl });
+      const formData = new FormData();
+      formData.append('imageFile', file);
+
+      await axios.put('users/profile-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 필요한 경우에만 추가
+        },
+      });
+      // setProfileData({ ...profileData, imageUrl: imageUrl });
     } catch (error) {
       console.error('Error updating profile image:', error);
     }
@@ -34,11 +50,16 @@ export default function MyProfile({ profileData, changePage, accountSettingsId }
             <img className="account-profile-image" src={profileData.imageUrl} alt="profile_image" />
           </div>
           <div>
-            <label for="file">
+            <label htmlFor="file">
               <div className="update-profile-button">사진 변경</div>
             </label>
-            <input type="file" name="file" id="file" className="display-none"></input>
-            {/* <input type="file" onChange={onChangeImage} className="update-profile-image-button" /> */}
+            <input
+              type="file"
+              name="file"
+              id="file"
+              onChange={onChangeImage}
+              className="display-none"
+            ></input>
           </div>
         </div>
       </div>
@@ -59,8 +80,8 @@ export default function MyProfile({ profileData, changePage, accountSettingsId }
           <EditMyProfile
             changePage={changePage}
             profileData={profileData}
-            // setProfileupdate={setProfileupdate}
-            // setProfileData={setProfileData}
+            setProfileUpdate={setProfileUpdate}
+            setProfileData={setProfileData}
           />
         ) : (
           <div className="account-profile-image-box">
