@@ -65,7 +65,7 @@ public class ArticleService {
 
         try{
 
-            url = s3uploader.upload(imageFile, "articles", TARGET_HEIGHT);
+            url = s3uploader.upload(imageFile, "articles");
             thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
             ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);
 

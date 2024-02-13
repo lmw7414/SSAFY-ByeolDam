@@ -37,14 +37,4 @@ public class ImageService {
         imageRepository.deleteById(image.id());
     }
 
-
-
-}
-
-    @Transactional
-    public void deleteImage(Image image){
-        imageRepository.deleteById(image.id());
-    }
-
-
 }
