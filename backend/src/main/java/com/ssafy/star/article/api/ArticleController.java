@@ -108,9 +108,9 @@ public class ArticleController {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
     )
-    @GetMapping("/articles/user/{userEmail}")
-    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String userEmail, Authentication authentication,Pageable pageable) {
-        List<ArticleResponse> articleResponses = articleService.userArticleList(userEmail, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList();
+    @GetMapping("/articles/user/{nickname}")
+    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String nickname, Authentication authentication,Pageable pageable) {
+        List<ArticleResponse> articleResponses = articleService.userArticleList(nickname, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList();
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), articleResponses.size());
         return Response.success(new PageImpl<>(articleResponses.subList(start, end), pageable, articleResponses.size()));

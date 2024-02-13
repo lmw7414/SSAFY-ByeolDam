@@ -25,7 +25,7 @@ public interface ConstellationUserRepository extends JpaRepository<Constellation
     List<ConstellationUserEntity> findConstellationUserEntitiesByConstellationEntity(@Param("constellationEntity") ConstellationEntity constellationEntity);
 
     // 해당 유저의 별자리 가져오기
-    @Query("SELECT c FROM ConstellationUserEntity cu JOIN ConstellationEntity c ON cu.id = c.id WHERE cu.userEntity =:userEntity")
+    @Query("SELECT c FROM ConstellationUserEntity cu JOIN ConstellationEntity c  ON c.id = cu.constellationEntity.id  WHERE cu.userEntity =:userEntity")
     List<ConstellationEntity> findConstellationByUserEntity(@Param("userEntity") UserEntity userEntity);
 
     @Query(value = "SELECT COUNT(*) FROM ConstellationUserEntity entity WHERE entity.userEntity = :userEntity")

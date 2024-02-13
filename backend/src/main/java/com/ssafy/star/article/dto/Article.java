@@ -10,6 +10,7 @@ import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.dto.User;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public record Article(
         Long id,
         String title,
         long hits,
+        // TODO : 설명 없애고 제목만 남기기
         String description,
         DisclosureType disclosure,
         Set<String> articleHashtags,
@@ -34,16 +36,28 @@ public record Article(
 
     public static Article fromEntity(ArticleEntity entity) {
 
-        Set<String> hashtags = entity.getArticleHashtagRelationEntities()
+        Set<String> hashtags = new HashSet<>();
+                try{
+                    hashtags = entity.getArticleHashtagRelationEntities()
                 .stream()
                 .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
                 .map(ArticleHashtagEntity::getTagName)
                 .collect(Collectors.toSet());
+                } catch(NullPointerException e) {
+                    hashtags = null;
+                }
 
         List<CommentDto> comments = entity.getCommentEntities()
                 .stream()
                 .map(CommentDto::from)
                 .collect(Collectors.toList());
+
+        Constellation constellation1 = null;
+        try{
+            constellation1 = Constellation.fromEntity(entity.getConstellationEntity());
+        } catch(NullPointerException e) {
+            constellation1 = null;
+        }
 
         return new Article(
                 entity.getId(),
@@ -52,7 +66,7 @@ public record Article(
                 entity.getDescription(),
                 entity.getDisclosure(),
                 hashtags,
-                Constellation.fromEntity(entity.getConstellationEntity()),
+                constellation1,
                 User.fromEntity(entity.getOwnerEntity()),
                 comments,
                 entity.getCreatedAt(),
