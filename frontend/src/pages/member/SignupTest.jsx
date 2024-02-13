@@ -20,7 +20,6 @@ export default function SignupTest() {
         name,
         nickname,
       });
-      console.log(data);
     } catch (e) {
       console.error(e);
     }
@@ -29,7 +28,6 @@ export default function SignupTest() {
   useEffect(() => {
     if (!nickname?.trim()) return;
     checkNickname(nickname).then(({ data }) => {
-      console.log(data);
       setIsNickNameDuplicated(!data.result);
     });
   }, [nickname]);
@@ -37,7 +35,6 @@ export default function SignupTest() {
   useEffect(() => {
     if (!email?.trim()) return;
     checkEmail(email).then(({ data }) => {
-      console.log(data);
       setIsEmailDuplicated(!data.result);
     });
   }, [email]);
