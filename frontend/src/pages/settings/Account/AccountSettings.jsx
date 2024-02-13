@@ -4,7 +4,6 @@ import axios from '../../../apis/axios';
 import parseJwt from '../../../utils/parseJwt.js';
 
 import MyProfile from './MyProfile';
-import EditMyProfile from './EditMyProfile';
 
 export default function AccountSettings() {
   const [accountSettingsId, setAccountSettingsId] = useState(0);
@@ -43,18 +42,12 @@ export default function AccountSettings() {
 
   return (
     <div className="account-settings-container">
-      <h1 className="nickname">계정</h1>
       <div className="content-container">
-        {accountSettingsId ? (
-          <EditMyProfile
-            profileData={profileData}
-            changePage={changePage}
-            setProfileupdate={setProfileupdate}
-          />
-        ) : (
-          <MyProfile profileData={profileData} changePage={changePage} />
-        )}
-        <hr className="settings-detail-divide" />
+        <MyProfile
+          profileData={profileData}
+          changePage={changePage}
+          accountSettingsId={accountSettingsId}
+        />
       </div>
     </div>
   );
