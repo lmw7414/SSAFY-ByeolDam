@@ -12,6 +12,7 @@ import com.ssafy.star.constellation.dto.response.ConstellationWithArticleRespons
 import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.dto.request.NicknameRequest;
+import com.ssafy.star.user.dto.response.LikeUserResponse;
 import com.ssafy.star.user.dto.response.UserDefaultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -249,12 +250,12 @@ public class ConstellationController {
             summary = "별자리를 좋아요한 사람의 목록 확인",
             description = "별자리를 좋아요한 사람의 목록을 확인합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = UserResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
             }
 
     )
     @GetMapping("/constellations/{constellationId}/likeList")
-    public Response<List<UserResponse>> likeList(@PathVariable Long constellationId) {
-        return Response.success(constellationService.likeList(constellationId).stream().map(UserResponse::fromUser).toList());
+    public Response<List<LikeUserResponse>> likeList(@PathVariable Long constellationId) {
+        return Response.success(constellationService.likeList(constellationId).stream().map(LikeUserResponse::fromUser).toList());
     }
 }
