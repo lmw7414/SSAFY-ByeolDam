@@ -12,10 +12,7 @@ import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dao.ConstellationLikeRepository;
-import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.dao.ConstellationUserRepository;
-import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
-import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
@@ -485,14 +482,5 @@ public class UserService {
         return articleLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
                 .map(ArticleLikeEntity::getArticleEntity)
                 .map(Article::fromEntity);
-    }
-
-    //좋아요한 별자리 목록 확인
-    @Transactional
-    public Page<Constellation> likeConstellationList(String email, Pageable pageable) {
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
-        return constellationLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
-                .map(ConstellationLikeEntity::getConstellationEntity)
-                .map(Constellation::fromEntity);
     }
 }

@@ -118,9 +118,8 @@ public class ArticleService {
         // 게시물 owner가 맞는지 확인
         ArticleEntity articleEntity = getArticleOwnerOrException(articleId, email);
         if(articleEntity.getDeletedAt() != null) {
-            throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %s has already deleted", articleId));
+            throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %d has already deleted", articleId));
         } else {
-            System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
             articleLikeRepository.deleteAllByArticleEntity(articleEntity);
             articleRepository.delete(articleEntity);
             articleHashtagRelationService.deleteByArticleEntity(articleEntity);
@@ -145,17 +144,16 @@ public class ArticleService {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
 
         if(!articleEntity.getOwnerEntity().equals(userEntity)) {
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", "email:" + email));
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", userEntity.getNickname()));
         }
 
         if(articleEntity.getDeletedAt() != null) {
-            System.out.println("deletedAt : " + String.valueOf(articleEntity.getDeletedAt()));
             articleEntity.undoDeletion();
             articleLikeRepository.findAllByArticleEntity(articleEntity).forEach(ArticleLikeEntity::undoDeletion);
             articleHashtagRelationRepository.findAllByArticleEntity(articleEntity).forEach(ArticleHashtagRelationEntity::undoDeletion);
 
         } else {
-            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("%s is not abandoned", "articleId:" + Long.toString(articleId)));
+            throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("article %d is not abandoned", articleId));
         }
 
         return Article.fromEntity(articleEntity);
@@ -234,11 +232,11 @@ public class ArticleService {
         } else {
             // Deletion 예외처리
             if(articleEntity.getDeletedAt() != null) {
-                throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("%s deleted", "articleId:" + Long.toString(articleId)));
+                throw new ByeolDamException(ErrorCode.ARTICLE_DELETED, String.format("article %d has deleted", articleId));
             }
 
             // 볼 수 있는 권한이 없다(내 게시물이 아니거나 INVISIBLE)
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with article %d", userEntity.getNickname(), articleId));
         }
     }
 
@@ -253,7 +251,7 @@ public class ArticleService {
         // 별자리 회원인지 확인하기
         if(constellationEntity.getAdminEntity() != userEntity) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with %s", "email:"+email, "constellationId:" + Long.toString(constellationId)));
+                    String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
         }
 
         // 반복문을 통해 Set에 있는 article 전부 별자리에 배정
@@ -264,13 +262,13 @@ public class ArticleService {
             // article이 휴지통에 있다면 예외처리
             if(articleEntity.getDeletedAt() != null) {
                 throw new ByeolDamException(ErrorCode.ARTICLE_DELETED,
-                        String.format("%s deleted", "articleId:"+Long.toString(articleId)));
+                        String.format("article %d deleted", articleId));
             }
 
             // article 본인 것이 아니라면 예외처리
             if(ownerEntity != userEntity) {
                 throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                        String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+                        String.format("%s has no permission with %d", userEntity.getNickname(), articleId));
             }
 
             articleEntity.selectConstellation(constellationEntity);
@@ -291,25 +289,25 @@ public class ArticleService {
     // 포스트가 존재하는지
     private ArticleEntity getArticleEntityOrException(Long articleId) {
         return articleRepository.findById(articleId).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("%s not founded", "articleId:" + Long.toString(articleId))));
+                new ByeolDamException(ErrorCode.ARTICLE_NOT_FOUND, String.format("article %d not founded", articleId)));
     }
 
     // 유저가 존재하는지(email)
     private UserEntity getUserEntityOrExceptionByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "email:" +email)));
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("email %s not founded", email)));
     }
 
     // 유저가 존재하는지(nickname)
     private UserEntity getUserEntityOrExceptionByNickname(String nickname) {
         return userRepository.findByNickname(nickname).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", "nickname:" +nickname)));
+                new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", nickname)));
     }
 
     // 별자리가 존재하는지
     private ConstellationEntity getConstellationEntityOrException(Long constellationId) {
         return constellationRepository.findById(constellationId).orElseThrow(() ->
-                new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, String.format("%s not founded", "constellationId:" + Long.toString(constellationId))));
+                new ByeolDamException(ErrorCode.CONSTELLATION_NOT_FOUND, String.format("constellation %d not founded", constellationId)));
     }
 
     // 게시물 owner인지 확인
@@ -321,7 +319,7 @@ public class ArticleService {
         // admin이어야 삭제 가능
         if(ownerEntity != userEntity) {
             throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with %s", "email:"+email, "articleId:" + Long.toString(articleId)));
+                    String.format("%s has no permission with %d", userEntity.getNickname(), articleId));
         }
 
         return articleEntity;

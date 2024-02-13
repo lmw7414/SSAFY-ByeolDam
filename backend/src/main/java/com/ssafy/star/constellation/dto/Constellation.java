@@ -10,9 +10,9 @@ public record Constellation (
 
     Long id,
     String name,
+    String title,
     Long contourId,
     long hits,
-    String description,
     List<ConstellationUser> constellationUsers,
     LocalDateTime createdAt,
     LocalDateTime modifiedAt
@@ -21,9 +21,9 @@ public record Constellation (
     public static Constellation of(
             Long id,
             String name,
+            String title,
             Long contourId,
             long hits,
-            String description,
             List<ConstellationUser> constellationUsers,
             LocalDateTime createdAt,
             LocalDateTime modifiedAt
@@ -31,9 +31,9 @@ public record Constellation (
         return new Constellation(
                 id,
                 name,
+                title,
                 contourId,
                 hits,
-                description,
                 constellationUsers,
                 createdAt,
                 modifiedAt
@@ -44,9 +44,9 @@ public record Constellation (
         return new Constellation(
                 entity.getId(),
                 entity.getName(),
+                entity.getTitle(),
                 entity.getContourId(),
                 entity.getHits(),
-                entity.getDescription(),
                 entity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                 entity.getCreatedAt(),
                 entity.getModifiedAt()
@@ -55,8 +55,8 @@ public record Constellation (
 
     public ConstellationEntity toEntity(){
         return ConstellationEntity.of(
-                name,
-                description
+                title,
+                name
         );
     }
 }

@@ -3,7 +3,6 @@ package com.ssafy.star.constellation.api;
 import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
-import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.constellation.dto.request.ConstellationCreateRequest;
 import com.ssafy.star.constellation.dto.request.ConstellationModifyRequest;
 import com.ssafy.star.constellation.dto.response.ConstellationForUserResponse;
@@ -53,12 +52,12 @@ public class ConstellationController {
             @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
             @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
-        log.info("contoursList : {} contoursList : {}", contoursList, ultimate);
+        log.debug("contoursList : {} contoursList : {}", contoursList, ultimate);
         // 사용자를 관리자로 만듦
         constellationService.create(
                 authentication.getName(),
                 request.name(),
-                request.description(),
+                request.title(),
                 origin,
                 thumb,
                 cthumb,
@@ -76,7 +75,7 @@ public class ConstellationController {
             }
     )
     @PutMapping("/constellations/{constellationId}")
-    public Response<ConstellationResponse> modify(
+    public Response<Void> modify(
             Authentication authentication,
             @PathVariable Long constellationId,
             @RequestPart("request") ConstellationModifyRequest request,
@@ -86,18 +85,18 @@ public class ConstellationController {
             @RequestPart("contoursList") List<List<List<Integer>>> contoursList,
             @RequestPart("ultimate") List<List<Integer>> ultimate
     ) throws IOException {
-        Constellation constellation = constellationService.modify(
+        constellationService.modify(
                 authentication.getName(),
                 constellationId,
                 request.name(),
-                request.description(),
+                request.title(),
                 origin,
                 thumb,
                 cthumb,
                 contoursList,
                 ultimate
         );
-        return Response.success(ConstellationResponse.fromConstellation(constellation));
+        return Response.success();
     }
 
     @Operation(

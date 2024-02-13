@@ -6,7 +6,6 @@ import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
-import com.ssafy.star.constellation.dto.response.ConstellationResponse;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
@@ -358,17 +357,5 @@ public class UserController {
     @GetMapping("/me/like-articles")
     public Response<Page<ArticleResponse>> likeArticleList(Authentication authentication, Pageable pageable) {
         return Response.success(userService.likeArticleList(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
-    }
-
-    @Operation(
-            summary = "내가 좋아요한 별자리 목록 확인",
-            description = "내가 좋아요한 별자리 목록을 확인합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "내가 좋아요한 별자리 정보 반환", content = @Content(schema = @Schema(implementation = ConstellationResponse.class)))
-            }
-    )
-    @GetMapping("/me/like-constellations")
-    public Response<Page<ConstellationResponse>> likeConstellationList(Authentication authentication, Pageable pageable) {
-        return Response.success(userService.likeConstellationList(authentication.getName(), pageable).map(ConstellationResponse::fromConstellation));
     }
 }

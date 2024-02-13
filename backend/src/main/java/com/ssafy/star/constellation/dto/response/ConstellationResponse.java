@@ -10,9 +10,9 @@ import java.util.List;
 public record ConstellationResponse (
         Long id,
         String name,
+        String title,
         Long contourId,
         long hits,
-        String description,
         List<ConstellationUser> constellationUsers,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
@@ -23,9 +23,9 @@ public record ConstellationResponse (
         return new ConstellationResponse(
                 dto.id(),
                 dto.name(),
+                dto.title(),
                 dto.contourId(),
                 dto.hits(),
-                dto.description(),
                 dto.constellationUsers(),
                 dto.createdAt(),
                 dto.modifiedAt()
