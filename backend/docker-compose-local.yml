@@ -38,7 +38,7 @@ services:
     image: mongo:latest
     volumes:
       # DB 데이터 저장 파일
-      - ./mongodb/data:/var/lib/mongodb
+      - ./mongodb/data:/data/db
       - ./mongodb/config:/etc/mongodb/conf.d
     environment:
       - MONGO_INITDB_DATABASE=byeol_dam
