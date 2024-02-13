@@ -1,12 +1,21 @@
 package com.ssafy.star.user.application;
 
 import com.ssafy.star.article.application.ArticleService;
+import com.ssafy.star.article.dao.ArticleLikeRepository;
+import com.ssafy.star.article.dao.ArticleRepository;
+import com.ssafy.star.article.domain.ArticleLikeEntity;
+import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.common.config.properties.AppProperties;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
-import com.ssafy.star.common.types.DisclosureType;
+import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.application.ConstellationService;
+import com.ssafy.star.constellation.dao.ConstellationLikeRepository;
+import com.ssafy.star.constellation.dao.ConstellationRepository;
+import com.ssafy.star.constellation.dao.ConstellationUserRepository;
+import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
+import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
@@ -35,6 +44,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +54,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
@@ -61,7 +71,10 @@ public class UserService {
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
     private final S3uploader s3uploader;
-
+    private final ArticleLikeRepository articleLikeRepository;
+    private final ConstellationLikeRepository constellationLikeRepository;
+    private final ArticleRepository articleRepository;
+    private final ConstellationUserRepository constellationUserRepository;
     private final ArticleService articleService;
     private final ConstellationService constellationService;
     private final FollowService followService;
@@ -401,6 +414,12 @@ public class UserService {
     @Transactional
     public void delete(String email) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+
+        articleRepository.findAllByOwnerEntity(userEntity).forEach(articleLikeRepository::deleteAllByArticleEntity);
+        constellationUserRepository.findByUserEntityAndConstellationUserRole(userEntity, ConstellationUserRole.ADMIN)
+                .forEach(entity -> constellationLikeRepository.deleteAllByConstellationEntity(entity.getConstellationEntity()));
+        articleLikeRepository.deleteAllByUserEntity(userEntity);
+        constellationLikeRepository.deleteAllByUserEntity(userEntity);
         userRepository.delete(userEntity);
     }
 
@@ -459,4 +478,21 @@ public class UserService {
         );
     }
 
+    //좋아요한 게시물 목록 확인
+    @Transactional
+    public Page<Article> likeArticleList(String email, Pageable pageable) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+        return articleLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
+                .map(ArticleLikeEntity::getArticleEntity)
+                .map(Article::fromEntity);
+    }
+
+    //좋아요한 별자리 목록 확인
+    @Transactional
+    public Page<Constellation> likeConstellationList(String email, Pageable pageable) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+        return constellationLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
+                .map(ConstellationLikeEntity::getConstellationEntity)
+                .map(Constellation::fromEntity);
+    }
 }

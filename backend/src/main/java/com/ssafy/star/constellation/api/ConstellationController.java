@@ -12,6 +12,7 @@ import com.ssafy.star.constellation.dto.response.ConstellationWithArticleRespons
 import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.dto.request.NicknameRequest;
+import com.ssafy.star.user.dto.response.LikeUserResponse;
 import com.ssafy.star.user.dto.response.UserDefaultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -215,5 +216,46 @@ public class ConstellationController {
         String userEmail = userEmailRequest.userEmail();
         constellationService.roleModify(constellationId, userEmail, authentication.getName());
         return Response.success();
+    }
+
+    @Operation(
+            summary = "별자리 좋아요 요청",
+            description = "별자리 좋아요를 요청합니다."
+    )
+    @PostMapping("/constellations/{constellationId}/likes")
+    public Response<Void> like(Authentication authentication, @PathVariable Long constellationId) {
+        constellationService.like(constellationId, authentication.getName());
+        return Response.success();
+    }
+
+    @Operation(
+            summary = "별자리 좋아요 상태 확인",
+            description = "별자리 좋아요 상태를 확인합니다."
+    )
+    @GetMapping("/constellations/{constellationId}/likes")
+    public Response<Boolean> checkLike(Authentication authentication, @PathVariable Long constellationId) {
+        return Response.success(constellationService.checkLike(constellationId, authentication.getName()));
+    }
+
+    @Operation(
+            summary = "별자리 좋아요 갯수 확인",
+            description = "별자리 좋아요의 개수를 확인합니다."
+    )
+    @GetMapping("/constellations/{constellationId}/likeCount")
+    public Response<Integer> likeCount(@PathVariable Long constellationId) {
+        return Response.success(constellationService.likeCount(constellationId));
+    }
+
+    @Operation(
+            summary = "별자리를 좋아요한 사람의 목록 확인",
+            description = "별자리를 좋아요한 사람의 목록을 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
+            }
+
+    )
+    @GetMapping("/constellations/{constellationId}/likeList")
+    public Response<List<LikeUserResponse>> likeList(@PathVariable Long constellationId) {
+        return Response.success(constellationService.likeList(constellationId).stream().map(LikeUserResponse::fromUser).toList());
     }
 }
