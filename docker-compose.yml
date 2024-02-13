@@ -37,8 +37,8 @@ services:
     image: mongo:latest
     volumes:
       # DB 데이터 저장 파일
-      - /home/ubuntu/database/data:/var/lib/mongodb
-      - ./backend/mongodb/config:/etc/mongodb/conf.d
+      - /home/ubuntu/database/mongo_data/mongo:/var/lib/mongodb
+      - ./backend/mongodb/config/mongod.conf:/etc/mongod.conf
     environment:
       - MONGO_INITDB_DATABASE=byeol_dam
       - MONGO_INITDB_ROOT_USERNAME=${SPRING_DATASOURCE_USERNAME}
