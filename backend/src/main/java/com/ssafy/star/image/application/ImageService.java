@@ -27,8 +27,8 @@ public class ImageService {
     }
 
     @Transactional
-    public Image getImageUrl(Long id){
-        ImageEntity imageEntity = imageRepository.findById(id).orElseThrow(()-> new ByeolDamException(ErrorCode.IMAGE_NOT_FOUND_ERROR, String.format("%s not founded", id)));
+    public Image getImageUrl(String url){
+        ImageEntity imageEntity = imageRepository.findByUrl(url).orElseThrow(()-> new ByeolDamException(ErrorCode.IMAGE_NOT_FOUND_ERROR, String.format("%s not founded", url)));
         return Image.fromEntity(imageEntity);
     }
 
@@ -36,7 +36,5 @@ public class ImageService {
     public void deleteImage(Image image){
         imageRepository.deleteById(image.id());
     }
-
-
 
 }

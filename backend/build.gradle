@@ -37,12 +37,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // 이메일
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
-    //implementation 'javax.mail:mail:1.4.7'
-    // Spring Context Support
-    //implementation 'org.springframework:spring-context-support:5.3.9'
 
     // JWT 토큰
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
