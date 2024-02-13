@@ -2,14 +2,11 @@ package com.ssafy.star.constellation.domain;
 
 import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.constellation.ConstellationUserRole;
-import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,8 +17,6 @@ import java.util.List;
 @Table(name = "constellation")
 @ToString
 @Getter
-@SQLDelete(sql = "UPDATE constellation SET deleted_at = NOW() where id=?")
-@Where(clause = "deleted_at is NULL")
 public class ConstellationEntity {
 
     @Id
@@ -29,23 +24,15 @@ public class ConstellationEntity {
     private Long id;
 
     @Setter
-    @Column(name = "name")
     private String name;
 
     @Setter
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "shared")
-    private SharedType shared;
+    @Column(name = "contour_id")
+    private Long contourId;
 
-
-    @Column(name = "outline_id")
-    private String outline_id;
-
-    @Column(name = "hits")
     private Long hits = 0L;
 
     @Setter
-    @Column(name = "description")
     private String description;
 
     @ToString.Exclude
@@ -59,8 +46,6 @@ public class ConstellationEntity {
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
-
-    private LocalDateTime deletedAt;
 
     @PrePersist
     void createdAt() {
@@ -100,14 +85,12 @@ public class ConstellationEntity {
     protected ConstellationEntity() {
     }
 
-    private ConstellationEntity(String name, SharedType shared, String description) {
+    private ConstellationEntity(String name, String description) {
         this.name = name;
-        this.shared = shared;
         this.description = description;
     }
 
-    public static ConstellationEntity of(String name, SharedType shared, String description) {
-        ConstellationEntity constellationEntity = new ConstellationEntity(name, shared, description);
-        return constellationEntity;
+    public static ConstellationEntity of(String name, String description) {
+        return new ConstellationEntity(name, description);
     }
 }

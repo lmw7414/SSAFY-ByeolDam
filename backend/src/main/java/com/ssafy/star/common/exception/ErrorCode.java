@@ -31,7 +31,8 @@ public enum ErrorCode {
     NEVER_ATTEMPT_EMAIL_AUTH(HttpStatus.BAD_REQUEST, "이메일 인증을 요청한 적이 없음"),
     INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "인증코드가 일치하지 않음"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
-    IMAGE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "Image Not Founded"),
+    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image Not Founded"),
+    CONTOUR_NOT_FOUND(HttpStatus.NOT_FOUND, "Contour Not Founded"),
     ALREADY_DEFAULT_IMAGE(HttpStatus.CONFLICT, "Profile already Default");
 
     final private HttpStatus status;

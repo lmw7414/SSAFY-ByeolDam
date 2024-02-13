@@ -9,6 +9,16 @@ export const login = async ({ email, password }) => {
   const token = data?.result?.token;
   sessionStorage.setItem('access_token', token);
   sessionStorage.setItem('profile', JSON.stringify(data.result.user));
+
+  axios.interceptors.request.use(
+    (config) => {
+      config.headers['Authorization'] = `Bearer ${data?.result?.token}`;
+      return config;
+    },
+    (e) => {
+      return Promise.reject(e);
+    },
+  );
 };
 
 export const signup = async ({ email, password, name, nickname }) => {

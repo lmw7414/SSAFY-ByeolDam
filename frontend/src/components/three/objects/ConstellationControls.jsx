@@ -98,15 +98,8 @@ export default function ConstellationControls({ controller, constellationList })
         setSelected(clicked.current === e.object ? 'none' : e.object.name);
       }}
     >
-      {constellationList.map(({ id, url, position, thumbnail }) => (
-        <Constellation
-          key={id}
-          url={url}
-          name={id}
-          position={position}
-          selected={selected}
-          thumbnail={thumbnail}
-        />
+      {constellationList.map(({ id, position }) => (
+        <Constellation key={id} name={id} id={id} position={position} selected={selected} />
       ))}
     </group>
   );

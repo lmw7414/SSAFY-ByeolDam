@@ -2,6 +2,7 @@ package com.ssafy.star.contour.application;
 
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.repository.ContourRepository;
+import com.ssafy.star.contour.utils.SequenceGeneratorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest
@@ -29,6 +31,14 @@ class ContourServiceTest {
 
         ContourEntity actual = contourRepository.save(contour);
         assertThat(actual).isNotNull();
+    }
+
+    @Test
+    public void select() {
+        //Long id = 1L;
+        List<ContourEntity> entity = contourRepository.findAll();
+        System.out.println(entity);
+        assertEquals(entity.size(), 2);
     }
 
     private List<List<List<Integer>>> makeThreeDimensionList() {

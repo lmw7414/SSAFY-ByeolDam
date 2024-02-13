@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ContourRepository extends MongoRepository<ContourEntity, String> {
+public interface ContourRepository extends MongoRepository<ContourEntity, Long> {
     @NonNull
-    Optional<ContourEntity> findById(@NonNull String contourId);
+    Optional<ContourEntity> findById(@NonNull Long contourId);
 }
