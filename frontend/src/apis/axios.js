@@ -4,7 +4,7 @@ let failedRequestQueue = [];
 let isRefreshing = false;
 
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
 });
 
