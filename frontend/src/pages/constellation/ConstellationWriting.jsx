@@ -156,6 +156,10 @@ export default function ConstellationWriting() {
               points={points}
               image={image}
               editorSize={editorSize}
+              convertedPoints={convertedPoints}
+              setConvertedPoints={setConvertedPoints}
+              imageConfig={imageConfig}
+              setImageConfig={setImageConfig}
             />
           </div>
         </div>

@@ -83,11 +83,6 @@ export default function NavBar() {
       children: <FollowModal followSubject={'following'} modalState={modalState} />,
     });
   };
-
-  useEffect(() => {
-    refreshToken();
-  }, []);
-
   return (
     <div>
       {navEx ? (

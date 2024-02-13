@@ -11,6 +11,10 @@ export default function MaskPreview({
   setSelected,
   image,
   editorSize,
+  convertedPoints,
+  setConvertedPoints,
+  imageConfig,
+  setImageConfig,
 }) {
   const preview = useRef();
 
