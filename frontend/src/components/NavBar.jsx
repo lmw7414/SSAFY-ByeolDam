@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { logout } from '../apis/member';
+import { getArticles } from '../apis/articles';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
