@@ -1,10 +1,12 @@
 .feed{
     display: flex;
     flex-direction: column;
-    border: 1px solid #ccc;
+    border: 1px;
     margin-bottom: 20px;
     padding: 20px;
     border-radius: 10px;
+    background-color: rgba(142, 124, 172);
+    margin-top: 15px;
 }
 
 .feed-img {
