@@ -8,10 +8,14 @@ public record LikeUserResponse(
         String image
 ) {
     public static LikeUserResponse fromUser(User dto) {
+        String imageUrl = "";
+        if (dto.image().url() != null) {
+            imageUrl = dto.image().url();
+        }
         return new LikeUserResponse(
         dto.nickname(),
         dto.name(),
-        dto.image().url()
+        imageUrl
         );
     }
 }
