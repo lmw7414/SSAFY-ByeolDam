@@ -27,9 +27,6 @@ public class ConstellationEntity {
     private String name;
 
     @Setter
-    private String title;
-
-    @Setter
     @Column(name = "contour_id")
     private Long contourId;
 
@@ -85,12 +82,11 @@ public class ConstellationEntity {
     protected ConstellationEntity() {
     }
 
-    private ConstellationEntity(String title, String name) {
-        this.title = title;
+    private ConstellationEntity(String name) {
         this.name = name;
     }
 
-    public static ConstellationEntity of(String title, String name) {
-        return new ConstellationEntity(title, name);
+    public static ConstellationEntity of(String name) {
+        return new ConstellationEntity(name);
     }
 }

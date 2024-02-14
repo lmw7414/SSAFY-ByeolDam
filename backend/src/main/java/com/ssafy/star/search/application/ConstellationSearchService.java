@@ -28,6 +28,6 @@ public class ConstellationSearchService {
     }
 
     public List<ConstellationEntity> constellationSearch(String keyword) {
-        return constellationSearchRepository.findByTitleContaining(keyword, sort);
+        return constellationSearchRepository.findByNameContaining(keyword, sort);
     }
 }

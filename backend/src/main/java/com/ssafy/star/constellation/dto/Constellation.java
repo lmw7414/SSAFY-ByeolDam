@@ -10,7 +10,6 @@ public record Constellation (
 
     Long id,
     String name,
-    String title,
     Long contourId,
     long hits,
     List<ConstellationUser> constellationUsers,
@@ -21,7 +20,6 @@ public record Constellation (
     public static Constellation of(
             Long id,
             String name,
-            String title,
             Long contourId,
             long hits,
             List<ConstellationUser> constellationUsers,
@@ -31,7 +29,6 @@ public record Constellation (
         return new Constellation(
                 id,
                 name,
-                title,
                 contourId,
                 hits,
                 constellationUsers,
@@ -44,7 +41,6 @@ public record Constellation (
         return new Constellation(
                 entity.getId(),
                 entity.getName(),
-                entity.getTitle(),
                 entity.getContourId(),
                 entity.getHits(),
                 entity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
@@ -55,7 +51,6 @@ public record Constellation (
 
     public ConstellationEntity toEntity(){
         return ConstellationEntity.of(
-                title,
                 name
         );
     }
