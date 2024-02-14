@@ -13,7 +13,7 @@ import ArticleWritingModal from '../components/modal/article/ArticleWritingModal
 import { getUserUniverse } from '../apis/constellation';
 import getPositionList from '../utils/getPositionList';
 
-export default function Universe() {
+export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
   const controller = useRef();
   const camera = useRef();
   const [modalState, setModalState] = useModal();
@@ -57,7 +57,7 @@ export default function Universe() {
 
   return (
     <div className="canvas-container">
-      <div className="main_buttons_box">
+      <div className={isNavBarVisible ? 'main_buttons_box' : 'display-none'}>
         <img
           src="/images/main_buttons/post_create_button.png"
           alt="post_create_button"
