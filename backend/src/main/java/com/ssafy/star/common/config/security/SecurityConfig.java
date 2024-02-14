@@ -34,6 +34,7 @@ public class SecurityConfig {
             "/api/*/users/check-nickname",
             "/api/*/email/**",
             "/api/*/users/{nickname}",
+            "/api/*/{nickname}/request-profile",
             "/api/*/{nickname}/count-followers",
             "/api/*/{nickname}/count-followings"
     };

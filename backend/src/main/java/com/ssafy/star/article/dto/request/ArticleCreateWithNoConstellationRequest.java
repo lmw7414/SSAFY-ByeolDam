@@ -5,12 +5,11 @@ import com.ssafy.star.image.ImageType;
 
 import java.util.Set;
 
-public record ArticleCreateRequest(
+public record ArticleCreateWithNoConstellationRequest(
 
     String title,
     String description,
     DisclosureType disclosureType,
     ImageType imageType,
-    Set<String> articleHashtagSet,
-    Long constellationId
+    Set<String> articleHashtagSet
 ){}

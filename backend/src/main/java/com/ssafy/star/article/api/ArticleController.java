@@ -2,10 +2,7 @@ package com.ssafy.star.article.api;
 
 
 import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.dto.request.ArticleConstellationSelect;
-import com.ssafy.star.article.dto.request.ArticleCreateRequest;
-import com.ssafy.star.article.dto.request.ArticleDeletionUndo;
-import com.ssafy.star.article.dto.request.ArticleModifyRequest;
+import com.ssafy.star.article.dto.request.*;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.common.exception.ByeolDamException;
@@ -35,8 +32,34 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @Operation(
-            summary = "게시물 작성",
-            description = "게시물 작성입니다.",
+            summary = "게시물 작성 및 미분류 별자리 배정",
+            description = "미분류 별자리에 들어갈 게시물 작성입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @PostMapping("/articles/no-constellation")
+    public Response<Void> createWithNoConstellation(@RequestPart ArticleCreateWithNoConstellationRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
+        log.info("request 정보 : {}", request);
+        if (imageFile != null) {
+            articleService.createWithNoConstellation(
+                    request.title(),
+                    request.description(),
+                    request.disclosureType(),
+                    authentication.getName(),
+                    imageFile,
+                    request.imageType(),
+                    request.articleHashtagSet()
+            );
+            return Response.success();
+        } else {
+            throw new ByeolDamException(ErrorCode.ARTICLE_IMAGE_EMPTY, "article imagefile is empty");
+        }
+    }
+
+    @Operation(
+            summary = "게시물 작성 및 별자리 배정",
+            description = "게시물 작성과 별자리 배정이 동시에 일어납니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
@@ -52,7 +75,8 @@ public class ArticleController {
                     authentication.getName(),
                     imageFile,
                     request.imageType(),
-                    request.articleHashtagSet()
+                    request.articleHashtagSet(),
+                    request.constellationId()
             );
             return Response.success();
         } else {
@@ -155,6 +179,18 @@ public class ArticleController {
     @GetMapping("/articles/constellation/{constellationId}")
     public Response<List<ArticleResponse>> articlesInConstellation(@PathVariable Long constellationId, Authentication authentication) {
         return Response.success(articleService.articlesInConstellation(constellationId, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
+    }
+
+    @Operation(
+            summary = "미분류 게시물 전체 조회",
+            description = "미분류 별자리에 있는 게시물 전체 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/articles/constellation")
+    public Response<List<ArticleResponse>> articlesInNoConstellation(Authentication authentication) {
+        return Response.success(articleService.articlesInNoConstellation(authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
     }
 
     @Operation(

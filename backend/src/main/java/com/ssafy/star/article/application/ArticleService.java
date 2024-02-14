@@ -55,10 +55,60 @@ public class ArticleService {
     private final NotificationProducer notificationProducer;
 
     /**
-     * 게시물 등록
-     */
+     * 게시물 등록과 별자리 배정
+      */
     @Transactional
     public void create(
+            String title,
+            String description,
+            DisclosureType disclosureType,
+            String email,
+            MultipartFile imageFile,
+            ImageType imageType,
+            Set<String> articleHashtagSet,
+            Long constellationId
+    ) {
+        String url = "";
+        String thumbnailUrl = "";
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
+
+        // 별자리 회원인지 확인하기
+        if(constellationEntity.getAdminEntity() != userEntity) {
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                    String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
+        }
+
+        // 이미지 S3에 업로드 (가장 마지막에 놓을 것)
+        try{
+            url = s3uploader.upload(imageFile, "articles");
+            thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
+            ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);
+
+            ArticleEntity articleEntity = ArticleEntity.of(title,
+                    description,
+                    disclosureType,
+                    userEntity,
+                    null,
+                    imageEntity
+            );
+
+            articleRepository.save(articleEntity);
+
+            articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
+
+            articleEntity.selectConstellation(constellationEntity);
+        } catch (IOException e) {
+            s3uploader.deleteImageFromS3(url);
+            s3uploader.deleteImageFromS3(thumbnailUrl);
+        }
+    }
+
+    /**
+     * 게시물 등록 및 미분류 별자리 배정
+     */
+    @Transactional
+    public void createWithNoConstellation(
             String title,
             String description,
             DisclosureType disclosureType,
@@ -286,6 +336,16 @@ public class ArticleService {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
         return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
+    }
+
+    /**
+     * 미분류 별자리의 전체 게시물 조회
+     */
+    @Transactional
+    public List<Article> articlesInNoConstellation(String email) {
+        // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
+        return articleRepository.findAllByConstellationEntityNullAndOwnerEntity(userEntity).stream().map(Article::fromEntity).toList();
     }
 
     // 포스트가 존재하는지

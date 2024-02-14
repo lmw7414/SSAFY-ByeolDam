@@ -21,8 +21,6 @@ public class ConstellationUserEntity {
     @Setter
     private ConstellationEntity constellationEntity;
 
-    //TODO : user Entity에 OneToMany 연결할 것
-
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

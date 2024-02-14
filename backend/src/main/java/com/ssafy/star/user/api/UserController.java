@@ -363,6 +363,10 @@ public class UserController {
     public Response<Page<ArticleResponse>> likeArticleList(Authentication authentication, Pageable pageable) {
         return Response.success(userService.likeArticleList(authentication.getName(), pageable).map(ArticleResponse::fromArticle));
     }
+    @GetMapping("/{nickname}/request-profile")
+    public Response<String> getProfileImageUrl(@PathVariable(name = "nickname") String nickname) {
+        return Response.success(userService.getProfileImageUrl(nickname));
+    }
     
     @Operation(
             summary = "나의 알림 리스트를 확인한다.",

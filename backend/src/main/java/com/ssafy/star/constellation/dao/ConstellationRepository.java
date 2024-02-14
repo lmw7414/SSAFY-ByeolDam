@@ -20,8 +20,5 @@ public interface ConstellationRepository extends JpaRepository<ConstellationEnti
     // 나의 별자리 전체 조회
     @Query("SELECT cu.constellationEntity FROM ConstellationUserEntity cu WHERE cu.userEntity = :userEntity")
     List<ConstellationEntity> findAllByUserEntity(@Param("userEntity") UserEntity userEntity);
-
-
-    //TODO : 별자리와 게시글(별)을 조인해서 보여줘야합니다.
 }
 
