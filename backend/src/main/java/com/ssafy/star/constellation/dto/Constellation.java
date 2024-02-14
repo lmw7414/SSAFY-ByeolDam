@@ -1,15 +1,7 @@
 package com.ssafy.star.constellation.dto;
 
-import com.ssafy.star.common.types.DisclosureType;
-import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.constellation.domain.ConstellationUserEntity;
-import com.ssafy.star.user.dto.User;
-import com.ssafy.star.user.domain.UserEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,37 +10,30 @@ public record Constellation (
 
     Long id,
     String name,
-    SharedType shared,
-//    NoSQL outline,
+    Long contourId,
     long hits,
-    String description,
-    List<ConstellationUserEntity> constellationUserEntities,
+    List<ConstellationUser> constellationUsers,
     LocalDateTime createdAt,
-    LocalDateTime modifiedAt,
-    LocalDateTime deletedAt
+    LocalDateTime modifiedAt
 )
 {
     public static Constellation of(
             Long id,
             String name,
-            SharedType shared,
+            Long contourId,
             long hits,
-            String description,
-            List<ConstellationUserEntity> constellationUserEntities,
+            List<ConstellationUser> constellationUsers,
             LocalDateTime createdAt,
-            LocalDateTime modifiedAt,
-            LocalDateTime deletedAt
+            LocalDateTime modifiedAt
     ) {
         return new Constellation(
                 id,
                 name,
-                shared,
+                contourId,
                 hits,
-                description,
-                constellationUserEntities,
+                constellationUsers,
                 createdAt,
-                modifiedAt,
-                deletedAt
+                modifiedAt
         );
     }
 
@@ -56,22 +41,17 @@ public record Constellation (
         return new Constellation(
                 entity.getId(),
                 entity.getName(),
-                entity.getShared(),
-                // entity.getOutline(),
+                entity.getContourId(),
                 entity.getHits(),
-                entity.getDescription(),
-                entity.getConstellationUserEntities(),
+                entity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                 entity.getCreatedAt(),
-                entity.getModifiedAt(),
-                entity.getDeletedAt()
+                entity.getModifiedAt()
         );
     }
 
     public ConstellationEntity toEntity(){
         return ConstellationEntity.of(
-                name,
-                shared,
-                description
+                name
         );
     }
 }

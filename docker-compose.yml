@@ -29,12 +29,29 @@ services:
     image: lmw7414/byeoldam-redis
     ports:
       - "6379:6379"
+  byeoldam-mongodb:
+    container_name: byeoldam-mongodb
+    #build:
+    #dockerfile: Dockerfile
+    #context: ./mongodb
+    image: mongo:latest
+    volumes:
+      # DB 데이터 저장 파일
+      - /home/ubuntu/database/mongo_data:/data/db
+      - ./backend/mongodb/config/mongod.conf:/etc/mongod.conf
+    environment:
+      - MONGO_INITDB_DATABASE=byeol_dam
+      - MONGO_INITDB_ROOT_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "27017:27017"
   byeoldam-app:
     container_name: byeoldam-app
     build: ./backend
     depends_on: # DB, Redis 실행 후 실행
       - byeoldam-database
       - byeoldam-redis
+      - byeoldam-mongodb
     image: lmw7414/byeoldam-app
     environment:
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}

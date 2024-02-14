@@ -1,9 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls } from '@react-three/drei';
-import { Suspense, useRef, useEffect } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-
-import constellationList from '../constants/dummyData';
 
 import ConstellationControls from '../components/three/objects/ConstellationControls';
 import Camera from '../components/three/objects/Camera';
@@ -12,10 +10,14 @@ import useModal from '../hooks/useModal';
 
 import ConstellationModal from '../components/modal/ConstellationModal/ConstellationModal.jsx';
 import ArticleWritingModal from '../components/modal/article/ArticleWritingModal.jsx';
+import { getConstellationContour, getMyConstellations } from '../apis/constellation';
+import getPositionList from '../utils/getPositionList';
+
 export default function Universe() {
   const controller = useRef();
   const camera = useRef();
   const [modalState, setModalState] = useModal();
+  const [constellationList, setConstellationList] = useState([]);
 
   const openConstellationModal = () => {
     setModalState({
@@ -32,6 +34,22 @@ export default function Universe() {
       children: <ArticleWritingModal />,
     });
   };
+
+  const getMyConstellationList = async () => {
+    const { result } = await getMyConstellations();
+
+    const positionList = getPositionList(result.length);
+
+    setConstellationList(
+      result.map((entity, idx) => {
+        return { id: entity.id, position: positionList[idx] };
+      }),
+    );
+  };
+
+  useEffect(() => {
+    getMyConstellationList();
+  }, []);
 
   return (
     <div className="canvas-container">
@@ -71,7 +89,7 @@ export default function Universe() {
         <Suspense fallback={null}>
           <Land />
           <Stars saturation={1} speed={0.7} fade />
-          <Stars saturation={2} speed={1.2} fade />
+          {/* <Stars saturation={2} speed={1.2} fade /> */}
           <ConstellationControls controller={controller} constellationList={constellationList} />
         </Suspense>
       </Canvas>

@@ -1,8 +1,8 @@
 package com.ssafy.star.article.dto.response;
 
-import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.comment.dto.CommentDto;
+import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.image.dto.response.ImageResponse;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public record ArticleResponse (
         String description,
         DisclosureType disclosure,
         Set<String> articleHashtags,
-        String constellationEntityName,
+        Long constellationId,
         String ownerEntityNickname,
         List<CommentDto> commentList,
         LocalDateTime createdAt,
@@ -27,6 +27,11 @@ public record ArticleResponse (
 
     public static ArticleResponse fromArticle(Article article) {
 
+        Long constellationId = null;
+        if(article.constellation() != null) {
+            constellationId = article.constellation().id();
+        }
+
         return new ArticleResponse(
                 article.id(),
                 article.title(),
@@ -34,8 +39,8 @@ public record ArticleResponse (
                 article.description(),
                 article.disclosure(),
                 article.articleHashtags(),
-                article.constellationEntityName(),
-                article.ownerEntityNickname(),
+                constellationId,
+                article.user().nickname(),
                 article.commentList(),
                 article.createdAt(),
                 article.modifiedAt(),

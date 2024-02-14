@@ -1,22 +1,41 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import useModal from '../../../hooks/useModal';
 
 import ConstellationRow from './ConstellationRow';
 
 import axios from '../../../apis/axios.js';
-import parseJwt from '../../../utils/parseJwt.js';
 
 export default function ConstellationModal() {
-  const [consteallationInfos, setConstellationInfos] = useState([]);
+  const [constellationArray, setConstellationArray] = useState([]);
+  const [currentModalState, setModalState] = useModal();
+
+  const closeModal = () => {
+    setModalState({
+      isOpen: false,
+      title: '',
+      children: null,
+    });
+  };
+
+  const navigate = useNavigate();
+
+  const openConstellaionWriting = () => {
+    navigate('/constellation');
+    closeModal();
+  };
 
   const readConstellations = async () => {
-    const JWTtoken = sessionStorage.getItem('token');
-    const parsed = parseJwt(JWTtoken);
-    // console.log(parsed.email);
-    const data = await axios.get(`/constellations/user/${parsed.email}`);
-    const array = data.data.result.content;
-    console.log(array.length);
-    setConstellationInfos(array);
+    const profileStr = sessionStorage.getItem('profile');
+    const profile = JSON.parse(profileStr);
+    const data = await axios.get(`/constellations/user/${profile.nickname}`);
+    const arr = data.data.result;
+    console.log(arr[0].constellationUserEntities[0].constellationId);
+    setConstellationArray(arr);
   };
+
+  // console.log(constellationArray);
 
   useEffect(() => {
     readConstellations();
@@ -25,32 +44,34 @@ export default function ConstellationModal() {
   const array = [
     {
       id: 0,
-      title: '갱얼쥐',
-      tag: 'string',
-      disclosure: 'VISIBLE',
-      hits: 45,
-      description: '멍멍멍뭉이',
-      createdAt: '2024-02-09T08:17:22.569Z',
-      modifiedAt: '2024-02-09T08:17:22.569Z',
-      deletedAt: '2024-02-09T08:17:22.569Z',
+      name: '갱얼쥐',
+      contourResponse: { thumbUrl: '/public/images/search-test/13.jpg' },
+      constellationUserEntities: [{ constellationId: 0 }],
     },
     {
       id: 1,
-      title: '고먐미',
-      tag: 'string',
-      disclosure: 'VISIBLE',
-      hits: 241,
-      description: '냐옹냐옹냐옹이',
-      createdAt: '2024-02-09T08:17:22.569Z',
-      modifiedAt: '2024-02-09T08:17:22.569Z',
-      deletedAt: '2024-02-09T08:17:22.569Z',
+      name: '고먐미',
+      contourResponse: { thumbUrl: '/public/images/search-test/14.jpg' },
+      constellationUserEntities: [{ constellationId: 1 }],
+    },
+    {
+      id: 2,
+      name: '몰라',
+      contourResponse: { thumbUrl: '/public/images/search-test/16.jpg' },
+      constellationUserEntities: [{ constellationId: 2 }],
     },
   ];
   return (
     <div className="constellation-modal-container">
-      <div className="">
+      <div className="constellation-row-container">
         {array.map((constellation) => (
-          <ConstellationRow key={constellation.id} title={constellation.title} />
+          <ConstellationRow
+            key={constellation.id}
+            title={constellation.name}
+            constellationThumb={constellation.contourResponse.thumbUrl}
+            constellationId={constellation.constellationUserEntities[0].constellationId}
+            // constellThumb={constellation.contourResponse.thumbUrl}
+          />
         ))}
       </div>
       <div className="constellation_main_buttons_box">
@@ -58,7 +79,7 @@ export default function ConstellationModal() {
           src="/images/constellation-modal/constellation_create_button.png"
           alt="post_create_button"
           className="constellation-main-button"
-          // onClick={openConstellationModal}
+          onClick={openConstellaionWriting}
         />
         <img
           src="/images/constellation-modal/post_create_button.png"

@@ -2,14 +2,12 @@ package com.ssafy.star.article.api;
 
 
 import com.ssafy.star.article.application.ArticleService;
-import com.ssafy.star.article.dto.request.ArticleConstellationSelect;
-import com.ssafy.star.article.dto.request.ArticleCreateRequest;
-import com.ssafy.star.article.dto.request.ArticleDeletionUndo;
-import com.ssafy.star.article.dto.request.ArticleModifyRequest;
+import com.ssafy.star.article.dto.request.*;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.user.dto.response.LikeUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,10 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,8 +32,34 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @Operation(
-            summary = "게시물 작성",
-            description = "게시물 작성입니다.",
+            summary = "게시물 작성 및 미분류 별자리 배정",
+            description = "미분류 별자리에 들어갈 게시물 작성입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @PostMapping("/articles/no-constellation")
+    public Response<Void> createWithNoConstellation(@RequestPart ArticleCreateWithNoConstellationRequest request, Authentication authentication, @RequestParam MultipartFile imageFile) {
+        log.info("request 정보 : {}", request);
+        if (imageFile != null) {
+            articleService.createWithNoConstellation(
+                    request.title(),
+                    request.description(),
+                    request.disclosureType(),
+                    authentication.getName(),
+                    imageFile,
+                    request.imageType(),
+                    request.articleHashtagSet()
+            );
+            return Response.success();
+        } else {
+            throw new ByeolDamException(ErrorCode.ARTICLE_IMAGE_EMPTY, "article imagefile is empty");
+        }
+    }
+
+    @Operation(
+            summary = "게시물 작성 및 별자리 배정",
+            description = "게시물 작성과 별자리 배정이 동시에 일어납니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "생성 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
@@ -48,7 +75,8 @@ public class ArticleController {
                     authentication.getName(),
                     imageFile,
                     request.imageType(),
-                    request.articleHashtagSet()
+                    request.articleHashtagSet(),
+                    request.constellationId()
             );
             return Response.success();
         } else {
@@ -105,9 +133,12 @@ public class ArticleController {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
             }
     )
-    @GetMapping("/articles/user/{userEmail}")
-    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String userEmail, Authentication authentication, Pageable pageable) {
-        return Response.success(articleService.userArticlePage(userEmail, authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    @GetMapping("/articles/user/{nickname}")
+    public Response<Page<ArticleResponse>> userArticlePage(@PathVariable String nickname, Authentication authentication,Pageable pageable) {
+        List<ArticleResponse> articleResponses = articleService.userArticleList(nickname, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), articleResponses.size());
+        return Response.success(new PageImpl<>(articleResponses.subList(start, end), pageable, articleResponses.size()));
     }
 
     @Operation(
@@ -146,8 +177,20 @@ public class ArticleController {
             }
     )
     @GetMapping("/articles/constellation/{constellationId}")
-    public Response<Page<ArticleResponse>> articlesInConstellation(@PathVariable Long constellationId, Authentication authentication, Pageable pageable) {
-        return Response.success(articleService.articlesInConstellation(constellationId, authentication.getName(), pageable).map(ArticleResponse::fromArticle));
+    public Response<List<ArticleResponse>> articlesInConstellation(@PathVariable Long constellationId, Authentication authentication) {
+        return Response.success(articleService.articlesInConstellation(constellationId, authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
+    }
+
+    @Operation(
+            summary = "미분류 게시물 전체 조회",
+            description = "미분류 별자리에 있는 게시물 전체 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/articles/constellation")
+    public Response<List<ArticleResponse>> articlesInNoConstellation(Authentication authentication) {
+        return Response.success(articleService.articlesInNoConstellation(authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
     }
 
     @Operation(
@@ -172,6 +215,47 @@ public class ArticleController {
     @PutMapping("/articles/trashcan/undo")
     public Response<ArticleResponse> undoDeletion(@RequestBody ArticleDeletionUndo articleDeletionUndo, Authentication authentication) {
         return Response.success(ArticleResponse.fromArticle(articleService.undoDeletion(articleDeletionUndo.articleId(), authentication.getName())));
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 요청",
+            description = "게시물 좋아요를 요청합니다."
+    )
+    @PostMapping("/articles/{articleId}/likes")
+    public Response<Void> like(Authentication authentication, @PathVariable Long articleId) {
+        articleService.like(articleId, authentication.getName());
+        return Response.success();
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 상태 확인",
+            description = "게시물 좋아요 상태를 확인합니다."
+    )
+    @GetMapping("/articles/{articleId}/likes")
+    public Response<Boolean> checkLike(Authentication authentication, @PathVariable Long articleId) {
+        return Response.success(articleService.checkLike(articleId, authentication.getName()));
+    }
+
+    @Operation(
+            summary = "게시물 좋아요 갯수 확인",
+            description = "게시물 좋아요의 개수를 확인합니다."
+    )
+    @GetMapping("/articles/{articleId}/likeCount")
+    public Response<Integer> likeCount(@PathVariable Long articleId) {
+        return Response.success(articleService.likeCount(articleId));
+    }
+
+    @Operation(
+            summary = "게시물을 좋아요한 사람의 목록 확인",
+            description = "게시물을 좋아요한 사람의 목록을 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
+            }
+
+    )
+    @GetMapping("/articles/{articleId}/likeList")
+    public Response<List<LikeUserResponse>> likeList(@PathVariable Long articleId) {
+        return Response.success(articleService.likeList(articleId).stream().map(LikeUserResponse::fromUser).toList());
     }
 
 }

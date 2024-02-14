@@ -1,13 +1,14 @@
 package com.ssafy.star.article.domain;
 
-import com.ssafy.star.article.DisclosureType;
 import com.ssafy.star.comment.domain.CommentEntity;
+import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
 import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 
@@ -48,6 +49,7 @@ public class ArticleEntity {
     private DisclosureType disclosure;
 
     @ToString.Exclude
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "constellation_id")
     private ConstellationEntity constellationEntity;
@@ -74,6 +76,7 @@ public class ArticleEntity {
     @JoinColumn(name = "image")
     private ImageEntity imageEntity;
 
+    // TODO : modifiedAt 생성시 초기화되는 것 해결
     @PrePersist
     void createdAt() {
         this.createdAt = LocalDateTime.from(LocalDateTime.now());

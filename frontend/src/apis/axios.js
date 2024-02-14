@@ -4,19 +4,18 @@ let failedRequestQueue = [];
 let isRefreshing = false;
 
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
 });
 
 client.interceptors.request.use(
   (config) => {
     const accessToken = sessionStorage['access_token'];
-    config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
     return config;
   },
   (e) => {
-    console.log(e);
     return Promise.reject(e);
   },
 );
@@ -42,6 +41,7 @@ const addFailedRequest = (request) => {
 
 export const refreshToken = async () => {
   const { data } = await client.get('/users/refresh');
+  sessionStorage.setItem('profile', JSON.stringify(data.result.user));
   return data.result.token;
 };
 
@@ -72,8 +72,8 @@ const refreshTokenAndResolveRequests = async (error) => {
 
     return failedRequest;
   } catch (e) {
-    if (sessionStorage['access_token']) sessionStorage.clear('access_token');
-    if (sessionStorage['profile']) sessionStorage.clear('profile');
+    // if (sessionStorage['access_token']) sessionStorage.clear('access_token');
+    // if (sessionStorage['profile']) sessionStorage.clear('profile');
     return Promise.reject(e);
   }
 };

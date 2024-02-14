@@ -1,21 +1,20 @@
 package com.ssafy.star.constellation.dto.response;
 
-import com.ssafy.star.constellation.SharedType;
 import com.ssafy.star.constellation.dto.Constellation;
+import com.ssafy.star.constellation.dto.ConstellationUser;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public record ConstellationResponse (
-        Long Id,
-    String name,
-    SharedType shared,
-    // TODO : 외곽선
-    long hits,
-    String description,
-    LocalDateTime createdAt,
-    LocalDateTime modifiedAt,
-    LocalDateTime deletedAt
+        Long id,
+        String name,
+        Long contourId,
+        long hits,
+        List<ConstellationUser> constellationUsers,
+        LocalDateTime createdAt,
+        LocalDateTime modifiedAt
 
 ) {
 
@@ -23,13 +22,11 @@ public record ConstellationResponse (
         return new ConstellationResponse(
                 dto.id(),
                 dto.name(),
-                dto.shared(),
-                // const.getOutline(),
+                dto.contourId(),
                 dto.hits(),
-                dto.description(),
+                dto.constellationUsers(),
                 dto.createdAt(),
-                dto.modifiedAt(),
-                dto.deletedAt()
+                dto.modifiedAt()
         );
     }
 }
