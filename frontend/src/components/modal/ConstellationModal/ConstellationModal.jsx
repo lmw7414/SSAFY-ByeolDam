@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import useModal from '../../../hooks/useModal';
 
 import ConstellationRow from './ConstellationRow';
 
@@ -6,6 +9,22 @@ import axios from '../../../apis/axios.js';
 
 export default function ConstellationModal() {
   const [constellationArray, setConstellationArray] = useState([]);
+  const [currentModalState, setModalState] = useModal();
+
+  const closeModal = () => {
+    setModalState({
+      isOpen: false,
+      title: '',
+      children: null,
+    });
+  };
+
+  const navigate = useNavigate();
+
+  const openConstellaionWriting = () => {
+    navigate('/constellation');
+    closeModal();
+  };
 
   const readConstellations = async () => {
     const profileStr = sessionStorage.getItem('profile');
@@ -60,7 +79,7 @@ export default function ConstellationModal() {
           src="/images/constellation-modal/constellation_create_button.png"
           alt="post_create_button"
           className="constellation-main-button"
-          // onClick={openConstellationModal}
+          onClick={openConstellaionWriting}
         />
         <img
           src="/images/constellation-modal/post_create_button.png"
