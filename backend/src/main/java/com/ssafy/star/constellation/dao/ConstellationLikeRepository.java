@@ -5,6 +5,7 @@ import com.ssafy.star.constellation.domain.ConstellationLikeEntity;
 import com.ssafy.star.user.domain.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,6 @@ public interface ConstellationLikeRepository extends JpaRepository<Constellation
     void deleteAllByConstellationEntity(ConstellationEntity constellationEntity);
     void deleteAllByUserEntity(UserEntity userEntity);
 
-    List<ConstellationLikeEntity> findAllByConstellationEntity(ConstellationEntity constellationEntity);
+    List<ConstellationLikeEntity> findAllByConstellationEntity(ConstellationEntity constellationEntity, Sort sort);
     Page<ConstellationLikeEntity> findAllByUserEntityOrderByCreatedAtDesc(UserEntity userEntity, Pageable pageable);
 }
