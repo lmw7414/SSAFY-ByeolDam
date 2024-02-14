@@ -18,7 +18,7 @@ export default function ArticleWritingModal() {
 
   const writeArticle = () => {
     addArticle(article, file).then((result) => {
-      useModal({
+      setModalState({
         ...modalState,
         isOpen: false,
       });

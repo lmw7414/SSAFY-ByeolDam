@@ -4,7 +4,6 @@ export const getArticles = async (articleId) => {
   const { data } = await axios.get(`articles/${articleId}`);
   return data;
 };
-
 export const addArticle = async (
   { description, articleHashtagSet, disclosureType, imageType },
   file,

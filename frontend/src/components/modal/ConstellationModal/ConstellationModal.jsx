@@ -5,11 +5,13 @@ import useModal from '../../../hooks/useModal';
 
 import ConstellationRow from './ConstellationRow';
 
-import axios from '../../../apis/axios.js';
+import { getMyConstellations } from '../../../apis/constellation';
+import ArticleWritingModal from '../article/ArticleWritingModal';
 
 export default function ConstellationModal() {
-  const [constellationArray, setConstellationArray] = useState([]);
   const [currentModalState, setModalState] = useModal();
+  const [constellationList, setConstellationList] = useState([]);
+  const [unLabeled, setUnLabeled] = useState([]);
 
   const closeModal = () => {
     setModalState({
@@ -26,51 +28,41 @@ export default function ConstellationModal() {
     closeModal();
   };
 
-  const readConstellations = async () => {
-    const profileStr = sessionStorage.getItem('profile');
-    const profile = JSON.parse(profileStr);
-    const data = await axios.get(`/constellations/user/${profile.nickname}`);
-    const arr = data.data.result;
-    console.log(arr[0].constellationUserEntities[0].constellationId);
-    setConstellationArray(arr);
+  const openArticleWritingModal = () => {
+    setModalState({
+      isOpen: true,
+      title: '새로운 별 생성하기',
+      children: <ArticleWritingModal />,
+    });
   };
 
-  // console.log(constellationArray);
-
   useEffect(() => {
-    readConstellations();
+    const nickname = JSON.parse(sessionStorage.profile).nickname;
+
+    getMyConstellations(nickname).then(({ labeledList, unLabeledList }) => {
+      setConstellationList(labeledList);
+      setUnLabeled(unLabeledList);
+    });
   }, []);
 
-  const array = [
-    {
-      id: 0,
-      name: '갱얼쥐',
-      contourResponse: { thumbUrl: '/public/images/search-test/13.jpg' },
-      constellationUserEntities: [{ constellationId: 0 }],
-    },
-    {
-      id: 1,
-      name: '고먐미',
-      contourResponse: { thumbUrl: '/public/images/search-test/14.jpg' },
-      constellationUserEntities: [{ constellationId: 1 }],
-    },
-    {
-      id: 2,
-      name: '몰라',
-      contourResponse: { thumbUrl: '/public/images/search-test/16.jpg' },
-      constellationUserEntities: [{ constellationId: 2 }],
-    },
-  ];
   return (
     <div className="constellation-modal-container">
       <div className="constellation-row-container">
-        {array.map((constellation) => (
+        <ConstellationRow
+          title={'미분류'}
+          constellationThumb={'https://cdn-icons-png.flaticon.com/512/1/1766.png'}
+          hoverAritcles={unLabeled.map(({ id, imageResponse }) => {
+            return { id: id, articleThumbnail: imageResponse.thumbnailUrl };
+          })}
+        />
+        {constellationList.map(({ name, id, hoverAritcles, contourResponse }) => (
           <ConstellationRow
-            key={constellation.id}
-            title={constellation.name}
-            constellationThumb={constellation.contourResponse.thumbUrl}
-            constellationId={constellation.constellationUserEntities[0].constellationId}
-            // constellThumb={constellation.contourResponse.thumbUrl}
+            key={id}
+            title={name}
+            constellationThumb={contourResponse.cThumbUrl}
+            constellationId={id}
+            hoverAritcles={hoverAritcles}
+            constellationName={name}
           />
         ))}
       </div>
@@ -85,7 +77,7 @@ export default function ConstellationModal() {
           src="/images/constellation-modal/post_create_button.png"
           alt="post_create_button"
           className="constellation-main-button"
-          // onClick={openConstellationModal}
+          onClick={openArticleWritingModal}
         />
       </div>
     </div>
