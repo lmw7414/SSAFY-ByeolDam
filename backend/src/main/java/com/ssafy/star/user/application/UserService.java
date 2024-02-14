@@ -483,4 +483,13 @@ public class UserService {
                 .map(ArticleLikeEntity::getArticleEntity)
                 .map(Article::fromEntity);
     }
+
+    // 닉네임으로 프로필 조회하기
+    @Transactional
+    public String getProfileImageUrl(String nickname) {
+        UserEntity user = userRepository.findByNickname(nickname).orElseThrow(
+                () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", nickname))
+        );
+        return user.getImageEntity().getUrl();
+    }
 }
