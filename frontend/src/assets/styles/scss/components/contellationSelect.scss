@@ -80,6 +80,21 @@
   }
 }
 
+.constellation-select-box-thumbnail-container {
+  width: 6rem;
+  height: 6rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.constellation-select-box-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .constellation-select-box:first-child {
   margin-top: 0;
 }
