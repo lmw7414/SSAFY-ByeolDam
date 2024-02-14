@@ -34,7 +34,7 @@ export default function FeedList() {
         {feedList.map((feed) => {
             return <Feed key={feed.id} feedData = {feed} />
         })}
-        <div ref={ref}>테스트</div>
+        <div ref={ref}>팔로우의 게시글이 없습니다!</div>
     </div>
   )
 }
