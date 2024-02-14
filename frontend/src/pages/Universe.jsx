@@ -10,7 +10,7 @@ import useModal from '../hooks/useModal';
 
 import ConstellationModal from '../components/modal/ConstellationModal/ConstellationModal.jsx';
 import ArticleWritingModal from '../components/modal/article/ArticleWritingModal.jsx';
-import { getConstellationContour, getMyConstellations } from '../apis/constellation';
+import { getMyConstellations } from '../apis/constellation';
 import getPositionList from '../utils/getPositionList';
 
 export default function Universe() {
@@ -36,7 +36,8 @@ export default function Universe() {
   };
 
   const getMyConstellationList = async () => {
-    const { result } = await getMyConstellations();
+    const nickname = JSON.parse(sessionStorage.profile).nickname;
+    const { result } = await getMyConstellations(nickname);
 
     const positionList = getPositionList(result.length);
 

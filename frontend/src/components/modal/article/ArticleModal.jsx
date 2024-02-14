@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getComments } from '../../../apis/comments';
 import Comment from '../../article/Comment';
-import { PositionPoint } from '@react-three/drei';
-import { addComments } from '../../../apis/comments';
-import { Pass } from 'postprocessing';
+import { addComments, getComments } from '../../../apis/comments';
 import axios from '../../../apis/axios';
 
 export default function ArticleModal({
@@ -60,13 +57,13 @@ export default function ArticleModal({
   const [liked, setLiked] = useState(false);
   const [content, setContent] = useState('');
   const [profile, setProfile] = useState({});
-  const [constellationList, setConstellationList] = useState([])
+  const [constellationList, setConstellationList] = useState([]);
 
   const readProfile = async () => {
     const profileStr = sessionStorage.getItem('profile');
     const profile = JSON.parse(profileStr);
     const data = await axios.get(`/users/${profile.nickname}`);
-    setProfile(data.data.result)
+    setProfile(data.data.result);
   };
 
   const readConstellationList = async () => {
@@ -79,13 +76,12 @@ export default function ArticleModal({
     }
   };
 
-
   useEffect(() => {
     readProfile();
     readConstellationList();
   }, []);
 
-  constellation === null  ? setConstellation("없음") : Pass;
+  constellation === null ? setConstellation('없음') : Pass;
 
   const createComment = (e) => {
     e.preventDefault();
@@ -93,9 +89,9 @@ export default function ArticleModal({
     addComments(articleId, content).then((result) => {
       console.log('댓글이 생성되었습니다:', content);
     });
-    setContent("")
+    setContent('');
   };
-  
+
   tags = ['#태극기', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한'];
   const likeCount = 1;
 
