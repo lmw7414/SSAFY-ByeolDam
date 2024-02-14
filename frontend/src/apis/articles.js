@@ -26,7 +26,7 @@ export const addArticle = async (
   formData.append('request', request);
   formData.append('imageFile', file);
 
-  const result = await axios.post('articles', formData, {
+  const result = await axios.post('articles/no-constellation', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
