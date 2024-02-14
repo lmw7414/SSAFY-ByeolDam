@@ -53,13 +53,20 @@ export const addConstellation = async ({
 };
 
 export const getMyConstellations = async (nickname) => {
-  const { data } = await axios.get(`/constellations/user/${nickname}`);
+  const { data: unLabeledList } = await axios.get('/articles/constellation');
+  const { data: labeledList } = await axios.get(`/constellations/user/${nickname}`);
 
-  return data;
+  return { unLabeledList: unLabeledList.result, labeledList: labeledList.result };
 };
 
 export const getConstellationContour = async (constellationId) => {
   const { data } = await axios.post(`/constellations/${constellationId}/request-contour`);
+
+  return data;
+};
+
+export const getUserUniverse = async (nickname) => {
+  const { data } = await axios.get(`/constellations/user/${nickname}`);
 
   return data;
 };

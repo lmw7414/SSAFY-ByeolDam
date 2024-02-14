@@ -10,7 +10,7 @@ import useModal from '../hooks/useModal';
 
 import ConstellationModal from '../components/modal/ConstellationModal/ConstellationModal.jsx';
 import ArticleWritingModal from '../components/modal/article/ArticleWritingModal.jsx';
-import { getMyConstellations } from '../apis/constellation';
+import { getUserUniverse } from '../apis/constellation';
 import getPositionList from '../utils/getPositionList';
 
 export default function Universe() {
@@ -35,21 +35,24 @@ export default function Universe() {
     });
   };
 
-  const getMyConstellationList = async () => {
-    const nickname = JSON.parse(sessionStorage.profile).nickname;
-    const { result } = await getMyConstellations(nickname);
-
-    const positionList = getPositionList(result.length);
-
-    setConstellationList(
-      result.map((entity, idx) => {
-        return { id: entity.id, position: positionList[idx] };
-      }),
-    );
-  };
-
   useEffect(() => {
-    getMyConstellationList();
+    const nickname = JSON.parse(sessionStorage.profile).nickname;
+
+    getUserUniverse(nickname).then(({ result }) => {
+      const positionList = getPositionList(result.length);
+
+      setConstellationList(
+        result.map(({ id, contourResponse, hoverArticles }, idx) => {
+          return {
+            id,
+            hoverArticles,
+            thumbnail: contourResponse.thumbUrl,
+            points: contourResponse.ultimate,
+            position: positionList[idx],
+          };
+        }),
+      );
+    });
   }, []);
 
   return (

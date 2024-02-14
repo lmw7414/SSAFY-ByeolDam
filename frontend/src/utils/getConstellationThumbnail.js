@@ -8,14 +8,7 @@ const downloadURI = (uri, name) => {
   link.click();
 };
 
-export const getConstellationThumbnail = ({
-  width,
-  height,
-  points,
-  img,
-  imageConfig,
-  originalFile,
-}) => {
+export const getThumb = ({ width, height, points, img, imageConfig, originalFile }) => {
   const stage = new Konva.Stage({
     container: 'save-image',
     width: width,
@@ -55,10 +48,56 @@ export const getConstellationThumbnail = ({
     type: 'image/png',
   });
 
+  return thumb;
+};
+
+export const getConstellationThumbnail = ({
+  width,
+  height,
+  points,
+  img,
+  imageConfig,
+  originalFile,
+}) => {
+  const stage = new Konva.Stage({
+    container: 'save-image',
+    width: width,
+    height: height,
+  });
+
+  const layer = new Konva.Layer();
+  stage.add(layer);
+
+  const group = new Konva.Group({
+    clipFunc: (ctx) => {
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.closePath();
+    },
+  });
+
+  layer.add(group);
+
+  const image = new Konva.Image({
+    image: img,
+    x: imageConfig.x,
+    y: imageConfig.y,
+    width: imageConfig.width,
+    height: imageConfig.height,
+    crop: imageConfig.crop,
+    opacity: 0.7,
+  });
+
+  group.add(image);
+  stage.draw();
+
   const line = new Konva.Line({
     points: points.reduce((prev, [x, y]) => [...prev, x, y], []),
     stroke: '#8E7CAC',
-    strokeWidth: 3,
+    strokeWidth: 4,
     closed: true,
     tension: 0.05,
   });
@@ -69,7 +108,7 @@ export const getConstellationThumbnail = ({
     const circle = new Konva.Circle({
       x: x,
       y: y,
-      radius: 2,
+      radius: 3,
       fill: 'white',
     });
     layer.add(circle);
@@ -79,6 +118,15 @@ export const getConstellationThumbnail = ({
   const cthumbBlob = dataURLtoBlob(stage.toDataURL({ pixelRatio: 256 / width }));
   const cthumb = new File([cthumbBlob], originalFile.name.split('.')[0] + '.png', {
     type: 'image/png',
+  });
+
+  const thumb = getThumb({
+    width,
+    height,
+    points,
+    img,
+    imageConfig,
+    originalFile,
   });
 
   return { thumb, cthumb };

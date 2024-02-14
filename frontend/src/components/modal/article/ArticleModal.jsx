@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Comment from '../../article/Comment';
-import { addComments, getComments } from '../../../apis/comments';
 import axios from '../../../apis/axios';
+import { addComments, getComments } from '../../../apis/comments';
 
 export default function ArticleModal({
   articleId,
@@ -14,44 +14,6 @@ export default function ArticleModal({
   constellationName,
   commentList,
 }) {
-  commentList = [
-    {
-      id: 0,
-      articleId: 0,
-      nickName: '작성자',
-      content: '내용',
-      parentId: 0,
-      createdAt: '2024-02-12T12:05:43.959Z',
-      modifiedAt: '2024-02-12T12:05:43.959Z',
-      childrenComments: [
-        {
-          id: 0,
-          nickName: '작성자',
-          content: '내용',
-          createdAt: '2024-02-12T12:05:43.959Z',
-          modifiedAt: '2024-02-12T12:05:43.959Z',
-        },
-        {
-          id: 0,
-          nickName: '작성자',
-          content: '내용',
-          createdAt: '2024-02-12T12:05:43.959Z',
-          modifiedAt: '2024-02-12T12:05:43.959Z',
-        },
-      ],
-    },
-    {
-      id: 0,
-      articleId: 0,
-      nickName: '작성자',
-      content: '내용',
-      parentId: 0,
-      createdAt: '2024-02-12T12:05:43.959Z',
-      modifiedAt: '2024-02-12T12:05:43.959Z',
-      childrenComments: [],
-    },
-  ];
-
   const [comments, setComments] = useState(commentList);
   const [constellation, setConstellation] = useState(constellationName);
   const [liked, setLiked] = useState(false);
@@ -81,8 +43,6 @@ export default function ArticleModal({
     readConstellationList();
   }, []);
 
-  constellation === null ? setConstellation('없음') : Pass;
-
   const createComment = (e) => {
     e.preventDefault();
     setContent(content.trim());
@@ -92,7 +52,6 @@ export default function ArticleModal({
     setContent('');
   };
 
-  tags = ['#태극기', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한', '#극한'];
   const likeCount = 1;
 
   return (
@@ -124,7 +83,9 @@ export default function ArticleModal({
           <p className="nickname article-owner">{owner}</p>
           <div id="tags">
             {tags.map((tag) => (
-              <p className="nickname">{tag}</p>
+              <p key={tag} className="nickname">
+                {tag}
+              </p>
             ))}
           </div>
           <div id="like-area">

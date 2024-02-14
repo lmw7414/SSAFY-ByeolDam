@@ -7,45 +7,58 @@ import { easing } from 'maath';
 import getUuidByString from 'uuid-by-string';
 import { getConstellationContour } from '../../../apis/constellation';
 
-export default function Constellation({ position = [5, 1.5, 5], name, selected, id }) {
+export default function Constellation({
+  position = [5, 1.5, 5],
+  name,
+  selected,
+  id,
+  points,
+  thumbnail,
+  hoverArticles,
+}) {
   const group = useRef();
   const imageRef = useRef();
   const [hovered, hover] = useState(false);
   const [pointList, setPointList] = useState([]);
-  const [thumbnail, setThumbnail] = useState(null);
+  const [starList, setStarList] = useState([]);
   const uuid = getUuidByString('' + name);
   useCursor(hovered);
 
   const isActive = selected === uuid;
 
   useEffect(() => {
-    getConstellationContour(id).then(({ result }) => {
-      const points = result.ultimate;
+    const [lx, rx] = points.reduce(
+      (prev, now) => [Math.min(now[0], prev[0]), Math.max(now[0], prev[1])],
+      [260, 0],
+    );
 
-      const [lx, rx] = points.reduce(
-        (prev, now) => [Math.min(now[0], prev[0]), Math.max(now[0], prev[1])],
-        [260, 0],
-      );
+    const [dy, uy] = points.reduce(
+      (prev, now) => [Math.min(now[1], prev[0]), Math.max(now[1], prev[1])],
+      [260, 0],
+    );
 
-      const [dy, uy] = points.reduce(
-        (prev, now) => [Math.min(now[1], prev[0]), Math.max(now[1], prev[1])],
-        [260, 0],
-      );
+    const width = rx - lx;
+    const height = uy - dy;
+    const size = Math.max(width, height);
 
-      const width = rx - lx;
-      const height = uy - dy;
-      const size = Math.max(width, height);
+    const point = points.map(([x, y]) => {
+      const X = (x - lx + (size - width) / 2) / size - 1 / 2;
+      const Y = (y - dy + (size - height) / 2) / size + 1 / 2;
 
-      const point = points.map(([x, y]) => {
-        const X = (x - lx + (size - width) / 2) / size - 1 / 2;
-        const Y = (y - dy + (size - height) / 2) / size + 1 / 2;
-
-        return [X * 80, (1 - Y) * 80, 0];
-      });
-
-      setPointList(point);
-      setThumbnail(result.thumbUrl);
+      return [X * 80, (1 - Y) * 80, 0];
     });
+
+    setPointList(point);
+
+    setStarList(
+      hoverArticles.map(({ id, articleThumbnail }, idx) => {
+        return {
+          id: id,
+          position: [pointList[idx][0], pointsList[idx][1], 0],
+          thumbnail: articleThumbnail,
+        };
+      }),
+    );
 
     group.current.lookAt(new THREE.Vector3(0, 0.03, 0));
   }, []);
@@ -82,13 +95,13 @@ export default function Constellation({ position = [5, 1.5, 5], name, selected, 
           raycast={() => null}
         />
       )}
-      {pointList.map(([x, y, _], i) => (
+      {starList.map(({ id, position, thumbnail }) => (
         <Star
-          key={'' + name + i}
-          position={[x, y, 0]}
+          key={id}
+          position={position}
           scale={1.5}
-          name={name}
-          id={i}
+          name={id}
+          id={id}
           isActive={isActive}
           thumbnail={thumbnail}
         />

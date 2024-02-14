@@ -56,6 +56,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  justify-content: flex-end;
 }
 
 #tags > p {
@@ -91,12 +92,12 @@
 }
 
 .comment-nickname {
-  color: #8E7CAC;
+  color: #8e7cac;
   font-family: 'NanumSquare', sans-serif;
   font-weight: 800;
 }
 
-#comment p{
+#comment p {
   margin: 0 0 4% 0;
 }
 
@@ -143,24 +144,24 @@
   cursor: pointer;
 }
 
-li{
+li {
   margin: 0 0 0 1rem;
-  width:8rem;
-  border:none;
+  width: 8rem;
+  border: none;
   background: $secondary;
-  color:#fff;
-  border-radius:7px;
-  font-size:14px;
-  transition:all 0.3s ease;
-  text-align:center;
-  list-style-type:none;
-  font-family:sans-serif;
+  color: #fff;
+  border-radius: 7px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-align: center;
+  list-style-type: none;
+  font-family: sans-serif;
 }
 
-li:hover{
+li:hover {
   background: $secondary;
-  cursor:pointer;
-  border-radius:7px 7px 0 0;
+  cursor: pointer;
+  border-radius: 7px 7px 0 0;
 }
 
 i {
@@ -176,48 +177,48 @@ i {
   -webkit-transform: rotate(45deg);
 }
 
-.dropdown{
-  z-index:-1;
-  position:absolute;
+.dropdown {
+  z-index: -1;
+  position: absolute;
   visibility: hidden;
-  opacity:0;
-  color:black;
-  background:#e1e6ea;
-  width:200px;
+  opacity: 0;
+  color: black;
+  background: #e1e6ea;
+  width: 200px;
   margin-top: 0.3%;
-  transition:all 0.3s ease;
-  border-radius:0px 0px 7px 7px;
-  transform:translateY(15px);
+  transition: all 0.3s ease;
+  border-radius: 0px 0px 7px 7px;
+  transform: translateY(15px);
   cursor: default;
   overflow: auto;
   max-height: 15%;
 }
 
-.drop-link{
-  display:block;
-  text-align:left;
-  text-decoration:none;
-  font-size:15px;
-  padding:10px 15px;
-  transition:all 0.3s ease;
-  color:#000;
+.drop-link {
+  display: block;
+  text-align: left;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+  color: #000;
   max-height: 2.5rem;
 }
 
-.drop-link:hover{
-  font-size:18px;
+.drop-link:hover {
+  font-size: 18px;
   background: #d4dade;
 }
 
-.drop-link:last-of-type{
-  border-radius:0px 0px 7px 7px;
+.drop-link:last-of-type {
+  border-radius: 0px 0px 7px 7px;
 }
 
-li:hover > .dropdown{
-  z-index:1;
-  opacity:1;
+li:hover > .dropdown {
+  z-index: 1;
+  opacity: 1;
   visibility: visible;
-  transform:translateY(0px);
+  transform: translateY(0px);
 }
 
 .children-comment-box {

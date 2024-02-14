@@ -17,9 +17,7 @@ export default function Star({
   const [modalState, setModalState] = useModal();
 
   const openAritcleModal = async () => {
-    const { result: data } = await getArticles(3);
-
-    console.log(data);
+    const { result: data } = await getArticles(articleId);
 
     setModalState({
       isOpen: true,
