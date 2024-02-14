@@ -31,12 +31,14 @@ import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.ssafy.star.constellation.ConstellationUserRole.ADMIN;
@@ -58,6 +60,8 @@ public class ConstellationService {
     private final ImageRepository imageRepository;
     private final ConstellationLikeRepository constellationLikeRepository;
 
+    Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+
     /**
      * 나의 우주 보기 - 별자리 전체 조회
      * VISIBLE, INVISIBLE 상관 없이, 개인 별자리, 공유 별자리 확인
@@ -66,7 +70,10 @@ public class ConstellationService {
     @Transactional(readOnly = true)
     public List<ConstellationWithArticle> myConstellations(String email) {
         UserEntity userEntity = getUserEntityByEmailOrException(email);
-        return constellationRepository.findAllByUserEntity(userEntity).stream().map(constellationEntity -> {
+        return constellationRepository.findAllByUserEntity(userEntity)
+                .stream()
+                .sorted(Comparator.comparing(ConstellationEntity::getCreatedAt).reversed())
+                .map(constellationEntity -> {
             ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));
             // ConstellationWithArticle DTO 생성
@@ -102,7 +109,10 @@ public class ConstellationService {
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.INVALID_PERMISSION));
         }
 
-        return constellationUserRepository.findConstellationByUserEntity(userEntity).stream().map(constellationEntity -> {
+        return constellationUserRepository.findConstellationByUserEntity(userEntity)
+                .stream()
+                .sorted(Comparator.comparing(ConstellationEntity::getCreatedAt).reversed())
+                .map(constellationEntity -> {
             ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));
             // ConstellationWithArticle DTO 생성
@@ -528,7 +538,7 @@ public class ConstellationService {
     public List<User> likeList(Long constellationId) {
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
         //목록 확인
-        return constellationLikeRepository.findAllByConstellationEntity(constellationEntity)
+        return constellationLikeRepository.findAllByConstellationEntity(constellationEntity, sort)
                 .stream()
                 .map(ConstellationLikeEntity::getUserEntity)
                 .map(User::fromEntity)

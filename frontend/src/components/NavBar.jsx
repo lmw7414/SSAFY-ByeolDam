@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { logout } from '../apis/member';
 import { getArticles } from '../apis/articles';
@@ -12,21 +12,16 @@ import FollowModal from './modal/Follow/FollowModal';
 
 import axios from '../apis/axios';
 
-export default function NavBar() {
-  const [isNavBarVisible, setIsNavBarVisible] = useState(true);
+export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
   const [modalState, setModalState] = useModal();
   const [profile, setProfile] = useState({});
-  // const [follower, setFollower] = useState('');
-  // const [following, setFollowing] = useState('');
-  // const [nickname, setNickname] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [profileImgUrl, setProfileImgUrl] = useState('');
-  // const [parsedJwt, setParsedJwt] = useState(null);
 
   // 네비게이션 바 작동 관련
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location.pathname);
 
   const goHome = () => {
     navigate('/home');
@@ -36,7 +31,7 @@ export default function NavBar() {
   const goFeed = () => {
     navigate('/feed');
     setBarId(2);
-  }
+  };
 
   const closeNavBar = () => {
     setIsNavBarVisible(!isNavBarVisible);
@@ -184,7 +179,10 @@ export default function NavBar() {
             </div>
           </div>
 
-          <div className="nav-bar-toggle-container" onClick={closeNavBar}>
+          <div
+            className="nav-bar-toggle-container"
+            onClick={location.pathname === '/settings' ? null : closeNavBar}
+          >
             <div className="nav-bar-menu-icon-box">
               <img
                 src={
