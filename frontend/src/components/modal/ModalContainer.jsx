@@ -1,6 +1,6 @@
 import useModal from '../../hooks/useModal';
 
-export default function ModalContainer() {
+export default function ModalContainer({ isNavBarVisible }) {
   const [currentModalState, setModalState] = useModal();
   const closeModal = () => {
     setModalState({
@@ -12,7 +12,9 @@ export default function ModalContainer() {
   return (
     <>
       {currentModalState.isOpen && (
-        <div className="modal-container-background">
+        <div
+          className={`modal-container-background ${isNavBarVisible ? 'modal-container-padding' : ''}`}
+        >
           <div className="modal-container">
             <div className="modal-header">
               <div></div>
