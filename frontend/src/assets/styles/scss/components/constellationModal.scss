@@ -11,8 +11,13 @@
   margin-bottom: 2rem;
 }
 
+.constellation-row-container::-webkit-scrollbar {
+  width: 1rem;
+}
+
 .constellation-row {
-  margin-bottom: 2rem;
+  // margin-bottom: 2rem;
+  padding: 0.5rem 0.4rem 1.5rem;
   display: flex;
   justify-content: space-between;
   // align-items: center;
@@ -24,12 +29,24 @@
   height: 12rem;
   border-radius: 1rem;
   padding: 1rem;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .constellation-thumbnail {
-  width: 10rem;
-  height: 10rem;
+  width: 9rem;
+  height: 9rem;
   border-radius: 1rem;
+}
+
+.constellation-title {
+  // position: absolute;
+  color: white;
+  font-size: 1.4rem;
 }
 
 .star-list-container {
@@ -40,9 +57,8 @@
   padding-bottom: 0;
   border-radius: 1rem;
   overflow-x: scroll;
-  // overflow: auto;
   flex-wrap: nowrap; /* 요소들이 가로로 줄 바꿈되지 않도록 설정 */
-  // flex-shrink: 0;
+  gap: 1rem;
 }
 
 .star-list-container::-webkit-scrollbar {

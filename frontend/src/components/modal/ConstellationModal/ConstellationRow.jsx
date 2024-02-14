@@ -9,7 +9,7 @@ export default function ConstellationRow({
   hoverArticles,
 }) {
   const [modalState, setModalState] = useModal();
-
+  console.log(hoverArticles);
   const openAritcle = async (articleId) => {
     const { result } = await getArticles(articleId);
 
@@ -34,6 +34,7 @@ export default function ConstellationRow({
     <div className="constellation-row">
       <div className="constellation-thumbnail-container">
         <img src={constellationThumb} alt="" className="constellation-thumbnail" />
+        <p className="constellation-title">{title}</p>
       </div>
       <div className="star-list-container">
         {hoverArticles &&
