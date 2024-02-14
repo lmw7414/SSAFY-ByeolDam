@@ -9,7 +9,6 @@ import java.util.List;
 public record ConstellationSearchResponse(
         Long id,
         String name,
-        String title,
         ContourResponse contourResponse,
         long hits,
         List<ConstellationUser> constellationUsers,

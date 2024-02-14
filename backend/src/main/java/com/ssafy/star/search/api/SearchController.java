@@ -72,7 +72,7 @@ public class SearchController {
     @Operation(
             summary = "별자리 검색 기능",
             description = "별자리 검색 기능입니다. " +
-            "별자리 title을 기준으로 찾습니다. 최신순 정렬합니다.",
+            "별자리 name을 기준으로 찾습니다. 최신순 정렬합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(schema = @Schema(implementation = ConstellationSearchResponse.class)))
             }
@@ -93,7 +93,6 @@ public class SearchController {
             constellationSearchResponses.add(new ConstellationSearchResponse(
                     constellationEntity.getId(),
                     constellationEntity.getName(),
-                    constellationEntity.getTitle(),
                     contourResponse,
                     constellationEntity.getHits(),
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),

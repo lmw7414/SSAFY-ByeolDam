@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ConstellationSearchRepository extends JpaRepository<ConstellationEntity, Long> {
-    // 별자리 title
-    List<ConstellationEntity> findByTitleContaining(String keyword, Sort sort);
+    // 별자리 name
+    List<ConstellationEntity> findByNameContaining(String keyword, Sort sort);
 }

@@ -10,7 +10,6 @@ import java.util.List;
 public record ConstellationResponse (
         Long id,
         String name,
-        String title,
         Long contourId,
         long hits,
         List<ConstellationUser> constellationUsers,
@@ -23,7 +22,6 @@ public record ConstellationResponse (
         return new ConstellationResponse(
                 dto.id(),
                 dto.name(),
-                dto.title(),
                 dto.contourId(),
                 dto.hits(),
                 dto.constellationUsers(),

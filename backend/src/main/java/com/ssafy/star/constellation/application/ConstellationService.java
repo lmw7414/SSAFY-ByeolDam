@@ -73,7 +73,6 @@ public class ConstellationService {
             return new ConstellationWithArticle(
                     constellationEntity.getId(),
                     constellationEntity.getName(),
-                    constellationEntity.getTitle(),
                     Contour.fromEntity(contourEntity),
                     constellationEntity.getHits(),
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
@@ -110,7 +109,6 @@ public class ConstellationService {
             return new ConstellationWithArticle(
                     constellationEntity.getId(),
                     constellationEntity.getName(),
-                    constellationEntity.getTitle(),
                     Contour.fromEntity(contourEntity),
                     constellationEntity.getHits(),
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
@@ -250,7 +248,6 @@ public class ConstellationService {
     public void create(
             String email,
             String name,
-            String title,
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cthumb,
@@ -275,7 +272,6 @@ public class ConstellationService {
 
         // 별자리 엔터티 생성
         ConstellationEntity constellationEntity = ConstellationEntity.of(
-                title,
                 name
         );
         // mongo에 저장된 id 반환
@@ -380,7 +376,6 @@ public class ConstellationService {
             String email,                // 사용자의 email
             Long constellationId,
             String name,
-            String title,
             MultipartFile origin,
             MultipartFile thumb,
             MultipartFile cThumb,
@@ -444,7 +439,6 @@ public class ConstellationService {
         if (name != null) {
             constellationEntity.setName(name);
         }
-        constellationEntity.setTitle(title);
         constellationRepository.save(constellationEntity);
     }
 

@@ -11,7 +11,6 @@ import java.util.List;
 public record ConstellationWithArticleResponse(
         Long id,
         String name,
-        String title,
         ContourResponse contourResponse,
         long hits,
         List<ConstellationUser> constellationUserEntities,
@@ -23,7 +22,6 @@ public record ConstellationWithArticleResponse(
         return new ConstellationWithArticleResponse(
                 dto.id(),
                 dto.name(),
-                dto.title(),
                 ContourResponse.fromContour(dto.contour()),
                 dto.hits(),
                 dto.constellationUsers(),
