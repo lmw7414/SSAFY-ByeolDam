@@ -32,7 +32,7 @@ export default function EditMyProfile({
     <form className="account-profile-image-box" onSubmit={editProfile}>
       <div className="flex-col-box">
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">닉네임</p>
+          <p className="profile-info-field body-1-1">닉네임</p>
           <input
             type="text"
             name="nickname"
@@ -42,7 +42,7 @@ export default function EditMyProfile({
           />
         </div>
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">이메일</p>
+          <p className="profile-info-field body-1-1">이메일</p>
           <input
             type="text"
             name="email"
@@ -52,7 +52,7 @@ export default function EditMyProfile({
           />
         </div>
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">이름</p>
+          <p className="profile-info-field body-1-1">이름</p>
           <input
             type="text"
             name="name"
@@ -62,7 +62,7 @@ export default function EditMyProfile({
           />
         </div>
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">생일</p>
+          <p className="profile-info-field body-1-1">생일</p>
           <input
             type="date"
             name="birthday"
@@ -72,7 +72,7 @@ export default function EditMyProfile({
           />
         </div>
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">소개글</p>
+          <p className="profile-info-field body-1-1">소개글</p>
           <input
             type="text"
             name="memo"
@@ -82,7 +82,7 @@ export default function EditMyProfile({
           />
         </div>
         <div className="my-profile-box">
-          <p className="profile-info-text body-1-1">공개범위</p>
+          <p className="profile-info-field body-1-1">공개범위</p>
           <select
             name="disclosureType"
             value={editedProfile.disclosureType}
