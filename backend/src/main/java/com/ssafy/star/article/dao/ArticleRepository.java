@@ -37,13 +37,16 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
 
         List<ArticleEntity> findAllByOwnerEntity(UserEntity userEntity);
 
-        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
+        // 별자리 검색 시 클릭, 해당 별자리 게시물 전체 조회
+        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND a.deletedAt IS NULL AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
         List<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity);
 
-        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity IS NULL AND a.ownerEntity = :userEntity")
+        // 미분류 별자리 게시물 전체 조회
+        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity IS NULL AND a.ownerEntity = :userEntity AND a.deletedAt IS NULL")
         List<ArticleEntity> findAllByConstellationEntityNullAndOwnerEntity(@Param("userEntity") UserEntity userEntity);
 
-        @Query(value = "SELECT COUNT(*) FROM ArticleEntity entity WHERE entity.ownerEntity = :ownerEntity")
+        // 게시물 숫자
+        @Query(value = "SELECT COUNT(*) FROM ArticleEntity entity WHERE entity.ownerEntity = :ownerEntity AND entity.deletedAt IS NULL")
         Integer countArticlesByUser(@Param("ownerEntity") UserEntity ownerEntity);
 }
 

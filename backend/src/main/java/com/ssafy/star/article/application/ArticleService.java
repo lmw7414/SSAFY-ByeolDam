@@ -219,9 +219,13 @@ public class ArticleService {
         Set<UserEntity> userEntitySet = userEntity.getFollowEntities().stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
 
         List<ArticleEntity> articleEntityList = new ArrayList<>();
-        // ID별 모든 게시글 가져오기
-        for(UserEntity tmpUserEntity : userEntitySet) {
-            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities();
+
+        for (UserEntity tmpUserEntity : userEntitySet) {
+            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities()
+                    .stream()
+                    .filter(articleEntity -> articleEntity.getDeletedAt() == null) // deletedAt이 null인 것들만 필터링
+                    .collect(Collectors.toList());
+
             articleEntityList.addAll(tmpArticleEntities);
         }
 
