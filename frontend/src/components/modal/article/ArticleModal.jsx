@@ -35,7 +35,7 @@ export default function ArticleModal({
   const createComment = (e) => {
     e.preventDefault();
     setContent(content.trim());
-    addComments(articleId, content).then((result) => {
+    addComments({articleId, content}).then((result) => {
       console.log('댓글이 생성되었습니다:', content);
       // getComment 실행
     });

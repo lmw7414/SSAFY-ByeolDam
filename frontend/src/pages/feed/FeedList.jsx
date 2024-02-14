@@ -13,7 +13,6 @@ export default function FeedList() {
     const getFeedData = async () => {
         try{
             const {data} = await getFeeds();
-            // console.log("result: ", data);
             setFeedList([...feedList, ...data]);
         } catch(error) {
             console.error("Error while fetching feed: ", error);
@@ -26,20 +25,16 @@ export default function FeedList() {
 
     useEffect(() => {
         if(inView) {
-            // console.log(inView, "무한 스크롤 요청")
             getFeedData();
         }
     }, [inView]);
-
-
-    // console.log("Feed list after useEffect: ", feedList);
 
   return (
     <div className='feed-container'>
         {feedList.map((feed) => {
             return <Feed key={feed.id} feedData = {feed} />
         })}
-        <div ref={ref}>테스트</div>
+        <div ref={ref}>팔로우의 게시글이 없습니다!</div>
     </div>
   )
 }
