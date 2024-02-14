@@ -13,6 +13,8 @@ import ArticleWritingModal from '../components/modal/article/ArticleWritingModal
 import { getUserUniverse } from '../apis/constellation';
 import getPositionList from '../utils/getPositionList';
 
+import Star from '../components/three/objects/Star';
+
 export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
   const controller = useRef();
   const camera = useRef();
@@ -42,7 +44,8 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
       const positionList = getPositionList(result.length);
 
       setConstellationList(
-        result.map(({ id, contourResponse, hoverArticles }, idx) => {
+        result.map(({ name, id, contourResponse, hoverArticles }, idx) => {
+          console.log(name, positionList[idx]);
           return {
             id,
             hoverArticles,

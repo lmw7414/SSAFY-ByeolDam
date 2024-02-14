@@ -61,10 +61,12 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
 export const getFeeds = async () => {
   const { data } = await axios.get(`articles/follow`);
   // console.log("axios에서 getFeeds의 data: ", data);
-  return { resultCode : data.resultCode, data : data.result.content }
-}
+  return { resultCode: data.resultCode, data: data.result.content };
+};
 
 export const getProfileImage = async (nickName) => {
   const { data } = await axios.get(`${nickName}/request-profile`);
-  return { resultCode : data.resultCode, data : data.result }
-}
+  return { resultCode: data.resultCode, data: data.result };
+};
+
+export const changeConstellationId = async (newId) => {};

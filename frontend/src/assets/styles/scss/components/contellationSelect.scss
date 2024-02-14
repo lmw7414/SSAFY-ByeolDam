@@ -60,8 +60,8 @@
 .constellation-select-box {
   display: flex;
   flex-direction: row;
-  background-color: white;
-  padding: 0.5rem;
+  background-color: $secondary;
+  padding: 1.2rem 1.5rem;
   margin: 1rem 0;
   border-radius: 0.5rem;
   align-items: center;
@@ -76,7 +76,7 @@
   }
 
   div {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 }
 
