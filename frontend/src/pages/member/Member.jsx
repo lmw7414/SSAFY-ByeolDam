@@ -21,7 +21,7 @@ export default function Member() {
     event.preventDefault();
     login({ email, password })
       .then(() => {
-        navigate('/home');
+        navigate('../home', { replace: true });
       })
       .catch((e) => {
         alert('아이디 또는 비밀번호가 일치하지 않거나 존재하지 않는 아이디입니다.');

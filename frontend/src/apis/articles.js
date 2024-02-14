@@ -4,7 +4,6 @@ export const getArticles = async (articleId) => {
   const { data } = await axios.get(`articles/${articleId}`);
   return data;
 };
-
 export const addArticle = async (
   { description, articleHashtagSet, disclosureType, imageType },
   file,
@@ -56,6 +55,11 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
 // async 안에 인자에 뭐가 들어가야 할지 잘 모르겠음
 export const getFeeds = async () => {
   const { data } = await axios.get(`articles/follow`);
-  //return pageable
-  //jpa pagination axios 검색
+  // console.log("axios에서 getFeeds의 data: ", data);
+  return { resultCode : data.resultCode, data : data.result.content }
+}
+
+export const getProfileImage = async (nickName) => {
+  const { data } = await axios.get(`${nickName}/request-profile`);
+  return { resultCode : data.resultCode, data : data.result }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import douglasPeucker from '../../utils/douglasPeucker';
 
@@ -21,6 +22,8 @@ export default function ConstellationWriting() {
   const [convertedPoints, setConvertedPoints] = useState([]);
   const [imageConfig, setImageConfig] = useState(null);
   const [name, setName] = useState('');
+
+  const navigate = useNavigate();
 
   const editorSize = 550;
 
@@ -99,6 +102,9 @@ export default function ConstellationWriting() {
       ultimate: convertedPoints,
       description: '',
       origin: originalFile,
+    }).then((result) => {
+      navigate('/home');
+      alert('별자리가 생성되었습니다.');
     });
   };
 

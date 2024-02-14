@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { logout } from '../apis/member';
+import { getArticles } from '../apis/articles';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -31,6 +32,11 @@ export default function NavBar() {
     navigate('/home');
     setBarId(0);
   };
+
+  const goFeed = () => {
+    navigate('/feed');
+    setBarId(2);
+  }
 
   const closeNavBar = () => {
     setIsNavBarVisible(!isNavBarVisible);
@@ -144,6 +150,7 @@ export default function NavBar() {
                   text={'피드'}
                   src={'/images/nav-bar-menu-icons/feed.png'}
                   alt={'feed'}
+                  onClick={goFeed}
                 />
                 <NavBarMenu
                   text={'알림'}

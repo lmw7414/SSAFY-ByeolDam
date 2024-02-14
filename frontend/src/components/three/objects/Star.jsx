@@ -17,13 +17,7 @@ export default function Star({
   const [modalState, setModalState] = useModal();
 
   const openAritcleModal = async () => {
-    const { resultCode, data } = await getArticles(1);
-    // const data = {
-    //   title: '글 제목',
-    //   description: '글 내용',
-    //   hits: 3,
-    //   createdAt: '2023-01-01',
-    // };
+    const { result: data } = await getArticles(articleId);
 
     setModalState({
       isOpen: true,
@@ -31,9 +25,14 @@ export default function Star({
       children: (
         <ArticleModal
           articleId={articleId}
-          description={data.description}
+          description={data.title}
           hits={data.hits}
           createdAt={data.createdAt}
+          imgUrl={data.imageResponse.imageUrl}
+          owner={data.ownerEntityNickname}
+          tags={data.articleHashtags}
+          commentList={data.commentList}
+          constellationName={data.constellationEntityName}
         />
       ),
     });
