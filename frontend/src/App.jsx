@@ -35,7 +35,7 @@ export default function App() {
 function NavApp() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
-
+  const [isNavBarVisible, setIsNavBarVisible] = useState(true);
   const [modalState, setModalState] = useState({
     isOpen: false,
     children: null,
@@ -54,9 +54,17 @@ function NavApp() {
     <>
       {isLogin ? (
         <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
-          <NavBar />
+          <NavBar isNavBarVisible={isNavBarVisible} setIsNavBarVisible={setIsNavBarVisible} />
           <Routes>
-            <Route path="/home/*" element={<Universe />} />
+            <Route
+              path="/home/*"
+              element={
+                <Universe
+                  isNavBarVisible={isNavBarVisible}
+                  setIsNavBarVisible={setIsNavBarVisible}
+                />
+              }
+            />
             <Route path="/settings" element={<Settings />} />
             <Route path="/search/star" element={<SearchStar />} />
             <Route path="/search/constellation" element={<SearchConstellation />} />
