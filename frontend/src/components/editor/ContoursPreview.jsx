@@ -50,7 +50,7 @@ export default function ContoursPreview({
         {points.length > 2 && (
           <Line
             points={convertedPoints.reduce((prev, [x, y]) => [...prev, x, y], [])}
-            stroke={'#8E7CAC'}
+            stroke={'#c7bed6'}
             strokeWidth={4}
             closed={true}
             tension={0.05}
