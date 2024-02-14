@@ -33,6 +33,11 @@ export default function NavBar() {
     setBarId(0);
   };
 
+  const goFeed = () => {
+    navigate('/feed');
+    setBarId(2);
+  }
+
   const closeNavBar = () => {
     setIsNavBarVisible(!isNavBarVisible);
   };
@@ -145,6 +150,7 @@ export default function NavBar() {
                   text={'피드'}
                   src={'/images/nav-bar-menu-icons/feed.png'}
                   alt={'feed'}
+                  onClick={goFeed}
                 />
                 <NavBarMenu
                   text={'알림'}

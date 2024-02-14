@@ -58,8 +58,6 @@ public class ConstellationEntity {
         this.hits++;
     }
 
-    // TODO : 별자리 Admin, user 나누는 로직 확인좀
-
     public void addUser(ConstellationUserEntity constellationUserEntity) {
         this.constellationUserEntities.add(constellationUserEntity);
         constellationUserEntity.updateConstellationEntity(this);
