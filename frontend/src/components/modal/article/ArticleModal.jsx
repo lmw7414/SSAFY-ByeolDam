@@ -71,7 +71,11 @@ export default function ArticleModal({
                 );
               })}
             </select>
-            {constellationId != newConstellationId && <button>적용하기</button>}
+            {constellationId != newConstellationId && (
+              <button type="button" onClick={changeConsteallationId}>
+                적용하기
+              </button>
+            )}
           </div>
         )}
       </div>

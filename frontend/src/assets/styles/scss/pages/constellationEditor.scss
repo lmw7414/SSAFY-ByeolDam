@@ -32,6 +32,12 @@
   padding: 1rem 5rem;
 }
 
+.constellation-editor-wrapper > div:first-child,
+.constellation-editor-preview-container > div:nth-child(2),
+.constellation-editor-preview-container > div:nth-child(4) {
+  border: 1px solid #c7bed6;
+}
+
 .constellation-editor-preview-label {
   color: white;
   font-weight: bold;
@@ -67,10 +73,25 @@
     margin-right: 0;
   }
 
+  button:disabled {
+    cursor: auto;
+    color: #c7bed6;
+  }
+
   label {
     color: white;
     margin-right: 0.5rem;
     font-size: 1.1rem;
+  }
+}
+
+.constellation-editor-button-wrapper {
+  display: flex;
+  align-items: center;
+  img {
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0.5rem;
   }
 }
 

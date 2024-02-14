@@ -69,4 +69,10 @@ export const getProfileImage = async (nickName) => {
   return { resultCode: data.resultCode, data: data.result };
 };
 
-export const changeConstellationId = async (newId) => {};
+export const changeConstellationId = async ({ constellationId, articleId }) => {
+  const { data } = await axios.post(`/articles/constellation-select/${constellationId}`, {
+    articleIdSet: [articleId],
+  });
+
+  return data;
+};
