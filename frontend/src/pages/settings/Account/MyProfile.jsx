@@ -42,7 +42,7 @@ export default function MyProfile({
   };
 
   return (
-    <div>
+    <div className="my-profile-container">
       <h1 className="nickname settings-title">계정</h1>
       <div className="notification-settings-menu">
         <h2 className="nickname">프로필 사진</h2>
@@ -81,37 +81,37 @@ export default function MyProfile({
           <div className="account-profile-image-box">
             <div className="flex-col-box">
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">닉네임</p>
+                <p className="profile-info-field body-1-1">닉네임</p>
                 <div>
                   <p className="profile-info-value body-1-1">{profileData.nickname}</p>
                 </div>
               </div>
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">이메일</p>
+                <p className="profile-info-field body-1-1">이메일</p>
                 <div>
                   <p className="profile-info-value body-1-1">{profileData.email}</p>
                 </div>
               </div>
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">이름</p>
+                <p className="profile-info-field body-1-1">이름</p>
                 <div>
                   <p className="profile-info-value body-1-1">{profileData.name}</p>
                 </div>
               </div>
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">생일</p>
+                <p className="profile-info-field body-1-1">생일</p>
                 <div>
                   <p className="profile-info-value body-1-1">{profileData.birthday}</p>
                 </div>
               </div>
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">소개글</p>
+                <p className="profile-info-field body-1-1">소개글</p>
                 <div>
                   <p className="profile-info-value body-1-1">{profileData.memo}</p>
                 </div>
               </div>
               <div className="my-profile-box">
-                <p className="profile-info-text body-1-1">공개범위</p>
+                <p className="profile-info-field body-1-1">공개범위</p>
                 <div>
                   <p className="profile-info-value body-1-1">
                     {profileData.disclosureType === 'VISIBLE' ? '공개' : '비공개'}

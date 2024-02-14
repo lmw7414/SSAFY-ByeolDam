@@ -33,6 +33,7 @@ export default function Star({
           tags={data.articleHashtags}
           commentList={data.commentList}
           constellationName={data.constellationEntityName}
+          constellationId={data.constellationId}
         />
       ),
     });

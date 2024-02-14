@@ -40,6 +40,7 @@ export default function ConstellationModal() {
     const nickname = JSON.parse(sessionStorage.profile).nickname;
 
     getMyConstellations(nickname).then(({ labeledList, unLabeledList }) => {
+      console.log(labeledList, unLabeledList);
       setConstellationList(labeledList);
       setUnLabeled(unLabeledList);
     });
@@ -51,17 +52,17 @@ export default function ConstellationModal() {
         <ConstellationRow
           title={'미분류'}
           constellationThumb={'https://cdn-icons-png.flaticon.com/512/1/1766.png'}
-          hoverAritcles={unLabeled.map(({ id, imageResponse }) => {
+          hoverArticles={unLabeled.map(({ id, imageResponse }) => {
             return { id: id, articleThumbnail: imageResponse.thumbnailUrl };
           })}
         />
-        {constellationList.map(({ name, id, hoverAritcles, contourResponse }) => (
+        {constellationList.map(({ name, id, hoverArticles, contourResponse }) => (
           <ConstellationRow
             key={id}
             title={name}
             constellationThumb={contourResponse.cThumbUrl}
             constellationId={id}
-            hoverAritcles={hoverAritcles}
+            hoverArticles={hoverArticles}
             constellationName={name}
           />
         ))}

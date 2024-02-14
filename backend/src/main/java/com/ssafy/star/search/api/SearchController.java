@@ -4,7 +4,6 @@ import com.ssafy.star.article.dto.Article;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
-import com.ssafy.star.constellation.dto.ConstellationUser;
 import com.ssafy.star.contour.domain.ContourEntity;
 import com.ssafy.star.contour.dto.Contour;
 import com.ssafy.star.contour.dto.ContourResponse;
@@ -91,7 +90,8 @@ public class SearchController {
                     constellationEntity.getName(),
                     contourResponse,
                     constellationEntity.getHits(),
-                    constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
+                    constellationEntity.getAdminEntity().getNickname(),
+                    constellationEntity.getArticleEntities().size(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt()
             ));

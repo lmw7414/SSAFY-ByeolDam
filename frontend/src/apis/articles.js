@@ -5,32 +5,37 @@ export const getArticles = async (articleId) => {
   return data;
 };
 export const addArticle = async (
-  { description, articleHashtagSet, disclosureType, imageType },
+  { description, articleHashtagSet, disclosureType, imageType, constellationId },
   file,
 ) => {
   const formData = new FormData();
 
-  const request = new Blob(
-    [
-      JSON.stringify({
-        description,
-        articleHashtagSet,
-        disclosureType,
-        imageType,
-        title: description,
-      }),
-    ],
-    { type: 'application/json' },
-  );
+  const requestObject =
+    constellationId === -1
+      ? { description, articleHashtagSet, disclosureType, imageType, title: description }
+      : {
+          description,
+          articleHashtagSet,
+          disclosureType,
+          imageType,
+          constellationId,
+          title: description,
+        };
+
+  const request = new Blob([JSON.stringify(requestObject)], { type: 'application/json' });
 
   formData.append('request', request);
   formData.append('imageFile', file);
 
-  const result = await axios.post('articles/no-constellation', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
+  const result = await axios.post(
+    constellationId === -1 ? '/articles/no-constellation' : '/articles',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     },
-  });
+  );
 
   return result;
 };
@@ -56,13 +61,21 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
 export const getFeeds = async () => {
   const { data } = await axios.get(`articles/follow`);
   // console.log("axios에서 getFeeds의 data: ", data);
-  return { resultCode : data.resultCode, data : data.result.content }
-}
+  return { resultCode: data.resultCode, data: data.result.content };
+};
 
 export const getProfileImage = async (nickName) => {
   const { data } = await axios.get(`${nickName}/request-profile`);
-  return { resultCode : data.resultCode, data : data.result }
-}
+  return { resultCode: data.resultCode, data: data.result };
+};
+
+export const changeConstellationId = async ({ constellationId, articleId }) => {
+  const { data } = await axios.post(`/articles/constellation-select/${constellationId}`, {
+    articleIdSet: [articleId],
+  });
+
+  return data;
+};
 
 export const getLikeCount = async (articleId) => {
   const { data } = await axios.get(`articles/${articleId}/likeCount`);

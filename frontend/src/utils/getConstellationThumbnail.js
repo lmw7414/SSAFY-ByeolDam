@@ -96,8 +96,8 @@ export const getConstellationThumbnail = ({
 
   const line = new Konva.Line({
     points: points.reduce((prev, [x, y]) => [...prev, x, y], []),
-    stroke: '#8E7CAC',
-    strokeWidth: 4,
+    stroke: '#c7bed6',
+    strokeWidth: 5,
     closed: true,
     tension: 0.05,
   });
@@ -108,7 +108,7 @@ export const getConstellationThumbnail = ({
     const circle = new Konva.Circle({
       x: x,
       y: y,
-      radius: 3,
+      radius: 4,
       fill: 'white',
     });
     layer.add(circle);

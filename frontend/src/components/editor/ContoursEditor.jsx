@@ -70,27 +70,15 @@ export default function ContoursEditor({
         editor.current.container().style.cursor = 'auto';
       }}
     >
-      {/* 
-{!!image && (
-          <KonvaImage
-            ref={imageRef}
-            image={image}
-            opacity={0.6}
-            x={(width - (width * image.width) / Math.max(image.width, image.height)) / 2}
-            y={(height - (height * image.height) / Math.max(image.width, image.height)) / 2}
-            width={(width * image.width) / Math.max(image.width, image.height)}
-            height={(height * image.height) / Math.max(image.width, image.height)}
-          />
-        )} */}
       <Layer>
         <KonvaImage
           ref={imageRef}
-          image={image}
-          opacity={0.6}
           x={0}
           y={0}
           width={width}
           height={height}
+          image={image}
+          opacity={0.6}
         />
         {points.map(([x, y], i) => (
           <Line

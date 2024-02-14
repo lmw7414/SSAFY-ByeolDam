@@ -18,7 +18,6 @@ import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
-import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -219,9 +218,13 @@ public class ArticleService {
         Set<UserEntity> userEntitySet = userEntity.getFollowEntities().stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
 
         List<ArticleEntity> articleEntityList = new ArrayList<>();
-        // ID별 모든 게시글 가져오기
-        for(UserEntity tmpUserEntity : userEntitySet) {
-            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities();
+
+        for (UserEntity tmpUserEntity : userEntitySet) {
+            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities()
+                    .stream()
+                    .filter(articleEntity -> articleEntity.getDeletedAt() == null) // deletedAt이 null인 것들만 필터링
+                    .collect(Collectors.toList());
+
             articleEntityList.addAll(tmpArticleEntities);
         }
 
@@ -296,13 +299,16 @@ public class ArticleService {
     @Transactional
     public void select(Long constellationId, Set<Long> articleIdSet, String email) {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);                      // 현재 사용자 user entity
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
+        ConstellationEntity constellationEntity = null;
+        if(constellationId != -1) {
+             constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
 
-        // 별자리 회원인지 확인하기
-        if(constellationEntity.getAdminEntity() != userEntity) {
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
-        }
+            // 별자리 회원인지 확인하기
+            if(constellationEntity.getAdminEntity() != userEntity) {
+                throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                        String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
+            }
+        } else {}
 
         // 반복문을 통해 Set에 있는 article 전부 별자리에 배정
         for(Long articleId : articleIdSet) {
@@ -417,17 +423,17 @@ public class ArticleService {
         return articleLikeRepository.countByArticleEntity(articleEntity);
     }
 
-    //게시물 좋아요한 사람들의 목록 확인
-    @Transactional
-    public List<User> likeList(Long articleId) {
-        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        //목록 확인
-        return articleLikeRepository.findAllByArticleEntity(articleEntity)
-                .stream()
-                .map(ArticleLikeEntity::getUserEntity)
-                .map(User::fromEntity)
-                .toList();
-    }
+//    //게시물 좋아요한 사람들의 목록 확인
+//    @Transactional
+//    public List<User> likeList(Long articleId) {
+//        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+//        //목록 확인
+//        return articleLikeRepository.findAllByArticleEntity(articleEntity)
+//                .stream()
+//                .map(ArticleLikeEntity::getUserEntity)
+//                .map(User::fromEntity)
+//                .toList();
+//    }
 
 
     public int countArticles(String email){

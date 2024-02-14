@@ -50,46 +50,46 @@
 }
 
 .constellation-select-list {
-  width: 400px;
+  width: 500px;
   height: 350px;
   overflow: scroll;
   overflow-x: hidden;
   padding-left: 15px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .constellation-select-box {
   display: flex;
-  flex-direction: row;
-  background-color: white;
-  padding: 0.5rem;
-  margin: 1rem 0;
+  flex-direction: column;
+  background-color: $secondary;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 1.5%;
   border-radius: 0.5rem;
   align-items: center;
-  width: 370px;
+  width: 30%;
   justify-content: space-between;
-  transition: all 0.4s;
+  border: 2px solid $secondary;
+  transition: background-color 0.4s;
   cursor: pointer;
 
   img {
-    width: 5rem;
-    height: 5rem;
+    width: 8rem;
+    height: 8rem;
   }
 
   div {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    color: white;
+    margin-top: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-.constellation-select-box:first-child {
-  margin-top: 0;
-}
-
-.constellation-select-box:last-child {
-  margin-bottom: 0;
-}
-
 .constellation-select-box-selected {
-  background-color: $green;
+  background-color: $page-background;
 }
 
 .article-prev-btn {

@@ -12,7 +12,7 @@ export default function ArticleWritingModal() {
     articleHashtagSet: [],
     disclosureType: 'VISIBLE',
     imageType: 'ARTICLE',
-    constellation: '',
+    constellationId: -1,
   });
   const [modalState, setModalState] = useModal();
 
