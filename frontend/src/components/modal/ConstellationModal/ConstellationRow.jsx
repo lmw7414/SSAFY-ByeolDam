@@ -6,7 +6,7 @@ export default function ConstellationRow({
   title,
   constellationId,
   constellationThumb,
-  hoverAritcles,
+  hoverArticles,
 }) {
   const [modalState, setModalState] = useModal();
 
@@ -35,8 +35,8 @@ export default function ConstellationRow({
         <img src={constellationThumb} alt="" className="constellation-thumbnail" />
       </div>
       <div className="star-list-container">
-        {hoverAritcles &&
-          hoverAritcles.map(({ id, articleThumbnail }) => (
+        {hoverArticles &&
+          hoverArticles.map(({ id, articleThumbnail }) => (
             <div
               key={id}
               className="star-image-container"

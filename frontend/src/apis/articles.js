@@ -5,32 +5,37 @@ export const getArticles = async (articleId) => {
   return data;
 };
 export const addArticle = async (
-  { description, articleHashtagSet, disclosureType, imageType },
+  { description, articleHashtagSet, disclosureType, imageType, constellationId },
   file,
 ) => {
   const formData = new FormData();
 
-  const request = new Blob(
-    [
-      JSON.stringify({
-        description,
-        articleHashtagSet,
-        disclosureType,
-        imageType,
-        title: description,
-      }),
-    ],
-    { type: 'application/json' },
-  );
+  const requestObject =
+    constellationId === -1
+      ? { description, articleHashtagSet, disclosureType, imageType, title: description }
+      : {
+          description,
+          articleHashtagSet,
+          disclosureType,
+          imageType,
+          constellationId,
+          title: description,
+        };
+
+  const request = new Blob([JSON.stringify(requestObject)], { type: 'application/json' });
 
   formData.append('request', request);
   formData.append('imageFile', file);
 
-  const result = await axios.post('articles', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
+  const result = await axios.post(
+    constellationId === -1 ? '/articles/no-constellation' : '/articles',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     },
-  });
+  );
 
   return result;
 };

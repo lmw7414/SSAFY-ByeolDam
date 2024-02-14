@@ -5,7 +5,6 @@ import { useFrame } from '@react-three/fiber';
 import { Line, useCursor, Image } from '@react-three/drei';
 import { easing } from 'maath';
 import getUuidByString from 'uuid-by-string';
-import { getConstellationContour } from '../../../apis/constellation';
 
 export default function Constellation({
   position = [5, 1.5, 5],
@@ -54,7 +53,7 @@ export default function Constellation({
       hoverArticles.map(({ id, articleThumbnail }, idx) => {
         return {
           id: id,
-          position: [pointList[idx][0], pointsList[idx][1], 0],
+          position: [point[idx][0], point[idx][1], 0],
           thumbnail: articleThumbnail,
         };
       }),
@@ -101,7 +100,7 @@ export default function Constellation({
           position={position}
           scale={1.5}
           name={id}
-          id={id}
+          articleId={id}
           isActive={isActive}
           thumbnail={thumbnail}
         />
