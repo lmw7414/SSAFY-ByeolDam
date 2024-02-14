@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import "../../assets/styles/scss/components/feed.scss";
 
 export default function Feed({feedData}) {
-    const [like, setLike] = useState(feedData.like);
+    const [like, setLike] = useState(false);
   
     // 좋아요 버튼을 누르면 좋아요 post 요청
     // 댓글 열고 닫기
@@ -21,11 +21,11 @@ export default function Feed({feedData}) {
   return (
     <div className='feed'>
         <div className='feed-header'>
-          <img src="frontend\src\assets\images\search-bar-filter-icons\user.png" alt="user-profile"/>
+          {/* <img src="frontend\src\assets\images\search-bar-filter-icons\user.png" alt="user-profile"/> */}
           {feedData.ownerEntityNickname}
         </div>
-        <div>
-        <img src={feedData.imageResponse.imageUrl} width={300} height={300} className='feed-img' alt={feedData.title}/>
+        <div className='image-container'>
+        <img src={feedData.imageResponse.imageUrl} width={468} height={468} className='feed-img' alt={feedData.title}/>
         </div>
         <div className='feed-content-container'>
           <div className='feed-content-header'>
@@ -36,7 +36,7 @@ export default function Feed({feedData}) {
             </div>
           <div className='feed-tag'>
             {feedData.articleHashtags.map((tag, index) => {
-              return <span key={index} className='tag'>{tag}</span>
+              return <span key={index} className='tag'>#{tag}</span>
             })}
           </div>
           <div className='feed-hits'>
