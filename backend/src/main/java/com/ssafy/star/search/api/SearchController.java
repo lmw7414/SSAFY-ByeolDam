@@ -11,7 +11,6 @@ import com.ssafy.star.contour.dto.ContourResponse;
 import com.ssafy.star.search.application.ArticleSearchService;
 import com.ssafy.star.search.application.ConstellationSearchService;
 import com.ssafy.star.search.application.UserSearchService;
-import com.ssafy.star.search.dto.request.SearchRequest;
 import com.ssafy.star.search.dto.response.ConstellationSearchResponse;
 import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.dto.response.SearchResponse;
@@ -22,8 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -48,9 +47,8 @@ public class SearchController {
             }
     )
     @GetMapping("/search/title")
-    public Response<List<ArticleResponse>> titleSearch(@RequestBody SearchRequest request) {
-        log.info("request 정보 : {}", request);
-        String keyword = request.keyword();
+    public Response<List<ArticleResponse>> titleSearch(@RequestParam String keyword) {
+        log.info("request 정보 : {}", keyword);
         return Response.success(articleSearchService.titleSearch(keyword).stream().map(Article::fromEntity).map(ArticleResponse::fromArticle).toList());
     }
 
@@ -63,9 +61,8 @@ public class SearchController {
             }
     )
     @GetMapping("/search/hashtag")
-    public Response<List<ArticleResponse>> hashtagSearch(@RequestBody SearchRequest request) {
-        log.info("request 정보 : {}", request);
-        String keyword = request.keyword();
+    public Response<List<ArticleResponse>> hashtagSearch(@RequestParam String keyword) {
+        log.info("request 정보 : {}", keyword);
         return Response.success(articleSearchService.hashtagSearch(keyword).stream().map(Article::fromEntity).map(ArticleResponse::fromArticle).toList());
     }
 
@@ -78,9 +75,8 @@ public class SearchController {
             }
     )
     @GetMapping("/search/constellation")
-    public Response<List<ConstellationSearchResponse>> constellationSearch(@RequestBody SearchRequest request) {
-        log.info("request 정보 : {}", request);
-        String keyword = request.keyword();
+    public Response<List<ConstellationSearchResponse>> constellationSearch(@RequestParam String keyword) {
+        log.info("request 정보 : {}", keyword);
 
         // 별자리 검색 반환 타입은 ConstellationEntity
         List<ConstellationEntity> constellationEntities = constellationSearchService.constellationSearch(keyword);
@@ -113,9 +109,8 @@ public class SearchController {
             }
     )
     @GetMapping("/search/user")
-    public Response<List<SearchResponse>> userSearch(@RequestBody SearchRequest request) {
-        log.info("request 정보 : {}", request);
-        String keyword = request.keyword();
+    public Response<List<SearchResponse>> userSearch(@RequestParam String keyword) {
+        log.info("request 정보 : {}", keyword);
         return Response.success(userSearchService.userSearch(keyword).stream().map(User::fromEntity).map(SearchResponse::fromUser).toList());
     }
 }
