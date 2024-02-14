@@ -4,9 +4,12 @@ import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
+import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.common.response.Response;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.image.ImageType;
+import com.ssafy.star.notification.application.NotificationService;
+import com.ssafy.star.notification.dto.response.NotificationResponse;
 import com.ssafy.star.user.application.FollowService;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.ApprovalStatus;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -38,6 +42,7 @@ public class UserController {
     private final FollowService followService;
     private final ArticleService articleService;
     private final ConstellationService constellationService;
+    private final NotificationService notificationService;
 
     @Operation(
             summary = "이메일로 닉네임 찾기",
@@ -361,5 +366,26 @@ public class UserController {
     @GetMapping("/{nickname}/request-profile")
     public Response<String> getProfileImageUrl(@PathVariable(name = "nickname") String nickname) {
         return Response.success(userService.getProfileImageUrl(nickname));
+    }
+    
+    @Operation(
+            summary = "나의 알림 리스트를 확인한다.",
+            description = "나의 알림 리스트를 확인합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "나의 알림 리스트를 반환", content = @Content(schema = @Schema(implementation = NotificationResponse.class)))
+            }
+    )
+    @GetMapping("/notification")
+    public Response<Page<NotificationResponse>> notification(Authentication authentication, Pageable pageable) {
+        return Response.success(userService.notificationList(authentication.getName(), pageable).map(NotificationResponse::fromNotificationDto));
+    }
+
+    @Operation(
+            summary = "SseEmitter를 생성 및 연결",
+            description = "사용자의 실시간 알림을 위해 SseEmitter를 생성하고 연결합니다"
+    )
+    @GetMapping(value = "/notification/subscribe")
+    public SseEmitter subscribe(Authentication authentication) {
+        return notificationService.connectNotification(authentication.getName());
     }
 }

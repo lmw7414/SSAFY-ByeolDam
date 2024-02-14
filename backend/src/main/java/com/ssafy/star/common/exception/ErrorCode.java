@@ -24,6 +24,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Token is expired"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not founded"),
+    REPLY_TO_REPLY(HttpStatus.BAD_REQUEST, "unable to reply to parent comments"),
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "Content type is invalid"),
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "Follow status not founded in follow list"),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Request is invalid"),
@@ -33,6 +34,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image Not Founded"),
     CONTOUR_NOT_FOUND(HttpStatus.NOT_FOUND, "Contour Not Founded"),
+    NOTIFICATION_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connect to notification occurs error"),
     ALREADY_DEFAULT_IMAGE(HttpStatus.CONFLICT, "Profile already Default");
 
     final private HttpStatus status;

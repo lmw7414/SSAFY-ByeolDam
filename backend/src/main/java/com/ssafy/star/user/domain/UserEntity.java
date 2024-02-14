@@ -2,6 +2,7 @@ package com.ssafy.star.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleLikeEntity;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.global.oauth.domain.ProviderType;
@@ -80,6 +81,9 @@ public class UserEntity {
 
     @Setter
     private LocalDate birthday;
+
+    @OneToMany(mappedBy = "userEntity", orphanRemoval = true)
+    private List<ArticleLikeEntity> articleLikes = new ArrayList<>();
 
     private LocalDateTime createdAt;
 
