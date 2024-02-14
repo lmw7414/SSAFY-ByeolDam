@@ -57,7 +57,7 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
 
   return (
     <div className="canvas-container">
-      <div className={isNavBarVisible ? 'main_buttons_box' : 'display-none'}>
+      <div className={`main_buttons_box ${isNavBarVisible ? '' : 'main-butons-box-hidden'}`}>
         <img
           src="/images/main_buttons/post_create_button.png"
           alt="post_create_button"

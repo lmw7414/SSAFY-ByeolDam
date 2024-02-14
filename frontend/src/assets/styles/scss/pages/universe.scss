@@ -10,14 +10,19 @@
 .main_buttons_box {
   position: absolute;
   z-index: 1;
-  bottom: 5%;
-  left: 60%;
-  transform: translate(-60%, -10%);
+  bottom: 1rem;
+  right: 2rem;
+  // transform: translate(-60%, -10%);
   display: flex;
   justify-content: space-between;
+  transition: bottom 0.5s;
 }
 
 .main-button {
-  height: 8rem;
+  height: 6rem;
   cursor: pointer;
+}
+
+.main-butons-box-hidden {
+  bottom: -6rem;
 }
