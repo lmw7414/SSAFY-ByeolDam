@@ -48,7 +48,6 @@ export default function ConstellationSelectList({ article, setArticle }) {
             });
           }}
           article={article}
-          index={idx + 1}
           id={id}
         />
       ))}

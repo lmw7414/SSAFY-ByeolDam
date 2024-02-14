@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Comment from '../../article/Comment';
-import axios from '../../../apis/axios';
-import { addComments, getComments } from '../../../apis/comments';
+import { addComments } from '../../../apis/comments';
+import { getUserUniverse } from '../../../apis/constellation';
 
 export default function ArticleModal({
   articleId,
@@ -13,34 +13,23 @@ export default function ArticleModal({
   tags,
   constellationName,
   commentList,
+  constellationId,
 }) {
-  const [comments, setComments] = useState(commentList);
+  const [comments, setComments] = useState(commentList || []);
   const [constellation, setConstellation] = useState(constellationName);
   const [liked, setLiked] = useState(false);
   const [content, setContent] = useState('');
-  const [profile, setProfile] = useState({});
   const [constellationList, setConstellationList] = useState([]);
+  const [newConstellationId, setNewConstellationId] = useState(constellationId);
 
-  const readProfile = async () => {
-    const profileStr = sessionStorage.getItem('profile');
-    const profile = JSON.parse(profileStr);
-    const data = await axios.get(`/users/${profile.nickname}`);
-    setProfile(data.data.result);
-  };
-
-  const readConstellationList = async () => {
-    try {
-      const response = await axios.get(`/constellations/user/${profile.nickname}`);
-      const data = response.data;
-      // console.log('데이터 가져오기 성공:', data);
-    } catch (error) {
-      // console.log('데이터 가져오기 실패:', error);
-    }
-  };
+  const nickname = JSON.parse(sessionStorage.profile).nickname;
 
   useEffect(() => {
-    readProfile();
-    readConstellationList();
+    if (owner === nickname) {
+      getUserUniverse(nickname).then(({ result }) => {
+        setConstellationList(result);
+      });
+    }
   }, []);
 
   const createComment = (e) => {
@@ -48,9 +37,20 @@ export default function ArticleModal({
     setContent(content.trim());
     addComments(articleId, content).then((result) => {
       console.log('댓글이 생성되었습니다:', content);
+      // getComment 실행
     });
     setContent('');
   };
+
+  const selectConstellationId = (e) => {
+    setNewConstellationId(e.target.value ? e.target.value : null);
+  };
+
+  const changeConsteallationId = () => {};
+
+  useEffect(() => {
+    console.log(constellationId, newConstellationId);
+  }, [newConstellationId]);
 
   const likeCount = 1;
 
@@ -58,29 +58,28 @@ export default function ArticleModal({
     <div className="modal-box">
       <div className="article-img-box">
         <img src={imgUrl} alt="사용자 게시물 이미지" />
-        <p className="nickname">
-          현재 속한 별자리:
-          <li>
-            {constellation}
-            <i class="down"></i>
-            <div class="dropdown">
-              <a class="drop-link" href="#">
-                Link1
-              </a>
-              <a class="drop-link" href="#">
-                Link2
-              </a>
-              <a class="drop-link" href="#">
-                Link3
-              </a>
-            </div>
-          </li>
-        </p>
+        {owner === nickname && (
+          <div className="select-constellation-box">
+            <div>현재 속한 별자리:</div>
+            <select onChange={selectConstellationId}>
+              <option value={''}>미분류</option>
+              {constellationList.map(({ id, name }) => {
+                return (
+                  <option key={id} selected={newConstellationId == id} value={id}>
+                    {name}
+                  </option>
+                );
+              })}
+            </select>
+            {constellationId != newConstellationId && <button>적용하기</button>}
+          </div>
+        )}
       </div>
 
       <div className="modal-right-box">
         <div className="modal-describe-box">
           <p className="nickname article-owner">{owner}</p>
+          <p className="nickname article-description">{description}</p>
           <div id="tags">
             {tags.map((tag) => (
               <p key={tag} className="nickname">
@@ -89,6 +88,7 @@ export default function ArticleModal({
             ))}
           </div>
           <div id="like-area">
+            <p className="nickname">좋아요 {likeCount}개</p>
             <img
               src={liked ? '/images/heart_activated.png' : '/images/heart.png'}
               alt="좋아요"
@@ -96,7 +96,6 @@ export default function ArticleModal({
                 setLiked(!liked);
               }}
             />
-            <p className="nickname">좋아요 {likeCount}개</p>
           </div>
         </div>
 

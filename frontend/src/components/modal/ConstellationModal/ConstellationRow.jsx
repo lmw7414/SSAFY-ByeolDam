@@ -24,6 +24,7 @@ export default function ConstellationRow({
           tags={result.articleHashtags}
           constellationName={''}
           commentList={result.commentList}
+          constellationId={result.constellationId}
         />
       ),
     });
