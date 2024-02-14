@@ -300,13 +300,16 @@ public class ArticleService {
     @Transactional
     public void select(Long constellationId, Set<Long> articleIdSet, String email) {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);                      // 현재 사용자 user entity
-        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
+        ConstellationEntity constellationEntity = null;
+        if(constellationId != -1) {
+             constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
 
-        // 별자리 회원인지 확인하기
-        if(constellationEntity.getAdminEntity() != userEntity) {
-            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
-                    String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
-        }
+            // 별자리 회원인지 확인하기
+            if(constellationEntity.getAdminEntity() != userEntity) {
+                throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                        String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
+            }
+        } else {}
 
         // 반복문을 통해 Set에 있는 article 전부 별자리에 배정
         for(Long articleId : articleIdSet) {
