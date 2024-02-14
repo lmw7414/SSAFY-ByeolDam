@@ -71,7 +71,7 @@ function NavApp() {
             <Route path="/constellation" element={<ConstellationWriting />} />
             <Route path="/feed" element={<FeedList />}></Route>
           </Routes>
-          <ModalContainer modalState={modalState} />
+          <ModalContainer modalState={modalState} isNavBarVisible={isNavBarVisible} />
         </ModalContext.Provider>
       ) : (
         <div></div>
