@@ -91,6 +91,7 @@ public class SearchController {
                     contourResponse,
                     constellationEntity.getHits(),
                     constellationEntity.getAdminEntity().getNickname(),
+                    constellationEntity.getArticleEntities().size(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt()
             ));
