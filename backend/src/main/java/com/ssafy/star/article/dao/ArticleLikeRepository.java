@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface ArticleLikeRepository extends JpaRepository<ArticleLikeEntity, Long> {
+    @Query("SELECT entity FROM ArticleLikeEntity entity WHERE entity.articleEntity = :articleEntity AND entity.userEntity = :userEntity AND entity.deletedAt IS NULL")
     Optional<ArticleLikeEntity> findByUserEntityAndArticleEntity(UserEntity userEntity, ArticleEntity articleEntity);
 
     @Query(value = "SELECT COUNT(*) FROM ArticleLikeEntity entity WHERE entity.articleEntity =:articleEntity")
