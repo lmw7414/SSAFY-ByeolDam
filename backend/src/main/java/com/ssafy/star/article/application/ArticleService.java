@@ -50,10 +50,60 @@ public class ArticleService {
     private final ArticleLikeRepository articleLikeRepository;
 
     /**
-     * 게시물 등록
+     * 게시물 등록과 별자리 배정
       */
     @Transactional
     public void create(
+            String title,
+            String description,
+            DisclosureType disclosureType,
+            String email,
+            MultipartFile imageFile,
+            ImageType imageType,
+            Set<String> articleHashtagSet,
+            Long constellationId
+    ) {
+        String url = "";
+        String thumbnailUrl = "";
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
+        ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId); // 배정하려는 별자리 Entity
+
+        // 별자리 회원인지 확인하기
+        if(constellationEntity.getAdminEntity() != userEntity) {
+            throw new ByeolDamException(ErrorCode.INVALID_PERMISSION,
+                    String.format("%s has no permission with constellation %d", userEntity.getNickname(), constellationId));
+        }
+
+        // 이미지 S3에 업로드 (가장 마지막에 놓을 것)
+        try{
+            url = s3uploader.upload(imageFile, "articles");
+            thumbnailUrl = s3uploader.uploadThumbnail(imageFile, "thumbnails");
+            ImageEntity imageEntity = imageService.saveImage(imageFile.getOriginalFilename(), url, thumbnailUrl, imageType);
+
+            ArticleEntity articleEntity = ArticleEntity.of(title,
+                    description,
+                    disclosureType,
+                    userEntity,
+                    null,
+                    imageEntity
+            );
+
+            articleRepository.save(articleEntity);
+
+            articleHashtagRelationService.saveHashtag(articleEntity, articleHashtagSet);
+
+            articleEntity.selectConstellation(constellationEntity);
+        } catch (IOException e) {
+            s3uploader.deleteImageFromS3(url);
+            s3uploader.deleteImageFromS3(thumbnailUrl);
+        }
+    }
+
+    /**
+     * 게시물 등록 및 미분류 별자리 배정
+     */
+    @Transactional
+    public void createWithNoConstellation(
             String title,
             String description,
             DisclosureType disclosureType,
