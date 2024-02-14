@@ -1,4 +1,4 @@
-const R = 40;
+const R = 45;
 
 const getPositionList = (size) => [
   ...Array.from({ length: size }, (x, i) => {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Comment from '../../article/Comment';
 import { addComments } from '../../../apis/comments';
 import { getUserUniverse } from '../../../apis/constellation';
+import { changeConstellationId } from '../../../apis/articles';
 
 export default function ArticleModal({
   articleId,
@@ -46,11 +47,11 @@ export default function ArticleModal({
     setNewConstellationId(e.target.value ? e.target.value : null);
   };
 
-  const changeConsteallationId = () => {};
-
-  useEffect(() => {
-    console.log(constellationId, newConstellationId);
-  }, [newConstellationId]);
+  const changeConsteallationId = () => {
+    changeConstellationId({ articleId, constellationId: newConstellationId }).then(() => {
+      constellationId = newConstellationId;
+    });
+  };
 
   const likeCount = 1;
 
@@ -61,11 +62,11 @@ export default function ArticleModal({
         {owner === nickname && (
           <div className="select-constellation-box">
             <div>현재 속한 별자리:</div>
-            <select onChange={selectConstellationId}>
+            <select onChange={selectConstellationId} defaultValue={constellationId || ''}>
               <option value={''}>미분류</option>
               {constellationList.map(({ id, name }) => {
                 return (
-                  <option key={id} selected={newConstellationId == id} value={id}>
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 );

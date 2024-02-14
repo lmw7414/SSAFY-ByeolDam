@@ -42,7 +42,7 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
       const positionList = getPositionList(result.length);
 
       setConstellationList(
-        result.map(({ name, id, contourResponse, hoverArticles }, idx) => {
+        result.slice(0, 20).map(({ name, id, contourResponse, hoverArticles }, idx) => {
           return {
             id,
             hoverArticles,
