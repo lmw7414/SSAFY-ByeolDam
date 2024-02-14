@@ -28,7 +28,7 @@ export default function ConstellationSelectList({ article, setArticle }) {
           key={-1}
           id={-1}
           name={'미분류'}
-          thumbnail={'/images/base/close-button.png'}
+          thumbnail={'/images/base/unclassified.png'}
           index={0}
           article={article}
           setSelected={() => {
