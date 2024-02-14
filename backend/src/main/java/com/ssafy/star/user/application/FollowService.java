@@ -3,10 +3,6 @@ package com.ssafy.star.user.application;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.types.DisclosureType;
-import com.ssafy.star.notification.dto.NotificationArgs;
-import com.ssafy.star.notification.dto.NotificationEvent;
-import com.ssafy.star.notification.dto.NotificationType;
-import com.ssafy.star.notification.producer.NotificationProducer;
 import com.ssafy.star.user.domain.ApprovalStatus;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
@@ -27,7 +23,6 @@ import java.util.List;
 public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
-    private final NotificationProducer notificationProducer;
 
     public ApprovalStatus requestFollow(String fromUserEmail, String toUserNickname) {
         // 1. 해당 유저가 실제로 존재하는지 확인하기
@@ -46,14 +41,12 @@ public class FollowService {
                 Follow.fromEntity(followRepository.save(
                         FollowEntity.of(fromUser, toUser, LocalDateTime.now(), ApprovalStatus.ACCEPT)
                 ));
-                notificationProducer.send(new NotificationEvent(NotificationType.FOLLOWED, new NotificationArgs(fromUser.getId(), toUser.getId()), toUser.getId()));
                 return ApprovalStatus.ACCEPT;
             } else {
                 // 상대의 프로필이 비공개인 경우  -> 팔로우 요청 보내기(status는 REQUEST)
                 Follow.fromEntity(followRepository.save(
                         FollowEntity.of(fromUser, toUser, null, ApprovalStatus.REQUEST)
                 ));
-                notificationProducer.send(new NotificationEvent(NotificationType.FOLLOW_REQUEST, new NotificationArgs(fromUser.getId(), toUser.getId()), toUser.getId()));
                 return ApprovalStatus.REQUEST;
             }
         } else {
@@ -93,7 +86,6 @@ public class FollowService {
                 result.setStatus(ApprovalStatus.ACCEPT);
                 result.setAcceptDate(LocalDateTime.now());
                 followRepository.save(result);
-                notificationProducer.send(new NotificationEvent(NotificationType.FOLLOW_ACCEPT, new NotificationArgs(fromUser.getId(), toUser.getId()), toUser.getId()));
                 return ApprovalStatus.ACCEPT;
             }
         }

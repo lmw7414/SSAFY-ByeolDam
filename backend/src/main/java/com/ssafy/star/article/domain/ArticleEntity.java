@@ -78,7 +78,9 @@ public class ArticleEntity {
 
     // TODO : modifiedAt 생성시 초기화되는 것 해결
     @PrePersist
-    void createdAt() { this.createdAt = LocalDateTime.from(LocalDateTime.now()); }
+    void createdAt() {
+        this.createdAt = LocalDateTime.from(LocalDateTime.now());
+    }
 
     @PreUpdate
     void modifiedAt() {
