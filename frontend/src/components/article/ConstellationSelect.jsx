@@ -12,7 +12,7 @@ export default function ConstellationSelect({ writeArticle, article, setArticle,
   return (
     <div className="constellation-select-container">
       <label className="constellation-select-label">별자리 선택</label>
-      <ConstellationSelectList />
+      <ConstellationSelectList setArticle={setArticle} article={article} />
       <label className="constellation-select-label" htmlFor="disclosure">
         공개범위 선택
       </label>

@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function ConstellationSelectBox({ thumbnail, name, selected, setSelected, index }) {
+export default function ConstellationSelectBox({ thumbnail, name, id, article, setSelected }) {
   return (
     <div
-      className={`constellation-select-box ${selected === index ? 'constellation-select-box-selected' : ''}`}
+      className={`constellation-select-box ${article.constellationId === id ? 'constellation-select-box-selected' : ''}`}
       onClick={setSelected}
     >
       <img src={thumbnail} />
