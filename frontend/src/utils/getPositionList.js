@@ -2,7 +2,7 @@ const R = 40;
 
 const getPositionList = (size) => [
   ...Array.from({ length: size }, (x, i) => {
-    const rand = i == 0 ? 0 : Math.random() * 10;
+    const rand = i == 0 ? 0 : Math.random() * 5;
     // const rand = 0;
     const angle = (Math.PI / 180) * (i % 2 ? 64 + rand : 39 + rand);
     const pos =

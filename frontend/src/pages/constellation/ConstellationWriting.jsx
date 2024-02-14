@@ -9,6 +9,8 @@ import ContoursPreview from '../../components/editor/ContoursPreview';
 
 import { addConstellation, getAIcontours } from '../../apis/constellation';
 import { getConstellationThumbnail } from '../../utils/getConstellationThumbnail';
+import getResizedImage from '../../utils/getResizedImage';
+import dataURLtoBlob from '../../utils/dataURLtoBlob';
 
 export default function ConstellationWriting() {
   const [points, setPoints] = useState([]);
@@ -22,6 +24,7 @@ export default function ConstellationWriting() {
   const [convertedPoints, setConvertedPoints] = useState([]);
   const [imageConfig, setImageConfig] = useState(null);
   const [name, setName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -42,7 +45,7 @@ export default function ConstellationWriting() {
       img.onload = async () => {
         setPointList([]);
         setPoints([]);
-        setImage(img);
+        setImage(getResizedImage({ img, width: img.naturalWidth, height: img.naturalHeight }));
       };
     });
   };
@@ -60,7 +63,7 @@ export default function ConstellationWriting() {
               const [x, y] = point;
               return { x, y };
             }),
-            5,
+            4,
           );
 
           return zipped.map(({ x, y }) => [(x * editorSize) / width, (y * editorSize) / height]);
@@ -70,8 +73,23 @@ export default function ConstellationWriting() {
   };
 
   const getAIcontoursByImage = async () => {
-    const data = await getAIcontours(originalFile);
-    setContoursData(data);
+    const resizedImageBlob = dataURLtoBlob(image.src);
+    const resizedImageFile = new File(
+      [resizedImageBlob],
+      originalFile.name.split('.')[0] + '.png',
+      { type: 'image/png' },
+    );
+
+    setIsLoading(true);
+
+    try {
+      const data = await getAIcontours(resizedImageFile);
+      setContoursData(data);
+    } catch (e) {
+      console.error(e);
+    }
+
+    setIsLoading(false);
   };
 
   const undo = () => {
@@ -94,6 +112,13 @@ export default function ConstellationWriting() {
       img: image,
     });
 
+    const resizedImageBlob = dataURLtoBlob(image.src);
+    const resizedImageFile = new File(
+      [resizedImageBlob],
+      originalFile.name.split('.')[0] + '.png',
+      { type: 'image/png' },
+    );
+
     addConstellation({
       name,
       thumb,
@@ -101,7 +126,7 @@ export default function ConstellationWriting() {
       contoursList: pointList,
       ultimate: convertedPoints,
       description: '',
-      origin: originalFile,
+      origin: resizedImageFile,
     }).then((result) => {
       navigate('/home');
       alert('별자리가 생성되었습니다.');
@@ -162,12 +187,13 @@ export default function ConstellationWriting() {
         </div>
         <div className="constellation-editor-button-box">
           <div className="constellation-editor-button-wrapper">
-            <button type="button" onClick={loadImage}>
+            <button type="button" onClick={loadImage} disabled={isLoading}>
               사진변경
             </button>
-            <button type="button" onClick={getAIcontoursByImage}>
+            <button type="button" onClick={getAIcontoursByImage} disabled={isLoading}>
               AI 윤곽선 추출
             </button>
+            {isLoading && <img src="/images/loading.gif" />}
           </div>
           <div className="constellation-editor-input-wrapper">
             <label>별자리 이름 :</label>
