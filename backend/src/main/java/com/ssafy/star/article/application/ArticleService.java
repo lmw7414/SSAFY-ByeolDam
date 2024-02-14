@@ -18,7 +18,6 @@ import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.domain.ImageEntity;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
-import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -424,17 +423,17 @@ public class ArticleService {
         return articleLikeRepository.countByArticleEntity(articleEntity);
     }
 
-    //게시물 좋아요한 사람들의 목록 확인
-    @Transactional
-    public List<User> likeList(Long articleId) {
-        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
-        //목록 확인
-        return articleLikeRepository.findAllByArticleEntity(articleEntity)
-                .stream()
-                .map(ArticleLikeEntity::getUserEntity)
-                .map(User::fromEntity)
-                .toList();
-    }
+//    //게시물 좋아요한 사람들의 목록 확인
+//    @Transactional
+//    public List<User> likeList(Long articleId) {
+//        ArticleEntity articleEntity = getArticleEntityOrException(articleId);
+//        //목록 확인
+//        return articleLikeRepository.findAllByArticleEntity(articleEntity)
+//                .stream()
+//                .map(ArticleLikeEntity::getUserEntity)
+//                .map(User::fromEntity)
+//                .toList();
+//    }
 
 
     public int countArticles(String email){

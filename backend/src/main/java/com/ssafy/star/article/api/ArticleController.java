@@ -7,7 +7,6 @@ import com.ssafy.star.article.dto.response.ArticleResponse;
 import com.ssafy.star.article.dto.response.Response;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
-import com.ssafy.star.user.dto.response.LikeUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -245,17 +244,17 @@ public class ArticleController {
         return Response.success(articleService.likeCount(articleId));
     }
 
-    @Operation(
-            summary = "게시물을 좋아요한 사람의 목록 확인",
-            description = "게시물을 좋아요한 사람의 목록을 확인합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
-            }
-
-    )
-    @GetMapping("/articles/{articleId}/likeList")
-    public Response<List<LikeUserResponse>> likeList(@PathVariable Long articleId) {
-        return Response.success(articleService.likeList(articleId).stream().map(LikeUserResponse::fromUser).toList());
-    }
+//    @Operation(
+//            summary = "게시물을 좋아요한 사람의 목록 확인",
+//            description = "게시물을 좋아요한 사람의 목록을 확인합니다.",
+//            responses = {
+//                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = LikeUserResponse.class)))
+//            }
+//
+//    )
+//    @GetMapping("/articles/{articleId}/likeList")
+//    public Response<List<LikeUserResponse>> likeList(@PathVariable Long articleId) {
+//        return Response.success(articleService.likeList(articleId).stream().map(LikeUserResponse::fromUser).toList());
+//    }
 
 }
