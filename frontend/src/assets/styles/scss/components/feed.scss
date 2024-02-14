@@ -9,10 +9,23 @@
 
 .feed-img {
     border-radius: 15px;
+    display: flex;
+    justify-content: center;
 }
 
 .feed-header {
+    display: flex;
+    align-items: center;
     padding: 10px;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.feed-header img{
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 10px;
 }
 
 .feed-content-header {
@@ -38,4 +51,24 @@
 
 .feed-tag .tag:not(:first-child) {
     margin-left: 5px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+}
+
+.comment-nickname {
+    font-weight: bold;
+    margin-right: 10px; /* nickName과 content 사이의 간격 조정 */
+}
+
+.content-container{
+    display: flex;
+    align-items: center;
+}
+
+.content-onwer{
+    font-weight: bold;
+    margin-right: 10px;
 }
