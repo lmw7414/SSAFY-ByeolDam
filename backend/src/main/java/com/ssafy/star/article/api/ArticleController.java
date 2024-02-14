@@ -158,6 +158,18 @@ public class ArticleController {
     }
 
     @Operation(
+            summary = "미분류 게시물 전체 조회",
+            description = "미분류 별자리에 있는 게시물 전체 조회입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ArticleResponse.class)))
+            }
+    )
+    @GetMapping("/articles/constellation")
+    public Response<List<ArticleResponse>> articlesInNoConstellation(Authentication authentication) {
+        return Response.success(articleService.articlesInNoConstellation(authentication.getName()).stream().map(ArticleResponse::fromArticle).toList());
+    }
+
+    @Operation(
             summary = "휴지통 조회",
             description = "휴지통을 조회합니다.",
             responses = {

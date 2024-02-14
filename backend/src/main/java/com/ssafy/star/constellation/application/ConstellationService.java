@@ -423,7 +423,6 @@ public class ConstellationService {
 //        contourEntity.setCThumbUrl(cThumbUrl);
 //        contourEntity.setContoursList(contoursList);
 //        contourEntity.setUltimate(ultimate);
-        // TODO : 기존 ID 값이 아닌 새로운 ID가 생성되는 문제 발생
 
         ContourEntity newContourEntity = contourRepository.save(ContourEntity.of(originUrl, thumbUrl, cThumbUrl, contoursList, ultimate));
         //contourRepository.delete(contourEntity);

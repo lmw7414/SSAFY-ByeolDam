@@ -286,6 +286,16 @@ public class ArticleService {
         return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
     }
 
+    /**
+     * 미분류 별자리의 전체 게시물 조회
+     */
+    @Transactional
+    public List<Article> articlesInNoConstellation(String email) {
+        // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
+        UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
+        return articleRepository.findAllByConstellationEntityNullAndOwnerEntity(userEntity).stream().map(Article::fromEntity).toList();
+    }
+
     // 포스트가 존재하는지
     private ArticleEntity getArticleEntityOrException(Long articleId) {
         return articleRepository.findById(articleId).orElseThrow(() ->
