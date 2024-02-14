@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import "../../assets/styles/scss/components/feed.scss";
+import UserBox from '../feed/UserBox.jsx';
+import Comment from '../feed/Comment.jsx';
 
 export default function Feed({feedData}) {
-    const [like, setLike] = useState(feedData.like);
-  
+    const [like, setLike] = useState(false);
+    const [comments, setComments] = useState([]);
     // 좋아요 버튼을 누르면 좋아요 post 요청
     // 댓글 열고 닫기
     useEffect(()=>{
@@ -12,20 +13,18 @@ export default function Feed({feedData}) {
     
     const toggleLike = () => {
       setLike(!like);
-      console.log("like : ", like);
+      // console.log("like : ", like);
     }
 
     console.log(feedData);
+    console.log("owner 체크: ", feedData.ownerEntityNickname);
 
     
   return (
     <div className='feed'>
-        <div className='feed-header'>
-          <img src="frontend\src\assets\images\search-bar-filter-icons\user.png" alt="user-profile"/>
-          {feedData.ownerEntityNickname}
-        </div>
-        <div>
-        <img src={feedData.imageResponse.imageUrl} width={300} height={300} className='feed-img' alt={feedData.title}/>
+        <UserBox nickName={feedData.ownerEntityNickname}></UserBox>
+        <div className='image-container'>
+        <img src={feedData.imageResponse.imageUrl} width={468} height={468} className='feed-img' alt={feedData.title}/>
         </div>
         <div className='feed-content-container'>
           <div className='feed-content-header'>
@@ -36,19 +35,30 @@ export default function Feed({feedData}) {
             </div>
           <div className='feed-tag'>
             {feedData.articleHashtags.map((tag, index) => {
-              return <span key={index} className='tag'>{tag}</span>
+              return <span key={index} className='tag'>#{tag}</span>
             })}
           </div>
           <div className='feed-hits'>
             <span>{feedData.hits}</span>
           </div>
           </div>
+          <div className='content-container'>
+          <div className='content-onwer'>{feedData.ownerEntityNickname}</div>
           <div className='feed-content'>
             {feedData.description}
           </div>
+          </div>
           <div>
-            {/* <Comment /> */}
-            {/* <ChildComment></ChildComment> */}
+            {feedData.commentList.map(({id, nickName, content, createdAt, parentId, childrenComments}) => {
+              return <Comment 
+              id = {id}
+              nickName = {nickName}
+              content = {content}
+              createdAt = {createdAt}
+              parentId = {parentId}
+              childrenComments = {childrenComments}
+            />
+            })}
           </div>
         </div>
     </div>
