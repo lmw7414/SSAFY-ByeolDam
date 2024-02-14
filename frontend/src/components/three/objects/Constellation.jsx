@@ -50,15 +50,15 @@ export default function Constellation({
 
     setPointList(point);
 
-    setStarList(
-      hoverArticles.map(({ id, articleThumbnail }, idx) => {
-        return {
-          id: id,
-          position: [pointList[idx][0], pointsList[idx][1], 0],
-          thumbnail: articleThumbnail,
-        };
-      }),
-    );
+    // setStarList(
+    //   hoverArticles.map(({ id, articleThumbnail }, idx) => {
+    //     return {
+    //       id: id,
+    //       position: [pointList[idx][0], pointsList[idx][1], 0],
+    //       thumbnail: articleThumbnail,
+    //     };
+    //   }),
+    // );
 
     group.current.lookAt(new THREE.Vector3(0, 0.03, 0));
   }, []);

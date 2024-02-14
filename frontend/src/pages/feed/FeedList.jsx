@@ -13,7 +13,6 @@ export default function FeedList() {
     const getFeedData = async () => {
         try{
             const {data} = await getFeeds();
-            // console.log("result: ", data);
             setFeedList([...feedList, ...data]);
         } catch(error) {
             console.error("Error while fetching feed: ", error);
@@ -26,13 +25,9 @@ export default function FeedList() {
 
     useEffect(() => {
         if(inView) {
-            // console.log(inView, "무한 스크롤 요청")
             getFeedData();
         }
     }, [inView]);
-
-
-    // console.log("Feed list after useEffect: ", feedList);
 
   return (
     <div className='feed-container'>

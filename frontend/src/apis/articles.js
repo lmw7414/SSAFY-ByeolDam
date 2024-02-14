@@ -63,3 +63,18 @@ export const getProfileImage = async (nickName) => {
   const { data } = await axios.get(`${nickName}/request-profile`);
   return { resultCode : data.resultCode, data : data.result }
 }
+
+export const getLikeCount = async (articleId) => {
+  const { data } = await axios.get(`articles/${articleId}/likeCount`);
+  return { resultCode : data.resultCode, data : data.result } 
+}
+
+export const postLike = async (articleId) => {
+  const data = await axios.post(`articles/${articleId}/likes`);
+  return data;
+}
+
+export const getLike = async (articleId) => {
+  const {data} = await axios.get(`articles/${articleId}/likes`);
+  return { resultCode : data.resultCode, data : data.result }
+}
