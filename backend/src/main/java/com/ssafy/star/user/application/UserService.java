@@ -23,6 +23,8 @@ import com.ssafy.star.global.oauth.util.HeaderUtils;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.dao.ImageRepository;
 import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.notification.dto.NotificationDto;
+import com.ssafy.star.notification.repository.NotificationRepository;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
@@ -66,15 +68,16 @@ public class UserService {
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final EmailCacheRepository emailCacheRepository;
     private final EmailService emailService;
+    private final ArticleLikeRepository articleLikeRepository;
     private final BCryptPasswordEncoder encoder;
     private final S3uploader s3uploader;
-    private final ArticleLikeRepository articleLikeRepository;
     private final ConstellationLikeRepository constellationLikeRepository;
     private final ArticleRepository articleRepository;
     private final ConstellationUserRepository constellationUserRepository;
     private final ArticleService articleService;
     private final ConstellationService constellationService;
     private final FollowService followService;
+    private final NotificationRepository notificationRepository;
 
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
@@ -491,5 +494,12 @@ public class UserService {
                 () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", nickname))
         );
         return user.getImageEntity().getUrl();
+    }
+
+    // 알람목록 확인
+    @Transactional
+    public Page<NotificationDto> notificationList(String email, Pageable pageable) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
+        return notificationRepository.findAllByUserEntity(userEntity, pageable).map(NotificationDto::fromEntity);
     }
 }
