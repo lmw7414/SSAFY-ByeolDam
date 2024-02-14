@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { logout } from '../apis/member';
 import { getArticles } from '../apis/articles';
@@ -20,6 +20,8 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
 
   // 네비게이션 바 작동 관련
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location.pathname);
 
   const goHome = () => {
     navigate('/home');
@@ -29,7 +31,7 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   const goFeed = () => {
     navigate('/feed');
     setBarId(2);
-  }
+  };
 
   const closeNavBar = () => {
     setIsNavBarVisible(!isNavBarVisible);
@@ -177,7 +179,10 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
             </div>
           </div>
 
-          <div className="nav-bar-toggle-container" onClick={closeNavBar}>
+          <div
+            className="nav-bar-toggle-container"
+            onClick={location.pathname === '/settings' ? null : closeNavBar}
+          >
             <div className="nav-bar-menu-icon-box">
               <img
                 src={
