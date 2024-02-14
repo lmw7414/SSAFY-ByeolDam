@@ -10,6 +10,7 @@ public record ConstellationSearchResponse(
         ContourResponse contourResponse,
         long hits,
         String adminNickname,
+        long articleCnt,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
