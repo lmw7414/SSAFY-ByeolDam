@@ -34,6 +34,10 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
     changeBar(4);
     changeExNav(1);
   };
+  const openFeedPage = () => {
+    changeBar(2);
+    changeExNav(1);
+  };
 
   const changeFilter = (id) => {
     setFilterId(id);
@@ -101,11 +105,17 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                   alt={'search'}
                   onClick={openSearchBar}
                 />
+                <Link to={'/feed'} onClick={openFeedPage}>
                 <ExtendedBarIcon
-                  src={'/images/nav-bar-menu-icons/feed.png'}
+                  src={
+                    barId === 2
+                    ? '/images/nav-bar-menu-icons/feed_activated.png'
+                    : '/images/nav-bar-menu-icons/feed.png'
+                  }
                   alt={'feed'}
                   className={'extended-bar-menu-icon'}
                 />
+                </Link>
                 <ExtendedBarIcon
                   src={
                     barId === 3
