@@ -26,6 +26,7 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   const goHome = () => {
     navigate('/home');
     setBarId(0);
+    setNavEx(0);
   };
 
   const goFeed = () => {
