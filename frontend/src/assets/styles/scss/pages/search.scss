@@ -1,7 +1,7 @@
 .search-page-background {
   background-color: $modal-background;
   height: 100%;
-  background-image: url('/images/space.jpg'); /* 이미지 경로를 적절히 수정하세요 */
+  background-image: url('/images/base/search_background_img.png'); /* 이미지 경로를 적절히 수정하세요 */
   background-size: cover; /* 이미지를 div에 맞게 조절 */
   overflow-y: auto;
   &::-webkit-scrollbar {
@@ -63,6 +63,11 @@
   justify-content: space-between;
 }
 
+.search-result-overlay p {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
 .search-result-header {
   display: flex;
   justify-content: end;
@@ -75,4 +80,29 @@
 
 .search-result-main-like-comment {
   display: flex;
+}
+
+.search-result-main-like-comment img {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+#hashtag {
+  font-weight: 100;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+#title {
+  margin-bottom: 0.8rem;
+}
+
+.search-like-comment {
+  display: flex;
+  align-items: end;
+  margin-left: 0.6rem;
+  gap: 0.2rem;
 }
