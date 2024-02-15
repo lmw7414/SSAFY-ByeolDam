@@ -11,6 +11,7 @@ import com.ssafy.star.global.oauth.util.NicknameUtils;
 import com.ssafy.star.user.application.UserService;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.dto.User;
+import com.ssafy.star.user.repository.UserCacheRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -21,8 +22,10 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,6 +36,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // 호출 시점 : 액세스 토큰을 OAuth2 제공자로부터 받았을 때.
     private final UserService userService;
     private final UserRepository userRepository;
+    private final UserCacheRepository userCacheRepository;
     private final BCryptPasswordEncoder encoder;
 
 
@@ -55,7 +59,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      * 해당 이메일로 된 계정이 없는 경우 -> 회원가입
      * 해당 이메일로 된 계정이 있는 경우 -> 토큰 발급
      */
-    private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+    @Transactional
+    protected OAuth2User process(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
 
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, oAuth2User.getAttributes());
@@ -69,8 +74,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             String dummyPassword = encoder.encode("{bcrypt}" + UUID.randomUUID());
             userService.join(userInfo.getEmail(), providerType, dummyPassword, userInfo.getName(), NicknameUtils.createRandomNickname(userInfo.getEmail()));
         }
+        // 레디스에 유저 정보 저장 후 리턴
         return userRepository.findByEmail(userInfo.getEmail())
-                .map(User::fromEntity)
+                .flatMap(userEntity -> {
+                    User user = User.fromEntity(userEntity);
+                    userCacheRepository.setUser(user);
+                    return Optional.of(user);
+                })
                 .map(user -> BoardPrincipal.from(user, oAuth2User.getAttributes()))
                 .orElseThrow(() ->
                         new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userInfo.getEmail()))
