@@ -118,13 +118,13 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
 
                   <ProfileInfo
                     text={'팔로워'}
-                    num={profile.followings}
+                    num={profile.followers}
                     onClick={openFollowerModal}
                   />
 
                   <ProfileInfo
                     text={'팔로잉'}
-                    num={profile.followers}
+                    num={profile.followings}
                     onClick={openFollowingModal}
                   />
                 </div>
