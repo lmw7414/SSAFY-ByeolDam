@@ -36,10 +36,7 @@ export default function ArticleModal({
   const createComment = (e) => {
     e.preventDefault();
     setContent(content.trim());
-    addComments({articleId, content}).then((result) => {
-      console.log('댓글이 생성되었습니다:', content);
-      // getComment 실행
-    });
+    addComments({ articleId, content }).then((result) => {});
     setContent('');
   };
 
@@ -132,7 +129,7 @@ export default function ArticleModal({
               }
             }}
           />
-          <img src="images/comment_create_btn.png" alt="댓글 생성 버튼" onClick={createComment} />
+          <img src="/images/comment_create_btn.png" alt="댓글 생성 버튼" onClick={createComment} />
         </div>
       </div>
     </div>

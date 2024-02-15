@@ -56,11 +56,8 @@ export const editArticle = async ({ articleId, title, disclosure, tag, descripti
   return { resultCode: data.resultCode };
 };
 
-// feed 받아오는 axios
-// async 안에 인자에 뭐가 들어가야 할지 잘 모르겠음
 export const getFeeds = async () => {
   const { data } = await axios.get(`articles/follow`);
-  // console.log("axios에서 getFeeds의 data: ", data);
   return { resultCode: data.resultCode, data: data.result.content };
 };
 
@@ -79,15 +76,15 @@ export const changeConstellationId = async ({ constellationId, articleId }) => {
 
 export const getLikeCount = async (articleId) => {
   const { data } = await axios.get(`articles/${articleId}/likeCount`);
-  return { resultCode : data.resultCode, data : data.result } 
-}
+  return { resultCode: data.resultCode, data: data.result };
+};
 
 export const postLike = async (articleId) => {
   const data = await axios.post(`articles/${articleId}/likes`);
   return data;
-}
+};
 
 export const getLike = async (articleId) => {
-  const {data} = await axios.get(`articles/${articleId}/likes`);
-  return { resultCode : data.resultCode, data : data.result }
-}
+  const { data } = await axios.get(`articles/${articleId}/likes`);
+  return { resultCode: data.resultCode, data: data.result };
+};

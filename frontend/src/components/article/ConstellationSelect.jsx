@@ -42,6 +42,7 @@ export default function ConstellationSelect({ writeArticle, article, setArticle,
       </div>
       <div className="article-button-wrapper">
         <button
+          type="button"
           className="article-prev-btn"
           onClick={() => {
             setStep(1);
