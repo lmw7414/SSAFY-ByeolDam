@@ -43,8 +43,9 @@ export default function Feed({feedData}) {
       e.preventDefault();
       setContent(content.trim());
       addComments({articleId, content}).then((result) => {
+        getFeedComments();
+        setContent('');
       });
-      setContent('');
     };
 
     const getFeedComments = async () => {
