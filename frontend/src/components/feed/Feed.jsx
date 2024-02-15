@@ -7,6 +7,7 @@ import { useThrottle } from '@uidotdev/usehooks';
 
 export default function Feed({feedData}) {
     const [like, setLike] = useState(false);
+    const [initLike, setInitLike] = useState(false);
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
     const [likeCount, setLikeCount] = useState(0);
@@ -19,11 +20,12 @@ export default function Feed({feedData}) {
     useEffect(()=>{
       getFeedComments();
       getLikeCnt();
-      getLikeStatus();
+      getLikeStatus(true);
     },[])
 
     useEffect(()=>{
       if (isMounted.current) {
+        if(initLike === throttleValue) return;
         postLike(feedData.id).then(()=>{
           getLikeStatus();
           getLikeCnt();
@@ -65,11 +67,12 @@ export default function Feed({feedData}) {
     }
 
     // 좋아요 상태를 가져오는 함수
-    const getLikeStatus = async () => {
+    const getLikeStatus = async (isInit) => {
       try{
         const {data} = await getLike(feedData.id);
         console.log("좋아요 상태: ",data);
-        setLike(data);
+        setInitLike(data);
+        if(isInit) setLike(data);
       }catch(error){
         console.error("Get Like Status Failed", error);
       }
