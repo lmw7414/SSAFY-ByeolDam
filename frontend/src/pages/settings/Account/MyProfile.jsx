@@ -35,6 +35,7 @@ export default function MyProfile({
         },
       });
       setProfileUpdate(1);
+      window.location.reload();
       // setProfileData({ ...profileData, imageUrl: imageUrl });
     } catch (error) {
       console.error('Error updating profile image:', error);
