@@ -1,9 +1,7 @@
 package com.ssafy.star.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.common.types.DisclosureType;
-import com.ssafy.star.constellation.domain.ConstellationUserEntity;
 import com.ssafy.star.global.oauth.domain.ProviderType;
 import com.ssafy.star.image.domain.ImageEntity;
 import jakarta.persistence.*;
@@ -16,8 +14,6 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -66,17 +62,17 @@ public class UserEntity {
     @Enumerated(value = EnumType.STRING)
     private DisclosureType disclosureType = DisclosureType.VISIBLE;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "fromUser", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FollowEntity> followEntities = new ArrayList<>();
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "userEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ConstellationUserEntity> constellationUserEntities = new ArrayList<>();
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "ownerEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ArticleEntity> articleEntities = new ArrayList<>();
+//    @ToString.Exclude
+//    @OneToMany(mappedBy = "fromUser", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<FollowEntity> followEntities = new ArrayList<>();
+//
+//    @ToString.Exclude
+//    @OneToMany(mappedBy = "userEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<ConstellationUserEntity> constellationUserEntities = new ArrayList<>();
+//
+//    @ToString.Exclude
+//    @OneToMany(mappedBy = "ownerEntity", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<ArticleEntity> articleEntities = new ArrayList<>();
 
     @Setter
     private LocalDate birthday;
