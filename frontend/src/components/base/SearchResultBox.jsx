@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
+import useModal from '../../hooks/useModal';
 import axios from '../../apis/axios';
 import { getComments } from '../../apis/comments';
+import ArticleModal from '../../components/modal/article/ArticleModal';
 
 export default function SearchResultBox({ data, filterId }) {
   const [cntLike, setCntLike] = useState(0);
   const [cntComment, setCntComment] = useState(0);
+  const [modalState, setModalState] = useModal();
 
   useEffect(() => {
     // 게시물 검색
@@ -32,8 +35,35 @@ export default function SearchResultBox({ data, filterId }) {
     }
   }, []);
 
+  const openArticleModal = (data) => {
+    setModalState({
+      isOpen: true,
+      title: '게시물 상세',
+      children: (
+        <ArticleModal
+          articleId={data.id}
+          description={data.title}
+          hits={data.hits}
+          createdAt={data.createdAt}
+          imgUrl={data.imageResponse.imageUrl}
+          owner={data.ownerEntityNickname}
+          tags={data.articleHashtags}
+          commentList={data.commentList}
+          constellationName={data.constellationEntityName}
+          constellationId={data.constellationId}
+        />
+      ),
+    });
+  };
+
   return (
-    <div key={data.id} className="search-result">
+    <div
+      key={data.id}
+      className="search-result"
+      onClick={() => {
+        openArticleModal(data);
+      }}
+    >
       <div className="search-result-overlay">
         <div className="search-result-header">
           <p>{data.ownerEntityNickname || data.adminNickname}</p>
@@ -65,7 +95,8 @@ export default function SearchResultBox({ data, filterId }) {
       <img
         src={
           (!!data.imageResponse && data.imageResponse.imageUrl) ||
-          (!!data.contourResponse && data.contourResponse.cThumbUrl)
+          (!!data.contourResponse && data.contourResponse.cThumbUrl) ||
+          (!!data.imgUrl && data.imgUrl)
         }
         alt=""
         className="search-result-image"
