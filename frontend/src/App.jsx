@@ -15,6 +15,7 @@ import SocialLogin from './pages/member/SocialLogin';
 import SearchStar from './pages/search/SearchStar';
 import SearchConstellation from './pages/search/SearchConstellation';
 import FeedList from './pages/feed/FeedList';
+import OtherUniverse from './pages/OtherUniverse';
 
 export default function App() {
   return (
@@ -41,10 +42,14 @@ function NavApp() {
     children: null,
     title: '',
   });
+  const [nickname, setNickname] = useState(null);
 
   useEffect(() => {
-    if (sessionStorage['profile'] && sessionStorage['access_token']) setIsLogin(true);
-    else {
+    if (isLogin) return;
+    if (sessionStorage['profile'] && sessionStorage['access_token']) {
+      setIsLogin(true);
+      setNickname(JSON.parse(sessionStorage['profile']).nickname);
+    } else {
       alert('로그인이 필요한 페이지입니다');
       navigate('/');
     }
@@ -54,7 +59,11 @@ function NavApp() {
     <>
       {isLogin ? (
         <ModalContext.Provider value={{ modalState, setModalState }} className="provider">
-          <NavBar isNavBarVisible={isNavBarVisible} setIsNavBarVisible={setIsNavBarVisible} />
+          <NavBar
+            isNavBarVisible={isNavBarVisible}
+            setIsNavBarVisible={setIsNavBarVisible}
+            nickname={nickname}
+          />
           <Routes>
             <Route
               path="/home/*"
@@ -64,6 +73,10 @@ function NavApp() {
                   setIsNavBarVisible={setIsNavBarVisible}
                 />
               }
+            />
+            <Route
+              path="/universe/:nickname"
+              element={<OtherUniverse setNickname={setNickname} />}
             />
             <Route path="/settings" element={<Settings />} />
             <Route path="/search/star" element={<SearchStar />} />

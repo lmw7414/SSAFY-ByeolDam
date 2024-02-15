@@ -11,7 +11,7 @@ export default function MyProfile({
   setProfileData,
 }) {
   // if (!profileData) {
-  //   return null; // 또는 로딩 상태를 나타내는 다른 JSX를 반환할 수 있습니다.
+  //   return null;
   // }
   const [uploadedImage, setUploadedImage] = useState(null);
 
@@ -22,8 +22,6 @@ export default function MyProfile({
   const onChangeImage = async (e) => {
     const file = e.target.files[0];
     const imageUrl = URL.createObjectURL(file);
-    // console.log(imageUrl);
-    // setProfileData({ ...profileData, [imageUrl]: imageUrl });
 
     try {
       const formData = new FormData();
@@ -31,7 +29,7 @@ export default function MyProfile({
 
       await axios.put('users/profile-image', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // 필요한 경우에만 추가
+          'Content-Type': 'multipart/form-data',
         },
       });
       setProfileUpdate(1);

@@ -51,7 +51,6 @@ export default function ConstellationControls({ controller, constellationList })
   }, [selected]);
 
   useFrame((state, dt) => {
-    // console.log(state.camera.position, controllerRef.current.object.position, lastCameraState);
     if (!lastCameraState.isDone) {
       if (!lastCameraState.prev) {
         easing.damp3(controllerRef.current.target, lastCameraState.target, 0.2, dt);

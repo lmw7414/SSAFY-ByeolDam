@@ -64,7 +64,6 @@ const refreshTokenAndResolveRequests = async (error) => {
       isRefreshing = true;
 
       const token = await refreshToken();
-      console.log('new token : ' + token);
       setToken(token);
       failedRequestQueue.forEach((request) => request(token));
       failedRequestQueue = [];

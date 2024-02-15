@@ -40,7 +40,6 @@ export default function ConstellationModal() {
     const nickname = JSON.parse(sessionStorage.profile).nickname;
 
     getMyConstellations(nickname).then(({ labeledList, unLabeledList }) => {
-      console.log(labeledList, unLabeledList);
       setConstellationList(labeledList);
       setUnLabeled(unLabeledList);
     });

@@ -74,6 +74,7 @@ export default function ConstellationWriting() {
 
   const getAIcontoursByImage = async () => {
     const resizedImageBlob = dataURLtoBlob(image.src);
+
     const resizedImageFile = new File(
       [resizedImageBlob],
       originalFile.name.split('.')[0] + '.png',
@@ -206,7 +207,7 @@ export default function ConstellationWriting() {
             />
           </div>
         </div>
-        <button className="constellation-writing-btn" onClick={writeConstellation}>
+        <button type="button" className="constellation-writing-btn" onClick={writeConstellation}>
           별자리 생성
         </button>
         <div id={'save-image'} style={{ display: 'none' }} />

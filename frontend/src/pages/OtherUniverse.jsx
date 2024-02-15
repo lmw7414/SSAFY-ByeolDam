@@ -2,41 +2,24 @@ import { Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls } from '@react-three/drei';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { useParams } from 'react-router-dom';
 
 import ConstellationControls from '../components/three/objects/ConstellationControls';
 import Camera from '../components/three/objects/Camera';
 import Land from '../components/three/objects/Land';
-import useModal from '../hooks/useModal';
 
-import ConstellationModal from '../components/modal/ConstellationModal/ConstellationModal.jsx';
-import ArticleWritingModal from '../components/modal/article/ArticleWritingModal.jsx';
 import { getUserUniverse } from '../apis/constellation';
 import getPositionList from '../utils/getPositionList';
 
-export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
-  const controller = useRef();
-  const camera = useRef();
-  const [modalState, setModalState] = useModal();
+export default function OtherUniverse({ setNickname }) {
   const [constellationList, setConstellationList] = useState([]);
-
-  const openConstellationModal = () => {
-    setModalState({
-      isOpen: true,
-      title: '별자리 리스트',
-      children: <ConstellationModal />,
-    });
-  };
-
-  const openArticleWritingModal = () => {
-    setModalState({
-      isOpen: true,
-      title: '새로운 별 생성하기',
-      children: <ArticleWritingModal />,
-    });
-  };
+  const controller = useRef();
+  const params = useParams();
+  const camera = useRef();
 
   useEffect(() => {
-    const nickname = JSON.parse(sessionStorage.profile).nickname;
+    const nickname = params.nickname;
+    setNickname(nickname);
 
     getUserUniverse(nickname).then(({ result }) => {
       const positionList = getPositionList(Math.min(15, result.length));
@@ -57,21 +40,6 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
 
   return (
     <div className="canvas-container">
-      <div className={`main_buttons_box ${isNavBarVisible ? '' : 'main-butons-box-hidden'}`}>
-        <img
-          src="/images/main_buttons/post_create_button.png"
-          alt="post_create_button"
-          className="main-button"
-          onClick={openArticleWritingModal}
-        />
-        <img
-          src="/images/main_buttons/constellation_list.png"
-          alt="post_create_button"
-          className="main-button"
-          onClick={openConstellationModal}
-        />
-      </div>
-
       <Canvas>
         <Camera ref={camera} />
         <OrbitControls
