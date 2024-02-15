@@ -2,11 +2,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import ExtendedBarIcon from './base/ExtendedBarIcon';
 import { useEffect, useState, useRef } from 'react';
 import axios from '../apis/axios';
+import UserView from './search/UserView';
 
 export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHome }) {
   const [isClose, setIsClosed] = useState(false);
   const [filterId, setFilterId] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const [users, setUsers] = useState([]);
   const inputRef = useRef();
 
   const search = (event) => {
@@ -51,15 +53,16 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
     changeExNav(1);
   };
 
-  const changeFilter = (id) => {
-    setFilterId(id);
-    if (id === 1) {
-      navigate('/search/star');
-    } else if (id === 2) {
-      navigate('/search/constellation');
+  const searchUser = async (keyword) => {
+    // console.log(keyword);
+    const { data: userResponse } = await axios.get(`/search/user?keyword=${keyword}`);
+    setUsers(userResponse.result);
+  };
+
   useEffect(() => {
     if (inputValue.trim() !== '') {
       if (filterId === 0) {
+        searchUser(inputValue);
       } else if (filterId === 1) {
         navigate('/search/star', { state: { keyword: inputValue.trim(), filterId: filterId } });
       } else if (filterId === 2) {
@@ -173,6 +176,11 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                 <div className="extended-bar-main-contents-top">
                   <p className="extended-bar-main-contents-top-title">검색 결과</p>
                   {/* <p className="extended-bar-main-reset">모두 지우기</p> */}
+                </div>
+                <div className="extended-bar-main-contents-user">
+                  {users.map((data) => {
+                    return <UserView key={data.nickname} data={data} />;
+                  })}
                 </div>
               </div>
             ) : (
