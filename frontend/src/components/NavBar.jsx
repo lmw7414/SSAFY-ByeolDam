@@ -25,6 +25,7 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   const goHome = () => {
     navigate('/home');
     setBarId(0);
+    setNavEx(0);
   };
 
   const goFeed = () => {
@@ -117,14 +118,16 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
 
                   <ProfileInfo
                     text={'팔로워'}
-                    num={profile.followings}
+                    num={profile.followers}
                     onClick={openFollowerModal}
+                    isFollowInfo={true}
                   />
 
                   <ProfileInfo
                     text={'팔로잉'}
-                    num={profile.followers}
+                    num={profile.followings}
                     onClick={openFollowingModal}
+                    isFollowInfo={true}
                   />
                 </div>
               </div>

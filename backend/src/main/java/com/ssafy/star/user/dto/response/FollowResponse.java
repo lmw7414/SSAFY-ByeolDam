@@ -13,7 +13,7 @@ public record FollowResponse(
 ) {
     public static FollowResponse fromFollow(User dto,int articleCounts, int constellationCounts){
         return new FollowResponse(
-                dto.image() == null ? "" : dto.image().url(),
+                dto.image() == null ? "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfileImage.png" : dto.image().url(),
                 dto.email(),
                 dto.name(),
                 dto.nickname(),

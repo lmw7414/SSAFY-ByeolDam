@@ -148,15 +148,15 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
                   onClick={openSearchBar}
                 />
                 <Link to={'/feed'} onClick={openFeedPage}>
-                <ExtendedBarIcon
-                  src={
-                    barId === 2
-                    ? '/images/nav-bar-menu-icons/feed_activated.png'
-                    : '/images/nav-bar-menu-icons/feed.png'
-                  }
-                  alt={'feed'}
-                  className={'extended-bar-menu-icon'}
-                />
+                  <ExtendedBarIcon
+                    src={
+                      barId === 2
+                        ? '/images/nav-bar-menu-icons/feed_activated.png'
+                        : '/images/nav-bar-menu-icons/feed.png'
+                    }
+                    alt={'feed'}
+                    className={'extended-bar-menu-icon'}
+                  />
                 </Link>
                 <ExtendedBarIcon
                   src={

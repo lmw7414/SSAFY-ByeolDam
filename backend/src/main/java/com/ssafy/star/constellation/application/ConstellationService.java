@@ -1,7 +1,7 @@
 package com.ssafy.star.constellation.application;
 
 import com.ssafy.star.article.dao.ArticleRepository;
-import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.article.dto.HoverArticle;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ssafy.star.constellation.ConstellationUserRole.ADMIN;
 import static com.ssafy.star.constellation.ConstellationUserRole.USER;
@@ -76,6 +77,7 @@ public class ConstellationService {
                 .map(constellationEntity -> {
             ContourEntity contourEntity = contourRepository.findById(constellationEntity.getContourId())
                     .orElseThrow(() -> new ByeolDamException(ErrorCode.CONTOUR_NOT_FOUND));
+
             // ConstellationWithArticle DTO 생성
             return new ConstellationWithArticle(
                     constellationEntity.getId(),
@@ -85,7 +87,7 @@ public class ConstellationService {
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt(),
-                    constellationEntity.getArticleEntities().stream().map(HoverArticle::fromEntity).toList()
+                    articleRepository.findAllByConstellationEntitySearch(constellationEntity,userEntity).stream().map(HoverArticle::fromEntity).toList()
             );
         }).toList();
     }
@@ -124,7 +126,7 @@ public class ConstellationService {
                     constellationEntity.getConstellationUserEntities().stream().map(ConstellationUser::fromEntity).toList(),
                     constellationEntity.getCreatedAt(),
                     constellationEntity.getModifiedAt(),
-                    constellationEntity.getArticleEntities().stream().map(HoverArticle::fromEntity).toList()
+                    articleRepository.findAllByConstellationEntitySearch(constellationEntity,userEntity).stream().map(HoverArticle::fromEntity).toList()
             );
         }).toList();
     }
@@ -187,6 +189,7 @@ public class ConstellationService {
     /**
      * 공유 별자리 유저 조회
      */
+    @Transactional
     public List<ConstellationForUserResponse> findConstellationUsers(Long constellationId) {
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
 
@@ -230,19 +233,6 @@ public class ConstellationService {
         } catch (ByeolDamException e) {
             changeRole(userEntity, constellationEntity, USER);
         }
-    }
-
-    /**
-     * -> 그룹별 별자리 - 별 사진 보기
-     * 1. 별자리에 포함될 별 선택하기
-     * - 해당 별자리에 있는 사진들
-     * - 미분류 + 그외 별자리에 존재하는 사진들
-     */
-    public List<Article> findAllArticlesGroupByConstellation(String email) {
-        UserEntity userEntity = getUserEntityByEmailOrException(email);
-        List<ConstellationUserEntity> constellationUserList = userEntity.getConstellationUserEntities();
-        //userEntity.getConstellationUserEntities().
-        return null;
     }
 
 
@@ -308,7 +298,9 @@ public class ConstellationService {
      */
     @Transactional
     public void deleteConstellationWithContour(String email, Long constellationId) {
+        // 사용자가 해당 별자리 admin인지 확인
         ConstellationEntity constellationEntity = getConstellationEntityIfAdminOrException(constellationId, email);
+        UserEntity userEntity = getUserEntityByEmailOrException(email);
         constellationLikeRepository.deleteAllByConstellationEntity(constellationEntity);
         Long contourId = constellationEntity.getContourId();
         System.out.println("contourId : " + contourId);
@@ -321,14 +313,16 @@ public class ConstellationService {
         contourRepository.delete(contourEntity);
 
         // 별자리의 별들을 미분류로 변환
-        constellationEntity.getArticleEntities()
+        List<ArticleEntity> articleEntities = articleRepository.findByConstellationEntity(constellationEntity)
                 .stream()
                 .map(article -> {
                     article.selectConstellation(null);
                     return article;
-                });
-        // 별자리 삭제
+                }).collect(Collectors.toList());
 
+        articleRepository.saveAll(articleEntities);
+
+        // 별자리 삭제
         constellationRepository.delete(constellationEntity);
 
         ImageEntity origin = imageService.getImageUrl(contourEntity.getOriginUrl());

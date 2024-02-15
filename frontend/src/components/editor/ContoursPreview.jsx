@@ -22,7 +22,7 @@ export default function ContoursPreview({
   }, [points]);
 
   return (
-    <Stage width={width} height={height}>
+    <Stage width={width} height={height} className="border-radius">
       <Layer>
         <Rect width={width} height={height} fill="#200B41" opacity={0.8} />
         {image && imageConfig && convertPoints.length && points.length > 2 && (

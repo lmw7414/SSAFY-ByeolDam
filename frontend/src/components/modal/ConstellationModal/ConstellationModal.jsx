@@ -51,7 +51,7 @@ export default function ConstellationModal() {
       <div className="constellation-row-container">
         <ConstellationRow
           title={'미분류'}
-          constellationThumb={'https://cdn-icons-png.flaticon.com/512/1/1766.png'}
+          constellationThumb={'/images/base/unclassified.png'}
           hoverArticles={unLabeled.map(({ id, imageResponse }) => {
             return { id: id, articleThumbnail: imageResponse.thumbnailUrl };
           })}
