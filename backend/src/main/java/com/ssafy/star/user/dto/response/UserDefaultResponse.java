@@ -24,7 +24,7 @@ public record UserDefaultResponse(
 
     public static UserDefaultResponse fromUser(User dto, int articleCounts, int constellationCounts,Long followers, Long followings) {
         return new UserDefaultResponse(
-                dto.image() == null ? "" : dto.image().url(),
+                dto.image() == null ? "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfileImage.png" : dto.image().url(),
                 dto.email(),
                 dto.providerType(),
                 dto.roleType(),

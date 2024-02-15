@@ -7,13 +7,11 @@ export default function FollowModal({ followSubject, modalState }) {
 
   const readFollowings = async () => {
     const data = await axios.get('/me/followings');
-    // console.log('followings', data.data.result);
     return data.data.result;
   };
 
   const readFollowers = async () => {
     const data = await axios.get('/me/followers');
-    // console.log('followers', data.data.result);
     return data.data.result;
   };
 
@@ -29,50 +27,18 @@ export default function FollowModal({ followSubject, modalState }) {
     }
   }, [modalState]);
 
-  // console.log(followSubject);
-  // console.log(array);
-  const dummyArray = [
-    {
-      imageUrl: '/images/space.png',
-      email: 'eung0202@naver.com',
-      name: '리은규',
-      nickname: '스트링치즈먹고싶다',
-      memo: '카페지즈에서 야간 작업중',
-      disclosureType: 'VISIBLE',
-      birthday: '1956-02-28',
-    },
-    {
-      imageUrl: '/images/space.png',
-      email: 'chiron7777@naver.com',
-      name: '리현쳘',
-      nickname: '배가부르다말다',
-      memo: '고치소사마 카레 세접시 쌉가능',
-      disclosureType: 'VISIBLE',
-      birthday: '1956-02-28',
-    },
-    {
-      imageUrl: '/images/space.png',
-      email: 'lsh243@naver.com',
-      name: '리수혁',
-      nickname: '메이플하고시팓',
-      memo: '헤헤헿',
-      disclosureType: 'VISIBLE',
-      birthday: '1999-05-12',
-    },
-  ];
-
   return (
     <div>
-      <input type="text" />
-      <div>
-        {dummyArray.map((user) => (
+      <input type="text" placeholder="검색" className="follow-modal-input" />
+      <div className="user-box-container">
+        {array.map((user) => (
           <UserBox
-            followSubject={followSubject}
             key={user.nickname}
+            followSubject={followSubject}
             profileImg={user.imageUrl}
             nickname={user.nickname}
-            // numConstellation={}
-            // numStar={}
+            constellationCounts={user.constellationCounts}
+            articleCounts={user.articleCounts}
           />
         ))}
       </div>
