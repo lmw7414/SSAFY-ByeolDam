@@ -46,7 +46,8 @@ export default function SignUp() {
     if (isDuplicatedNickname || isDuplicatedEmail || !isEndValidation) return;
     signup({ email, password, name, nickname })
       .then((result) => {
-        console.log(result);
+        alert('회원가입에 성공했습니다.');
+        navigate('/login');
       })
       .catch((e) => {
         console.error(e);
@@ -147,10 +148,9 @@ export default function SignUp() {
             <button
               type="button"
               onClick={() => {
-                if (!email.trim() || isDuplicatedEmail) return;
-                verificateEmail(email).then((data) => {
-                  setIsStartedEmailValidation(true);
-                });
+                if (!email.trim() || isDuplicatedEmail || isStatredEmailValidation) return;
+                setIsStartedEmailValidation(true);
+                verificateEmail(email);
               }}
             >
               인증하기
@@ -215,7 +215,7 @@ export default function SignUp() {
             placeholder="비밀번호를 다시 입력해주세요"
           />
           {!isSamePassword && <div className="member-duplicated">비밀번호가 일치하지 않습니다</div>}
-          <label htmlFor="birthDate" className="member-input-label">
+          {/* <label htmlFor="birthDate" className="member-input-label">
             생일
           </label>
           <input
@@ -226,7 +226,7 @@ export default function SignUp() {
             onChange={(e) => {
               setBirthDate(e.target.value);
             }}
-          />
+          /> */}
           <button className="member-button">회원가입</button>
         </form>
         <div

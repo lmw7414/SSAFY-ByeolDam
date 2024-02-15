@@ -11,7 +11,7 @@ import FollowModal from './modal/Follow/FollowModal';
 
 import axios from '../apis/axios';
 
-export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
+export default function NavBar({ isNavBarVisible, setIsNavBarVisible, nickname }) {
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
   const [modalState, setModalState] = useModal();
@@ -20,7 +20,6 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   // 네비게이션 바 작동 관련
   const navigate = useNavigate();
   const location = useLocation();
-  // console.log(location.pathname);
 
   const goHome = () => {
     navigate('/home');
@@ -55,16 +54,14 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
     setBarId(4);
   };
 
-  const readProfile = async () => {
-    const profileStr = sessionStorage.getItem('profile');
-    const profile = JSON.parse(profileStr);
-    const data = await axios.get(`/users/${profile.nickname}`);
+  const readProfile = async (nickname) => {
+    const data = await axios.get(`/users/${nickname}`);
     setProfile(data.data.result);
   };
 
   useEffect(() => {
-    readProfile();
-  }, []);
+    readProfile(nickname);
+  }, [nickname]);
 
   // 팔로우 모달
   const openFollowerModal = () => {

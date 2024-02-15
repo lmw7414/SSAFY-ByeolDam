@@ -19,7 +19,6 @@ export default function EditMyProfile({
 
     try {
       const response = await axios.put('/users', editedProfile);
-      console.log('내 정보 수정 성공');
       changePage(0);
       setProfileData(editedProfile);
       setProfileUpdate(1);

@@ -19,7 +19,6 @@ export default function AccountSettings() {
 
   const changePage = (newId) => {
     setAccountSettingsId(newId);
-    // console.log(accountSettingsId);
   };
 
   const readProfile = async () => {

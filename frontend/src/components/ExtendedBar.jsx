@@ -58,7 +58,6 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
   };
 
   const searchUser = async (keyword) => {
-    // console.log(keyword);
     const { data: userResponse } = await axios.get(`/search/user?keyword=${keyword}`);
     setUsers(userResponse.result);
   };

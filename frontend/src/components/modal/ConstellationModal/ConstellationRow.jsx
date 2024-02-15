@@ -9,7 +9,6 @@ export default function ConstellationRow({
   hoverArticles,
 }) {
   const [modalState, setModalState] = useModal();
-  console.log(hoverArticles);
   const openAritcle = async (articleId) => {
     const { result } = await getArticles(articleId);
 
