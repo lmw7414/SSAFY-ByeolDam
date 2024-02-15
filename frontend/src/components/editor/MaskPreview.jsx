@@ -19,7 +19,7 @@ export default function MaskPreview({
   const preview = useRef();
 
   return (
-    <Stage ref={preview} width={width} height={height}>
+    <Stage ref={preview} width={width} height={height} className="border-radius">
       <Layer>
         <Image image={image} opacity={0.8} x={0} y={0} width={width} height={height} />
         {pointList.map((data, i) => {
