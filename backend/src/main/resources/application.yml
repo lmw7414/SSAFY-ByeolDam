@@ -99,6 +99,10 @@ app:
       - http://localhost:5173/oauth/redirect
       - http://i10b309.p.ssafy.io:5173/oauth/redirect
       - http://i10b309.p.ssafy.io:5173
+      - https://i10b309.p.ssafy.io:5173/oauth/redirect
+      - https://i10b309.p.ssafy.io:5173
+      - https://byeoldam.site:5173/oauth/redirect
+      - https://byeoldam.site:5173
       - http://localhost:3000
 
 ---
