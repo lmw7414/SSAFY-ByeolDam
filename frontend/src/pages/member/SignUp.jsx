@@ -38,7 +38,6 @@ export default function SignUp() {
       !email.trim() ||
       !password.trim() ||
       !checkPassword.trim() ||
-      !birthDate.trim() ||
       !nickname.trim() ||
       !name.trim()
     )
