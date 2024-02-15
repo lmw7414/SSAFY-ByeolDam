@@ -11,7 +11,6 @@ import { addConstellation, getAIcontours } from '../../apis/constellation';
 import { getConstellationThumbnail } from '../../utils/getConstellationThumbnail';
 import getResizedImage from '../../utils/getResizedImage';
 import dataURLtoBlob from '../../utils/dataURLtoBlob';
-import { downloadURI } from '../../utils/saveClippedImage';
 
 export default function ConstellationWriting() {
   const [points, setPoints] = useState([]);
@@ -75,7 +74,6 @@ export default function ConstellationWriting() {
 
   const getAIcontoursByImage = async () => {
     const resizedImageBlob = dataURLtoBlob(image.src);
-    downloadURI(image.src, 'image');
 
     const resizedImageFile = new File(
       [resizedImageBlob],
