@@ -63,7 +63,7 @@ export default function ConstellationControls({ controller, constellationList })
         easing.damp3(
           controllerRef.current.object.position,
           lastCameraState.position,
-          smoothTime / 1.5,
+          smoothTime / 1.1,
           dt,
         );
       }
