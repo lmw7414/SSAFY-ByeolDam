@@ -73,6 +73,7 @@ export default function ConstellationWriting() {
   };
 
   const getAIcontoursByImage = async () => {
+    if (isLoading) return;
     const resizedImageBlob = dataURLtoBlob(image.src);
 
     const resizedImageFile = new File(
@@ -104,6 +105,9 @@ export default function ConstellationWriting() {
   };
 
   const writeConstellation = () => {
+    if (!name.trim() && !alert('별자리의 이름을 입력해주세요')) return;
+    if (isLoading) return;
+
     const { thumb, cthumb } = getConstellationThumbnail({
       imageConfig,
       originalFile,
@@ -207,7 +211,12 @@ export default function ConstellationWriting() {
             />
           </div>
         </div>
-        <button type="button" className="constellation-writing-btn" onClick={writeConstellation}>
+        <button
+          type="button"
+          className={`constellation-writing-btn ${isLoading ? 'btn-loading' : ''}`}
+          onClick={writeConstellation}
+          disabled={isLoading}
+        >
           별자리 생성
         </button>
         <div id={'save-image'} style={{ display: 'none' }} />

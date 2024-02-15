@@ -14,8 +14,16 @@ export default function ModalContainer({ isNavBarVisible }) {
       {currentModalState.isOpen && (
         <div
           className={`modal-container-background ${isNavBarVisible ? 'modal-container-padding' : ''}`}
+          onClick={() => {
+            setModalState({ ...currentModalState, isOpen: false });
+          }}
         >
-          <div className="modal-container">
+          <div
+            className="modal-container"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <div className="modal-header">
               <div></div>
               <h1 className="modal-title">{currentModalState.title}</h1>

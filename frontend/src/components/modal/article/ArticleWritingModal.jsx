@@ -15,15 +15,23 @@ export default function ArticleWritingModal() {
     constellationId: -1,
   });
   const [modalState, setModalState] = useModal();
+  const [isLoading, setIsLoading] = useState(false);
 
   const writeArticle = () => {
-    addArticle(article, file).then((result) => {
-      setModalState({
-        ...modalState,
-        isOpen: false,
+    if (isLoading) return;
+
+    setIsLoading(true);
+    addArticle(article, file)
+      .then((result) => {
+        setModalState({
+          ...modalState,
+          isOpen: false,
+        });
+        alert('별이 생성되었습니다.');
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-      alert('별이 생성되었습니다.');
-    });
   };
 
   return (
@@ -42,6 +50,7 @@ export default function ArticleWritingModal() {
           article={article}
           setArticle={setArticle}
           setStep={setStep}
+          isLoading={isLoading}
         />
       )}
     </div>
