@@ -69,6 +69,7 @@ export default function ContoursEditor({
       onMouseLeave={() => {
         editor.current.container().style.cursor = 'auto';
       }}
+      className="border-radius"
     >
       <Layer>
         <KonvaImage
