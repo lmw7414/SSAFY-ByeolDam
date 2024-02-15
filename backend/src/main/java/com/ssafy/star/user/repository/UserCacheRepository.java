@@ -2,6 +2,7 @@ package com.ssafy.star.user.repository;
 
 import com.ssafy.star.user.dto.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class UserCacheRepository {
@@ -19,11 +21,13 @@ public class UserCacheRepository {
     public void setUser(User user) {
         String key = getKey(user.email());
         userRedisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
+        log.info("set user : {}, {}", key, user);
     }
 
     public Optional<User> getUser(String email) {
         String key = getKey(email);
         User user = userRedisTemplate.opsForValue().get(key);
+        log.info("get User : {}, {}", key, user);
         return Optional.ofNullable(user);
     }
 
