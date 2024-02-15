@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { logout } from '../apis/member';
-import { getArticles } from '../apis/articles';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -21,11 +20,12 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   // 네비게이션 바 작동 관련
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.pathname);
+  // console.log(location.pathname);
 
   const goHome = () => {
     navigate('/home');
     setBarId(0);
+    setNavEx(0);
   };
 
   const goFeed = () => {
@@ -118,14 +118,16 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
 
                   <ProfileInfo
                     text={'팔로워'}
-                    num={profile.followings}
+                    num={profile.followers}
                     onClick={openFollowerModal}
+                    isFollowInfo={true}
                   />
 
                   <ProfileInfo
                     text={'팔로잉'}
-                    num={profile.followers}
+                    num={profile.followings}
                     onClick={openFollowingModal}
+                    isFollowInfo={true}
                   />
                 </div>
               </div>

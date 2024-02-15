@@ -84,7 +84,7 @@ public class UserEntity {
     private LocalDateTime deletedAt;
 
     @Setter
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "image")
     private ImageEntity imageEntity;
 
