@@ -3,8 +3,12 @@ package com.ssafy.star.user.application;
 import com.ssafy.star.article.application.ArticleService;
 import com.ssafy.star.article.dao.ArticleLikeRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
+import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleHashtagEntity;
+import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
 import com.ssafy.star.article.domain.ArticleLikeEntity;
 import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.comment.dto.CommentDto;
 import com.ssafy.star.common.config.properties.AppProperties;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
@@ -13,6 +17,7 @@ import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.constellation.application.ConstellationService;
 import com.ssafy.star.constellation.dao.ConstellationLikeRepository;
 import com.ssafy.star.constellation.dao.ConstellationUserRepository;
+import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.global.auth.util.AuthToken;
 import com.ssafy.star.global.auth.util.AuthTokenProvider;
 import com.ssafy.star.global.email.Repository.EmailCacheRepository;
@@ -23,6 +28,7 @@ import com.ssafy.star.global.oauth.util.HeaderUtils;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.dao.ImageRepository;
 import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
 import com.ssafy.star.user.domain.RoleType;
 import com.ssafy.star.user.domain.UserEntity;
 import com.ssafy.star.user.domain.UserRefreshToken;
@@ -51,11 +57,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -481,7 +486,7 @@ public class UserService {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", email)));
         return articleLikeRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity, pageable)
                 .map(ArticleLikeEntity::getArticleEntity)
-                .map(Article::fromEntity);
+                .map(articleEntity -> getArticle(articleEntity));
     }
 
     // 닉네임으로 프로필 조회하기
@@ -491,5 +496,51 @@ public class UserService {
                 () -> new ByeolDamException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", nickname))
         );
         return user.getImageEntity().getUrl();
+    }
+
+    public Article getArticle(ArticleEntity entity) {
+        Set<String> hashtags = new HashSet<>();
+        try{
+            hashtags = entity.getArticleHashtagRelationEntities()
+                    .stream()
+                    .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
+                    .map(ArticleHashtagEntity::getTagName)
+                    .collect(Collectors.toSet());
+        } catch(NullPointerException e) {
+            hashtags = null;
+        }
+
+        List<CommentDto> comments = null;
+        try {
+            comments = entity.getCommentEntities()
+                    .stream()
+                    .map(CommentDto::from)
+                    .collect(Collectors.toList());
+        } catch (NullPointerException e) {
+            comments = null;
+        }
+
+        Constellation constellation = null;
+        try{
+            constellation = Constellation.fromEntity(entity.getConstellationEntity());
+        } catch(NullPointerException e) {
+            constellation = null;
+        }
+
+        return new Article(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getHits(),
+                entity.getDescription(),
+                entity.getDisclosure(),
+                hashtags,
+                constellation,
+                User.fromEntity(entity.getOwnerEntity()),
+                comments,
+                entity.getCreatedAt(),
+                entity.getModifiedAt(),
+                entity.getDeletedAt(),
+                Image.fromEntity(entity.getImageEntity())
+        );
     }
 }

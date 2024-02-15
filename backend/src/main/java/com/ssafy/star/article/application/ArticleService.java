@@ -4,20 +4,26 @@ import com.ssafy.star.article.dao.ArticleHashtagRelationRepository;
 import com.ssafy.star.article.dao.ArticleLikeRepository;
 import com.ssafy.star.article.dao.ArticleRepository;
 import com.ssafy.star.article.domain.ArticleEntity;
+import com.ssafy.star.article.domain.ArticleHashtagEntity;
 import com.ssafy.star.article.domain.ArticleHashtagRelationEntity;
 import com.ssafy.star.article.domain.ArticleLikeEntity;
 import com.ssafy.star.article.dto.Article;
+import com.ssafy.star.comment.dto.CommentDto;
 import com.ssafy.star.common.exception.ByeolDamException;
 import com.ssafy.star.common.exception.ErrorCode;
 import com.ssafy.star.common.infra.S3.S3uploader;
 import com.ssafy.star.common.types.DisclosureType;
 import com.ssafy.star.constellation.dao.ConstellationRepository;
 import com.ssafy.star.constellation.domain.ConstellationEntity;
+import com.ssafy.star.constellation.dto.Constellation;
 import com.ssafy.star.image.ImageType;
 import com.ssafy.star.image.application.ImageService;
 import com.ssafy.star.image.domain.ImageEntity;
+import com.ssafy.star.image.dto.Image;
+import com.ssafy.star.user.domain.ApprovalStatus;
 import com.ssafy.star.user.domain.FollowEntity;
 import com.ssafy.star.user.domain.UserEntity;
+import com.ssafy.star.user.dto.User;
 import com.ssafy.star.user.repository.FollowRepository;
 import com.ssafy.star.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -181,7 +187,7 @@ public class ArticleService {
     @Transactional
     public Page<Article> trashcan(String email, Pageable pageable) {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
-        return articleRepository.findAllByOwnerEntityAndDeleted(userEntity, pageable).map(Article::fromEntity);
+        return articleRepository.findAllByOwnerEntityAndDeleted(userEntity, pageable).map(articleEntity -> getArticle(articleEntity));
     }
 
     /**
@@ -205,7 +211,7 @@ public class ArticleService {
             throw new ByeolDamException(ErrorCode.INVALID_REQUEST, String.format("article %d is not abandoned", articleId));
         }
 
-        return Article.fromEntity(articleEntity);
+        return getArticle(articleEntity);
     }
 
     /**
@@ -215,12 +221,12 @@ public class ArticleService {
     @Transactional(readOnly = true)
     public Page<Article> followFeed(String email, Pageable pageable) {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
-        Set<UserEntity> userEntitySet = userEntity.getFollowEntities().stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
+        Set<UserEntity> userEntitySet = followRepository.findByFromUserAndStatus(userEntity, ApprovalStatus.ACCEPT).stream().map(FollowEntity::getToUser).collect(Collectors.toSet());
 
         List<ArticleEntity> articleEntityList = new ArrayList<>();
 
         for (UserEntity tmpUserEntity : userEntitySet) {
-            List<ArticleEntity> tmpArticleEntities = tmpUserEntity.getArticleEntities()
+            List<ArticleEntity> tmpArticleEntities = articleRepository.findAllByOwnerEntity(tmpUserEntity)
                     .stream()
                     .filter(articleEntity -> articleEntity.getDeletedAt() == null) // deletedAt이 null인 것들만 필터링
                     .collect(Collectors.toList());
@@ -239,9 +245,7 @@ public class ArticleService {
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), articleEntityList.size());
         List<Article> dtoList = articleEntityList.subList(start, end)
-                .stream()
-                .map(Article::fromEntity)
-                .collect(Collectors.toList());
+                .stream().map(articleEntity -> getArticle(articleEntity)).toList();
 
         // 페이징처리
         return new PageImpl<>(dtoList, pageable, articleEntityList.size());
@@ -260,11 +264,11 @@ public class ArticleService {
             if(!followRepository.findByFromUserAndToUser(myEntity, userEntity).isPresent()) {
 
                 // disclosureType에 따라 조회여부 판단
-                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(Article::fromEntity).toList();
+                return articleRepository.findAllByOwnerEntityAndNotDeletedAndDisclosure(userEntity).stream().map(articleEntity -> getArticle(articleEntity)).toList();
             }
             // following 중이라면 전체 조회한다
         }
-        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity).stream().map(Article::fromEntity).toList();
+        return articleRepository.findAllByOwnerEntityAndNotDeleted(userEntity).stream().map(articleEntity -> getArticle(articleEntity)).toList();
     }
 
     /**
@@ -281,7 +285,7 @@ public class ArticleService {
         if(articleRepository.findByArticleIdAndNotDeleted(articleId, userEntity)) {
             articleEntity.addHits();
 
-            return Article.fromEntity(articleRepository.saveAndFlush(articleEntity));
+            return getArticle(articleRepository.saveAndFlush(articleEntity));
         } else {
             // Deletion 예외처리
             if(articleEntity.getDeletedAt() != null) {
@@ -339,7 +343,7 @@ public class ArticleService {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         ConstellationEntity constellationEntity = getConstellationEntityOrException(constellationId);
-        return articleRepository.findAllByConstellationEntity(constellationEntity, userEntity).stream().map(Article::fromEntity).toList();
+        return articleRepository.findAllByConstellationEntitySearch(constellationEntity, userEntity).stream().map(articleEntity -> getArticle(articleEntity)).toList();
     }
 
     /**
@@ -349,7 +353,7 @@ public class ArticleService {
     public List<Article> articlesInNoConstellation(String email) {
         // email로 userEntity 구하고 별자리 공개여부와 해당 게시물 공유여부를 확인해 Error 반환
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
-        return articleRepository.findAllByConstellationEntityNullAndOwnerEntity(userEntity).stream().map(Article::fromEntity).toList();
+        return articleRepository.findAllByConstellationEntityNullAndOwnerEntity(userEntity).stream().map(articleEntity -> getArticle(articleEntity)).toList();
     }
 
     // 포스트가 존재하는지
@@ -440,4 +444,52 @@ public class ArticleService {
         UserEntity userEntity = getUserEntityOrExceptionByEmail(email);
         return articleRepository.countArticlesByUser(userEntity);
     }
+
+    public Article getArticle(ArticleEntity entity) {
+        Set<String> hashtags = new HashSet<>();
+        try{
+            hashtags = entity.getArticleHashtagRelationEntities()
+                    .stream()
+                    .map(ArticleHashtagRelationEntity::getArticleHashtagEntity)
+                    .map(ArticleHashtagEntity::getTagName)
+                    .collect(Collectors.toSet());
+        } catch(NullPointerException e) {
+            hashtags = null;
+        }
+
+        List<CommentDto> comments = null;
+        try {
+            comments = entity.getCommentEntities()
+                    .stream()
+                    .map(CommentDto::from)
+                    .collect(Collectors.toList());
+        } catch (NullPointerException e) {
+            comments = null;
+        }
+
+        Constellation constellation = null;
+        try{
+            constellation = Constellation.fromEntity(entity.getConstellationEntity());
+        } catch(NullPointerException e) {
+            constellation = null;
+        }
+
+        return new Article(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getHits(),
+                entity.getDescription(),
+                entity.getDisclosure(),
+                hashtags,
+                constellation,
+                User.fromEntity(entity.getOwnerEntity()),
+                comments,
+                entity.getCreatedAt(),
+                entity.getModifiedAt(),
+                entity.getDeletedAt(),
+                Image.fromEntity(entity.getImageEntity())
+        );
+    }
+
+
 }

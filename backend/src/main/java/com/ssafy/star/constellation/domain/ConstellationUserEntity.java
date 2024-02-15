@@ -22,7 +22,7 @@ public class ConstellationUserEntity {
     private ConstellationEntity constellationEntity;
 
     @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @Setter
     private UserEntity userEntity;

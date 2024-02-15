@@ -1,6 +1,5 @@
 package com.ssafy.star.constellation.domain;
 
-import com.ssafy.star.article.domain.ArticleEntity;
 import com.ssafy.star.constellation.ConstellationUserRole;
 import com.ssafy.star.user.domain.UserEntity;
 import jakarta.persistence.*;
@@ -36,9 +35,9 @@ public class ConstellationEntity {
     @OneToMany(mappedBy = "constellationEntity", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ConstellationUserEntity> constellationUserEntities = new ArrayList<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "constellationEntity")
-    private List<ArticleEntity> articleEntities;
+//    @ToString.Exclude
+//    @OneToMany(mappedBy = "constellationEntity")
+//    private List<ArticleEntity> articleEntities;
 
     private LocalDateTime createdAt;
 

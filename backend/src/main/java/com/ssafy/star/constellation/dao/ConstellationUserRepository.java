@@ -7,10 +7,12 @@ import com.ssafy.star.user.domain.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface ConstellationUserRepository extends JpaRepository<ConstellationUserEntity, Long> {
 
     // 별자리 삭제, 강퇴, 유저 역할 변경

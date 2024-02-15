@@ -39,7 +39,11 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
 
         // 별자리 검색 시 클릭, 해당 별자리 게시물 전체 조회
         @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity AND a.deletedAt IS NULL AND (a.disclosure = 'VISIBLE' OR a.ownerEntity = :userEntity)")
-        List<ArticleEntity> findAllByConstellationEntity(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity);
+        List<ArticleEntity> findAllByConstellationEntitySearch(@Param("constellationEntity")ConstellationEntity constellationEntity, @Param("userEntity")UserEntity userEntity);
+
+        // 별자리 삭제 시 별자리의 모든 게시물 가져오기
+//        @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity = :constellationEntity")
+        List<ArticleEntity> findByConstellationEntity(ConstellationEntity constellationEntity);
 
         // 미분류 별자리 게시물 전체 조회
         @Query("SELECT a FROM ArticleEntity a WHERE a.constellationEntity IS NULL AND a.ownerEntity = :userEntity AND a.deletedAt IS NULL")

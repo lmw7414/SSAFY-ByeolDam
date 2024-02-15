@@ -50,7 +50,7 @@ public class ArticleEntity {
 
     @ToString.Exclude
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "constellation_id")
     private ConstellationEntity constellationEntity;
 
