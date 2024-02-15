@@ -56,8 +56,9 @@ export default function ConstellationControls({ controller, constellationList })
         easing.damp3(controllerRef.current.target, lastCameraState.target, 0.2, dt);
         easing.damp3(controllerRef.current.object.position, lastCameraState.position, 0.2, dt);
       } else {
-        const ease = (x) => (0.0041 * x * x - 0.0137 * x + 0.1857) / 5;
-        const smoothTime = ease(controllerRef.current.target.distanceTo(lastCameraState.target));
+        // const ease = (x) => (0.0041 * x * x - 0.0137 * x + 0.1857) / 20;
+        // const smoothTime = ease(controllerRef.current.target.distanceTo(lastCameraState.target));
+        const smoothTime = 0.2;
         easing.damp3(controllerRef.current.target, lastCameraState.target, smoothTime, dt);
         easing.damp3(
           controllerRef.current.object.position,
@@ -68,9 +69,14 @@ export default function ConstellationControls({ controller, constellationList })
       }
       controllerRef.current.minDistance = 0;
       if (
-        controllerRef.current.target.distanceTo(lastCameraState.target) < 0.1 &&
+        controllerRef.current.target.distanceTo(lastCameraState.target) < 0.1 ||
         controllerRef.current.object.position.distanceTo(lastCameraState.position) < 0.1
       ) {
+        if (
+          controllerRef.current.target.distanceTo(lastCameraState.target) > 2 ||
+          controllerRef.current.object.position.distanceTo(lastCameraState.position) > 2
+        )
+          return;
         setLastCameraState({ ...lastCameraState, isDone: true });
         if (!lastCameraState.prev) {
           controllerRef.current.enableRotate = true;

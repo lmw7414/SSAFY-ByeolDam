@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import ConstellationSelectList from './ConstellationSelectList';
 
-export default function ConstellationSelect({ writeArticle, article, setArticle, setStep }) {
+export default function ConstellationSelect({
+  writeArticle,
+  article,
+  setArticle,
+  setStep,
+  isLoading,
+}) {
   const setDisclosureType = (e) => {
     setArticle({
       ...article,
@@ -48,9 +54,13 @@ export default function ConstellationSelect({ writeArticle, article, setArticle,
             setStep(1);
           }}
         >
-          {'< 이전으로'}
+          <img src="/images/nav-bar-toggle-button/close.png" />
         </button>
-        <button className="article-write-btn" type="button" onClick={writeArticle}>
+        <button
+          className={`article-write-btn ${isLoading ? 'article-write-btn-loading' : ''}`}
+          type="button"
+          onClick={writeArticle}
+        >
           별 생성하기
         </button>
       </div>

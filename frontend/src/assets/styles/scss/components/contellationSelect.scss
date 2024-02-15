@@ -49,6 +49,11 @@
   cursor: pointer;
 }
 
+.article-write-btn-loading {
+  cursor: auto;
+  background-color: $page-background;
+}
+
 .constellation-select-list {
   width: 500px;
   height: 350px;
@@ -107,19 +112,14 @@
   background-color: $modal-background;
 }
 
-.article-prev-btn {
+.article-prev-btn img {
   position: absolute;
-  bottom: 0;
+  bottom: 591px;
   left: 0;
   background-color: transparent;
   border: none;
-  color: white;
-  opacity: 0.5;
+  height: 2rem;
   cursor: pointer;
-}
-
-.article-prev-btn:hover {
-  opacity: 1;
 }
 
 .article-button-wrapper {

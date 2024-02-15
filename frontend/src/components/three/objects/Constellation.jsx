@@ -84,12 +84,13 @@ export default function Constellation({
         <boxGeometry />
         <meshPhongMaterial opacity={0} transparent />
       </mesh>
+
       {!!thumbnail && (
         <Image
           ref={imageRef}
           url={thumbnail}
           scale={90}
-          opacity={0.05}
+          opacity={0.09}
           transparent
           raycast={() => null}
         />
