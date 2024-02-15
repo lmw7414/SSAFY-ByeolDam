@@ -69,7 +69,8 @@ export default function ImageUpload({ setStep, setFile, setArticle, article }) {
   };
 
   const nextStep = () => {
-    if (!article.description || !editor.image) return;
+    if (!article.description.trim() && !alert('설명을 입력해주세요')) return;
+    if (!editor.image && !alert('사진을 추가해주세요')) return;
     saveFile();
     setStep(2);
   };

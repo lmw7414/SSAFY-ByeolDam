@@ -88,7 +88,7 @@ export const getConstellationThumbnail = ({
     width: imageConfig.width,
     height: imageConfig.height,
     crop: imageConfig.crop,
-    opacity: 0.7,
+    opacity: 0.6,
   });
 
   group.add(image);
