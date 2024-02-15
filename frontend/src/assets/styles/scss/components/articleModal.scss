@@ -1,3 +1,8 @@
+.article-modal-top {
+  display: flex;
+  justify-content: space-between;
+}
+
 .modal-box {
   display: flex;
   justify-content: space-between;
@@ -11,17 +16,18 @@
 }
 
 .article-img-box {
-  padding: 3% 3% 0 3%;
+  padding: 0 3% 0 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: start;
+  width: 85%;
 }
 
 .article-img-box > img {
   box-shadow: 0px 0px 16px 3px #8e7cac;
   border-radius: 8px;
-  width: 85%;
+  width: 100%;
 }
 
 .article-img-box > p {
@@ -32,10 +38,10 @@
 
 .modal-right-box {
   width: 100%;
-  padding: 1.5% 3% 3% 3%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  padding: 1.5% 0;
 }
 
 .modal-right-box > hr {
@@ -44,17 +50,24 @@
 
 .modal-describe-box {
   display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
 .article-owner {
   display: flex;
   justify-content: flex-end;
+  align-items: start;
+  color: $text-primary;
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
 .article-description {
   display: flex;
   justify-content: flex-end;
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 100;
 }
 
 .select-constellation-box {
@@ -63,7 +76,7 @@
   width: 85%;
   color: white;
   font-size: 1.2rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
   align-items: center;
   line-height: 1rem;
 
@@ -90,32 +103,25 @@
 }
 
 #tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-#tags > p {
   margin: 0;
   color: #c7bed6;
+  width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #like-area {
+  color: #c7bed6;
   display: flex;
   justify-content: flex-end;
-  align-items: center;
-  margin: 3.5% 0;
-}
-
-#like-area p {
-  margin: 0;
+  align-items: end;
+  margin-left: 10px;
 }
 
 #like-area > img {
   cursor: pointer;
-  width: 7%;
-  margin: 0 2%;
+  width: 13%;
+  margin: 2% 2%;
 }
 
 #comment-area {
@@ -126,7 +132,6 @@
 #comment {
   display: flex;
   flex-direction: column;
-  padding: 5%;
 }
 
 .comment-nickname {
@@ -135,8 +140,10 @@
   font-weight: 800;
 }
 
-#comment p {
-  margin: 0 0 4% 0;
+.comment-content {
+  color: white;
+  font-family: 'NanumSquare', sans-serif;
+  font-weight: 800;
 }
 
 #comment > hr {
@@ -156,6 +163,7 @@
   background-color: #5a41855b;
   border-radius: 10px;
   justify-content: space-between;
+  border: solid 1px #c7bed6;
 }
 
 .create-comment-area textarea {
@@ -267,4 +275,11 @@ li:hover > .dropdown {
   color: $page-background;
   border: solid 1px;
   margin: 0 0 0 1rem;
+}
+
+.article-modal-comment {
+  color: white;
+  display: flex;
+  justify-content: center;
+  margin-top: 1%;
 }
