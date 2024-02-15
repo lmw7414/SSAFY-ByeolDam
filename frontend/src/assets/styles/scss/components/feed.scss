@@ -5,7 +5,8 @@
     margin-bottom: 20px;
     padding: 20px;
     border-radius: 10px;
-    background-color: rgba(142, 124, 172);
+    // background-color: rgba(142, 124, 172);
+    background-color: $modal-background;
     margin-top: 15px;
 }
 
@@ -21,6 +22,7 @@
     padding: 10px;
     font-weight: bold;
     font-size: 1.5rem;
+    color: white;
 }
 
 .feed-header img{
@@ -30,47 +32,139 @@
     margin-right: 10px;
 }
 
-.feed-content-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 7px;
+.feed-content-container {
+    margin-top: 10px;
 }
 
-.feed-like,
-.feed-tag,
-.feed-hits {
+.feed-content-header {
+    display: flex;
+    padding: 7px;
+    justify-content: space-between;
+}
+
+.feed-like img{
+    height: 1.3rem;
+    cursor: pointer;
+}
+
+.content-onwer{
+    font-weight: bold;
+    margin-right: 10px;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.feed-content {
+    color: #c7bed6;
+}
+
+.feed-like {
   display: flex;
   align-items: center;
+  margin-left: auto;
+}
+
+.like-count {
+    color: #c7bed6;
+    margin-left: 10px;
+    line-height: 2rem;
+    margin-bottom: 3px;
+}
+
+.feed-tag {
+    display: flex;
+    align-items: center;
 }
 
 .feed-tag {
     margin-left: 10px; /* feed-like와 조금 떨어지도록 설정 */
 }
-  
-.feed-hits {
-    margin-left: auto; /* 오른쪽으로 정렬 */
+
+.tag {
+    color: #c7bed6;
 }
 
 .feed-tag .tag:not(:first-child) {
     margin-left: 5px;
 }
 
-.comment-header {
+hr {
+    border: 1px solid rgba(199, 190, 214, 0.403);
+    margin: 1rem 0;
+}
+
+.feed-comment-header {
     display: flex;
     align-items: center;
 }
 
-.comment-nickname {
+.feed-comment-nickname {
     font-weight: bold;
     margin-right: 10px; /* nickName과 content 사이의 간격 조정 */
+    color: white;
+    font-size: 1.1rem;
+}
+
+.feed-comment-content {
+    color: #c7bed6;
+}
+
+.child-comment-header {
+    display: flex;
+    align-items: center;
+}
+
+.child-comment-nickname {
+    font-weight: bold;
+    margin-right: 10px; /* nickName과 content 사이의 간격 조정 */
+    color: white;
+    font-size: 1.1rem;
+}
+
+.child-comment-content {
+    color: #c7bed6;
 }
 
 .content-container{
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
-.content-onwer{
-    font-weight: bold;
-    margin-right: 10px;
+.comment-container {
+    margin-bottom: 10px;
+}
+
+.create-feed-comment-area {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    border: none;
+    background-color: #5a41855b;
+    border-radius: 10px;
+    justify-content: space-between;
+}
+
+.create-feed-comment-area textarea {
+    border: none;
+    background: none;
+    width: 89%;
+    height: 3.1rem;
+    padding: 2% 1% 2% 2%;
+    color: white;
+    resize: none;
+}
+
+.create-feed-comment-area textarea:focus {
+    outline: none;
+}
+
+.create-comment-area textarea::placeholder {
+    vertical-align: top;
+}
+
+.create-feed-comment-area img {
+    width: 7%;
+    margin: 0 2% 0 0;
+    cursor: pointer;
 }

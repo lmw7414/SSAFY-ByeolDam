@@ -38,7 +38,7 @@ export default function Member() {
         <div className="member-logo-box">
           <img src={Logo} className="member-box-logo" alt="logo" />
         </div>
-        <form className="member-login-box" onSubmit={userLogin}>
+        <form className="member-login-box" onSubmit={userLogin} autoComplete="on">
           <input
             className="member-input"
             type="email"

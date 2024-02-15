@@ -89,7 +89,7 @@ export default function Constellation({
           ref={imageRef}
           url={thumbnail}
           scale={90}
-          opacity={0.25}
+          opacity={0.05}
           transparent
           raycast={() => null}
         />

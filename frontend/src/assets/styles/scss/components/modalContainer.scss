@@ -4,15 +4,19 @@
   height: 100vh;
   top: 0;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.7s;
   // backdrop-filter: blur(1px);
 }
 
+.modal-container-padding {
+  padding-left: $nav-bar-width;
+}
+
 .modal-container {
-  position: absolute;
   background-color: $modal-background;
-  top: 50%;
-  left: 70%;
-  transform: translate(-65%, -50%);
   z-index: 4;
   padding: 2rem;
   border-radius: 12px;

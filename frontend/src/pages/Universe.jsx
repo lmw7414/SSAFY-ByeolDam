@@ -42,7 +42,7 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
       const positionList = getPositionList(result.length);
 
       setConstellationList(
-        result.map(({ name, id, contourResponse, hoverArticles }, idx) => {
+        result.slice(0, 20).map(({ name, id, contourResponse, hoverArticles }, idx) => {
           return {
             id,
             hoverArticles,
@@ -57,7 +57,7 @@ export default function Universe({ isNavBarVisible, setIsNavBarVisible }) {
 
   return (
     <div className="canvas-container">
-      <div className={isNavBarVisible ? 'main_buttons_box' : 'display-none'}>
+      <div className={`main_buttons_box ${isNavBarVisible ? '' : 'main-butons-box-hidden'}`}>
         <img
           src="/images/main_buttons/post_create_button.png"
           alt="post_create_button"

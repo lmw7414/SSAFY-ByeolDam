@@ -84,7 +84,7 @@ mail:
   auth-code-expired-ms: 600000 #10분
 
 cors:
-  allowed-origins: 'http://localhost:3000,http://localhost:5173,http://i10b309.p.ssafy.io:5173'
+  allowed-origins: 'http://localhost:3000,http://localhost:5173,http://i10b309.p.ssafy.io:5173, https://byeoldam.site'
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
   allowed-headers: '*'
   max-age: 3600
@@ -99,6 +99,11 @@ app:
       - http://localhost:5173/oauth/redirect
       - http://i10b309.p.ssafy.io:5173/oauth/redirect
       - http://i10b309.p.ssafy.io:5173
+      - https://i10b309.p.ssafy.io:5173/oauth/redirect
+      - https://i10b309.p.ssafy.io:5173
+      - https://byeoldam.site/oauth/redirect
+      - https://byeoldam.site
+      - http://localhost:3000
 
 ---
 spring:
@@ -121,6 +126,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     generate-ddl: true
+    open-in-view: false
   data:
     redis:
       url: redis://localhost:6379
@@ -156,6 +162,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
   data:
     redis:
       url: redis://byeoldam-redis:6379

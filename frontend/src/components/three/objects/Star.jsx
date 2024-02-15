@@ -44,7 +44,7 @@ export default function Star({
   return (
     <group position={position}>
       <mesh
-        scale={scale * (hovered ? 0.9 : 0.6)}
+        scale={scale * (hovered ? 1.0 : 0.7)}
         onPointerOver={(e) => {
           e.stopPropagation();
           if (!isActive) return;
