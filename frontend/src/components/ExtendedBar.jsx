@@ -8,8 +8,6 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
   const [isClose, setIsClosed] = useState(false);
   const [filterId, setFilterId] = useState(0);
   const [inputValue, setInputValue] = useState('');
-  const [users, setUsers] = useState([]);
-  const inputRef = useRef();
 
   const search = (event) => {
     if (event.key === 'Enter') {
