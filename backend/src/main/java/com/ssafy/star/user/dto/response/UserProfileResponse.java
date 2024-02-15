@@ -27,7 +27,7 @@ public record UserProfileResponse(
 
     public static UserProfileResponse fromUser(User dto, int articleCounts, int constellationCounts, Long followers, Long followings) {
         return new UserProfileResponse(
-                dto.image() == null ? "" : dto.image().url(),
+                dto.image() == null ? "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfileImage.png" : dto.image().url(),
                 dto.email(),
                 dto.providerType(),
                 dto.roleType(),
