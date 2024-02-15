@@ -24,7 +24,7 @@ export default function OtherUniverse({ setNickname }) {
     const nickname = params.nickname;
     const myNickName = JSON.parse(sessionStorage.profile).nickname;
 
-    if (nickname == myNickName) {
+    if (nickname === myNickName) {
       window.location.replace('/home');
       return;
     }
