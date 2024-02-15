@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { logout } from '../apis/member';
-import { getArticles } from '../apis/articles';
 import useModal from '../hooks/useModal';
 
 import ExtendedBar from './ExtendedBar';
@@ -21,7 +20,7 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible }) {
   // 네비게이션 바 작동 관련
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.pathname);
+  // console.log(location.pathname);
 
   const goHome = () => {
     navigate('/home');

@@ -1,15 +1,27 @@
 import { Link, useNavigate } from 'react-router-dom';
 import ExtendedBarIcon from './base/ExtendedBarIcon';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import axios from '../apis/axios';
 
 export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHome }) {
   const [isClose, setIsClosed] = useState(false);
   const [filterId, setFilterId] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef();
 
   const search = (event) => {
-    setInputValue(event.target.value);
-    // console.log(inputValue);
+    if (event.key === 'Enter') {
+      setInputValue(event.target.value);
+    }
+  };
+
+  const resetSearch = () => {
+    inputRef.current.value = '';
+    setInputValue('');
+  };
+
+  const changeFilter = (id) => {
+    setFilterId(id);
   };
 
   const navigate = useNavigate();
@@ -20,16 +32,20 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
     setTimeout(() => {
       changeBar(0);
       changeExNav(0);
+      navigate('/home');
     }, 400);
   };
+
   const openSearchBar = () => {
     changeBar(1);
     changeExNav(1);
   };
+
   const openNotificationBar = () => {
     changeBar(3);
     changeExNav(1);
   };
+
   const openSettingsPage = () => {
     changeBar(4);
     changeExNav(1);
@@ -45,8 +61,18 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
       navigate('/search/star');
     } else if (id === 2) {
       navigate('/search/constellation');
+  useEffect(() => {
+    if (inputValue.trim() !== '') {
+      if (filterId === 0) {
+      } else if (filterId === 1) {
+        navigate('/search/star', { state: { keyword: inputValue.trim(), filterId: filterId } });
+      } else if (filterId === 2) {
+        navigate('/search/constellation', {
+          state: { keyword: inputValue.trim(), filterId: filterId },
+        });
+      }
     }
-  };
+  }, [inputValue, filterId]);
 
   return (
     <div className={isClose ? 'extended-bar-closed' : 'extended-bar-big-container'}>
@@ -55,9 +81,22 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
       </div>
       <div className={isClose ? 'extended-bar-container-closed' : 'extended-bar-container'}>
         <div className="extended-bar-contents">
-          {barId === 1 ? (
-            <input type="text" placeholder="검색" className="search-bar-input" onChange={search} />
-          ) : null}
+          <div className="extended-bar-search">
+            {barId === 1 ? (
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="검색"
+                className="search-bar-input"
+                onKeyUp={search}
+              />
+            ) : null}
+            <img
+              src="/images/base/close-button.png"
+              alt="검색어 초기화 X 버튼"
+              onClick={resetSearch}
+            />
+          </div>
 
           <div className="search-bar-bottom-contents">
             <div className="extended-bar-side-menu-box">
@@ -139,9 +178,20 @@ export default function ExtendedBar({ changeBar, barId, changeExNav, exNav, goHo
               </div>
             </div>
 
-            <div className="extended-bar-main-contents-box">
-              <p className="title nickname">texts</p>
-            </div>
+            {filterId === 0 ? (
+              <div className="extended-bar-main-contents-box">
+                <div className="extended-bar-main-contents-top">
+                  <p className="extended-bar-main-contents-top-title">검색 결과</p>
+                  {/* <p className="extended-bar-main-reset">모두 지우기</p> */}
+                </div>
+              </div>
+            ) : (
+              <div className="extended-bar-main-contents-box">
+                <div className="extended-bar-main-contents-top">
+                  <p className="extended-bar-main-contents-top-title">연관 검색어</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
