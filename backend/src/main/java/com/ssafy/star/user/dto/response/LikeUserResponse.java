@@ -8,14 +8,10 @@ public record LikeUserResponse(
         String image
 ) {
     public static LikeUserResponse fromUser(User dto) {
-        String imageUrl = "";
-        if (dto.image().url() != null) {
-            imageUrl = dto.image().url();
-        }
         return new LikeUserResponse(
-        dto.nickname(),
-        dto.name(),
-        imageUrl
+                dto.nickname(),
+                dto.name(),
+                dto.image() == null ? "https://byeoldam.s3.ap-northeast-2.amazonaws.com/profiles/defaultProfileImage.png" : dto.image().url()
         );
     }
 }
