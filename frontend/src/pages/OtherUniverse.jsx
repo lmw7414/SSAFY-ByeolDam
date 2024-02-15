@@ -25,7 +25,7 @@ export default function OtherUniverse({ setNickname }) {
     const myNickName = JSON.parse(sessionStorage.profile).nickname;
 
     if (nickname == myNickName) {
-      navigate('/home', { replace: true });
+      window.location.replace('/home');
       return;
     }
 
@@ -50,7 +50,7 @@ export default function OtherUniverse({ setNickname }) {
         }),
       );
     });
-  }, []);
+  }, [params.nickname]);
 
   return (
     <div className="canvas-container">
