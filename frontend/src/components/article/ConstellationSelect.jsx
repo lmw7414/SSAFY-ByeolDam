@@ -47,7 +47,7 @@ export default function ConstellationSelect({
         </label>
       </div>
       <div className="article-button-wrapper">
-        <button
+        <div
           type="button"
           className="article-prev-btn"
           onClick={() => {
@@ -55,7 +55,7 @@ export default function ConstellationSelect({
           }}
         >
           <img src="/images/nav-bar-toggle-button/close.png" />
-        </button>
+        </div>
         <button
           className={`article-write-btn ${isLoading ? 'article-write-btn-loading' : ''}`}
           type="button"
