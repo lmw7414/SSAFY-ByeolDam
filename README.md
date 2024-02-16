@@ -2785,28 +2785,28 @@ import insideDirectory from './insideDirectory'; // camelCase export/import/dire
   // bad
   const PRIVATE_VARIABLE =
     "should not be unnecessarily uppercased within a file";
-
+  
   // bad
   export const THING_TO_BE_CHANGED = "should obviously not be uppercased";
-
+  
   // bad
   export let REASSIGNABLE_VARIABLE = "do not use let with uppercase variables";
-
+  
   // ---
-
+  
   // allowed but does not supply semantic value
   export const apiKey = "SOMEKEY";
-
+  
   // better in most cases
   export const API_KEY = "SOMEKEY";
-
+  
   // ---
-
+  
   // bad - unnecessarily uppercases key while adding no semantic value
   export const MAPPING = {
     KEY: "value",
   };
-
+  
   // good
   export const MAPPING = {
     key: "value", // 속성인 key는 대문자가 아님에 유의
@@ -3330,7 +3330,7 @@ render() {
 
 ---
 
-![Untitled](%F0%9F%8C%8C%F0%9F%94%AD%E1%84%87%E1%85%A7%E1%86%AF%E1%84%8B%E1%85%B3%E1%86%AF%20%E1%84%83%E1%85%A1%E1%86%B7%E1%84%83%E1%85%A1%F0%9F%8C%8C%20b1a3c142f5ea4fb396cfd1ebd273741a/Untitled%201.png)
+![Untitled](Untitled 201.png)
 
 ## ⚒️ CI/CD
 
