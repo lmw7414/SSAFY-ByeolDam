@@ -12,7 +12,7 @@ import { getConstellationThumbnail } from '../../utils/getConstellationThumbnail
 import getResizedImage from '../../utils/getResizedImage';
 import dataURLtoBlob from '../../utils/dataURLtoBlob';
 
-export default function ConstellationWriting() {
+export default function ConstellationWriting({ isNavBarVisible }) {
   const [points, setPoints] = useState([]);
   const [image, setImage] = useState(null);
   const [pointList, setPointList] = useState([]);
@@ -150,7 +150,11 @@ export default function ConstellationWriting() {
   }, [pointList]);
 
   return (
-    <div className="constellation-editor-container" tabIndex={1} onKeyDown={keyInputHandler}>
+    <div
+      className={`constellation-editor-container ${isNavBarVisible ? 'constellation-editor-container-extend' : ''}`}
+      tabIndex={1}
+      onKeyDown={keyInputHandler}
+    >
       <div className="constellation-editor-box">
         <div className="constellation-editor-wrapper">
           <ContoursEditor

@@ -24,6 +24,7 @@ export default function ConstellationRow({
           constellationName={''}
           commentList={result.commentList}
           constellationId={result.constellationId}
+          description={result.description}
         />
       ),
     });

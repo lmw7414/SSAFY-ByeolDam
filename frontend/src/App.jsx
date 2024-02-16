@@ -81,7 +81,10 @@ function NavApp() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/search/star" element={<SearchStar />} />
             <Route path="/search/constellation" element={<SearchConstellation />} />
-            <Route path="/constellation" element={<ConstellationWriting />} />
+            <Route
+              path="/constellation"
+              element={<ConstellationWriting isNavBarVisible={isNavBarVisible} />}
+            />
             <Route path="/feed" element={<FeedList />}></Route>
           </Routes>
           <ModalContainer modalState={modalState} isNavBarVisible={isNavBarVisible} />
