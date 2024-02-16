@@ -1,7 +1,11 @@
 .constellation-modal-container {
   margin: 2rem;
+  margin-bottom: 1rem;
   width: 66vw;
   height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .constellation-row-container {
@@ -84,10 +88,11 @@
   display: flex;
   justify-content: end;
   gap: 1rem;
+  margin-top: auto;
 }
 
 .constellation-main-button {
-  height: 7rem;
+  height: 6rem;
   cursor: pointer;
 }
 

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Comment from '../../article/Comment';
 import { addComments, getComments } from '../../../apis/comments';
 import { getUserUniverse } from '../../../apis/constellation';
-import { changeConstellationId } from '../../../apis/articles';
+import { changeConstellationId, getLikeCount, postLike } from '../../../apis/articles';
 
 export default function ArticleModal({
   articleId,
@@ -12,16 +12,17 @@ export default function ArticleModal({
   imgUrl,
   owner,
   tags,
-  constellationName,
   commentList,
   constellationId,
 }) {
   const [comments, setComments] = useState(commentList || []);
-  const [constellation, setConstellation] = useState(constellationName);
+  const [constellationName, setConstellationName] = useState('');
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [content, setContent] = useState('');
   const [constellationList, setConstellationList] = useState([]);
   const [newConstellationId, setNewConstellationId] = useState(constellationId);
+  const isFirstCall = useRef();
 
   const nickname = JSON.parse(sessionStorage.profile).nickname;
 
@@ -35,12 +36,22 @@ export default function ArticleModal({
     getComments(articleId).then(({ data }) => {
       setComments(data);
     });
-  }, [comments]);
+
+    getLikeCount(articleId).then(({ data }) => {
+      setLikeCount(data);
+    });
+  }, []);
 
   const createComment = (e) => {
     e.preventDefault();
     setContent(content.trim());
-    addComments({ articleId, content }).then((result) => {});
+    addComments({ articleId, content }).then((result) => {
+      setTimeout(() => {
+        getComments(articleId).then(({ data }) => {
+          setComments(data);
+        });
+      }, 200);
+    });
     setContent('');
   };
 
@@ -50,11 +61,30 @@ export default function ArticleModal({
 
   const changeConsteallationId = () => {
     changeConstellationId({ articleId, constellationId: newConstellationId }).then(() => {
+      alert('별자리를 옮겼습니다');
       constellationId = newConstellationId;
     });
   };
 
-  const likeCount = 1;
+  useEffect(() => {
+    if (isFirstCall.current) {
+      postLike(articleId).then(() => {
+        setTimeout(() => {
+          getLikeCount(articleId).then(({ data }) => {
+            setLikeCount(data);
+          });
+        }, 200);
+      });
+    } else {
+      isFirstCall.current = true;
+    }
+  }, [liked]);
+
+  useEffect(() => {
+    constellationList.forEach(({ id, name }) => {
+      if (id === constellationId) setConstellationName(name);
+    });
+  }, [constellationList]);
 
   return (
     <div>
@@ -73,7 +103,7 @@ export default function ArticleModal({
             <p id="like-area">
               좋아요 {likeCount}개
               <img
-                src={liked ? '/images/heart_activated.png' : '/images/heart.png'}
+                src={liked ? '/images/colored_heart.png' : '/images/empty_heart.png'}
                 alt="좋아요"
                 onClick={() => {
                   setLiked(!liked);
@@ -125,11 +155,11 @@ export default function ArticleModal({
       {owner === nickname && (
         <div className="select-constellation-box">
           <div>현재 속한 별자리:</div>
-          <select onChange={selectConstellationId} defaultValue={constellationId || ''}>
+          <select onChange={selectConstellationId}>
             <option value={''}>미분류</option>
             {constellationList.map(({ id, name }) => {
               return (
-                <option key={id} value={id}>
+                <option key={id} value={id} selected={id === constellationId}>
                   {name}
                 </option>
               );

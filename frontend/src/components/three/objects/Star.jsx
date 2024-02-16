@@ -32,7 +32,6 @@ export default function Star({
           owner={data.ownerEntityNickname}
           tags={data.articleHashtags}
           commentList={data.commentList}
-          constellationName={data.constellationEntityName}
           constellationId={data.constellationId}
         />
       ),

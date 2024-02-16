@@ -1,10 +1,15 @@
 .constellation-editor-container {
   width: 100%;
   height: 100vh;
-  // padding-left: calc($extended-bar-width);
   background-color: $page-background;
   display: flex;
   justify-content: center;
+  align-items: center;
+  transition: padding 0.7s;
+}
+
+.constellation-editor-container-extend {
+  padding-left: calc($nav-bar-width);
 }
 
 .constellation-editor-preview-container {
@@ -16,8 +21,7 @@
 .constellation-editor-box {
   display: flex;
   flex-direction: column;
-  width: calc(820px + 5rem);
-  height: 100vh;
+  border-radius: 12px;
   background-color: $modal-background;
   overflow: hidden;
   align-items: center;
@@ -29,7 +33,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  padding: 1rem 5rem;
+  padding: 1rem 4rem;
 }
 
 .constellation-editor-wrapper > div:first-child,
@@ -115,7 +119,7 @@
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
-  margin: auto 3rem 3rem auto;
+  margin: 3rem 5rem 3rem auto;
 }
 
 .btn-loading {
