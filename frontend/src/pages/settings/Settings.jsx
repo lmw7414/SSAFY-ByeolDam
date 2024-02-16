@@ -32,7 +32,7 @@ export default function Settings() {
             setSettingId(2);
           }}
         >
-          <p className="settings-menu-text">이용 안내</p>
+          <p className="settings-menu-text">이용약관</p>
         </div>
       </div>
       {settingId === 0 && <AccountSettings />}

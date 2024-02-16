@@ -81,10 +81,6 @@ $nav-bar-width: 20rem;
   margin: 5rem 11rem;
 }
 
-.notification-settings-menu > h2 {
-  margin-bottom: 1.5rem;
-}
-
 .settings-title {
   margin: 5rem 11rem;
 }
@@ -113,7 +109,7 @@ $nav-bar-width: 20rem;
 
 .settings-page-container p {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 
 #toggle-slide {
@@ -178,15 +174,23 @@ $nav-bar-width: 20rem;
   box-shadow: inset 0 0 0 0.2rem $modal-background;
 }
 
-// .profile-image-change-btn {
-//   background-color: rgb(142, 124, 172);
-//   border: none;
-//   border-radius: 0.4rem;
-//   height: 2rem;
-//   width: 10rem;
-//   cursor: pointer;
-//   color: white;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-// }
+.policy_innerbox {
+  width: 100%;
+  height: 100%;
+}
+
+.policy_title {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.policy_maintext {
+  color: white;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.policy_sub_title {
+  color: white;
+}
