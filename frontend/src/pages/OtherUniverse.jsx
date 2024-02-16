@@ -22,6 +22,8 @@ export default function OtherUniverse({ setNickname }) {
 
   useEffect(() => {
     const nickname = params.nickname;
+    setNickname(nickname);
+
     const myNickName = JSON.parse(sessionStorage.profile).nickname;
 
     if (nickname === myNickName) {
@@ -33,8 +35,6 @@ export default function OtherUniverse({ setNickname }) {
     checkFollow(nickname).then(({ result }) => {
       setIsFollow(result);
     });
-
-    setNickname(nickname);
 
     getUserUniverse(nickname).then(({ result }) => {
       const positionList = getPositionList(Math.min(15, result.length));

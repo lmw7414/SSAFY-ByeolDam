@@ -11,7 +11,7 @@ import FollowModal from './modal/Follow/FollowModal';
 
 import axios from '../apis/axios';
 
-export default function NavBar({ isNavBarVisible, setIsNavBarVisible, nickname }) {
+export default function NavBar({ isNavBarVisible, setIsNavBarVisible, nickname, setNickname }) {
   const [barId, setBarId] = useState(0);
   const [navEx, setNavEx] = useState(0);
   const [modalState, setModalState] = useModal();
@@ -22,7 +22,10 @@ export default function NavBar({ isNavBarVisible, setIsNavBarVisible, nickname }
   const location = useLocation();
 
   const goHome = () => {
+    const myNickName = JSON.parse(sessionStorage.profile).nickname;
+
     navigate('/home');
+    setNickname(myNickName);
     setBarId(0);
     setNavEx(0);
   };

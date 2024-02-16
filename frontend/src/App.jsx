@@ -63,6 +63,7 @@ function NavApp() {
             isNavBarVisible={isNavBarVisible}
             setIsNavBarVisible={setIsNavBarVisible}
             nickname={nickname}
+            setNickname={setNickname}
           />
           <Routes>
             <Route
