@@ -20,7 +20,7 @@
             </tr>
             <tr>
             	<td>이은규</td>
-                <td>Frontend, UI/UX Design Chief</td>
+                <td>Frontend, UI/UX Design Chief, Presenter</td>
             </tr>
             <tr>
             	<td>이창헌</td>
@@ -28,7 +28,7 @@
             </tr>
             <tr>
             	<td>차현철</td>
-                <td>Backend, Presenter, AI</td>
+                <td>Backend, AI</td>
             </tr>
             <tr>
             	<td>황정민</td>
