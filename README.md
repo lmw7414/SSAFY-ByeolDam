@@ -2,10 +2,11 @@
 > Samsung Software Academy For Youth 10기  
 > 주 제 : 웹 큐레이팅  
 > 개발 기간 : 2023.12.28 ~ 2024.02.16
-![Untitled](Untitled.png)
 
 # 🌟 프로젝트 소개
-![별을담다logo](https://github.com/user-attachments/assets/6ebc1ccc-1a6f-4523-8072-4794b054fb5a)
+<p align="center">
+<img src="https://github.com/user-attachments/assets/6ebc1ccc-1a6f-4523-8072-4794b054fb5a" height="200"/>
+</p>
 갤러리형식의 사진기반 SNS 서비스! 아직 감이 안 오시죠?? 저희는 기존의 사진기반 SNS인 인스타그램에서 서비스를 조금 더 발전시켜 3D로 제작해보았습니다. 나의 우주에 나만의 별자리를 만들어 우주를 꾸미고, 나의 개성을 우주를 통해 보여주세요. 
 
 ### 1. 프로젝트를 어떻게 기획하게 되었나요?
@@ -23,10 +24,9 @@
 - 홈 화면에서는 마우스를 이용하여 화면을 이동시킬 수 있습니다.
 - 3D 화면처럼 보이도록 하여 우주의 다양한 별자리를 볼 수 있으며 별자리를 클릭하면 해당 별자리를 크게 볼 수 있고 해당 별자리의 별들도 볼 수 있습니다.
 
-### 별자리 생성
+### 별자리 생성하기
 
-![윤곽선 추출.gif](./별자리 생성.gif)
-
+![별자리 생성](https://github.com/user-attachments/assets/8d309551-ac9e-48c3-ba5f-d23e2dda66d3)
 ![별자리 생성.gif](별자리생성.gif)
 
 - 사진을 등록하는 버튼을 통해 별자리로 만들고 싶은 사진을 추가할 수 있습니다.
@@ -35,36 +35,28 @@
 - 만약 원하는대로 나오지 않았다면 점들을 드래그 앤 드롭을 통해 별자리를 편집할 수 있습니다.
 - 별자리 편집을 완료하였다면 별자리 이름을 적고 생성 버튼을 누르면 나의 우주에 별자리가 생성된 것을 확인할 수 있습니다.
 
-### 별 생성
+### 별 생성하기
 
 ![별생성1.gif](<게시물 생성.gif>)
-![별생성2.gif](<게시물 생성 제목.gif>)
-![별생성3.gif](%ED%83%9C%EA%B7%B8%EB%8B%AC%EA%B8%B0.gif)
-![별생성4.gif](<게시물 생성.gif>)
 ![별생성5.gif](%EB%A7%88%EC%9A%B0%EC%8A%A4%ED%98%B8%EB%B2%84.gif)
-
 - 사진을 선택하고 사진을 설명할 수 있는 글과 해시태그들을 적습니다.
 - 다음을 눌러 원하는 별자리를 선택하고 새 별을 생성합니다.
 - 별을 생성하면 다음과 같이 별자리에 글이 생김을 확인할 수 있으며 글 위에 마우스를 갖다대면 썸네일이 보이고 별을 누르면 해당 게시글을 볼 수 있습니다.
 
-### 피드
+### 피드 확인하기
 
 ![피드.gif](%ED%94%BC%EB%93%9C.gif)
-
-- 팔로워의 피드들이 나오는 곳이다
-- 좋아요 및 댓글을 달 수 있다
-- 댓글에는 답글을 달 수 있다.
+- 자신의 팔로워들의 피드들을 볼 수 있습니다.
+- 상대의 피드에 좋아요 및 댓글을 남길 수 있습니다.
+- 대댓글까지 가능합니다.
 
 ### 검색
 
 ![Animation.gif](Animation.gif)
 
-- 유저 검색과 게시물 검색이 가능하다.
+- 유저 검색과 게시물 검색이 가능합니다.
 
-## 🛠️ Stack
-
----
-
+# 🛠️ 주요 기술 스택
 ### FrontEnd
 
 - Language : JavaScript
@@ -98,27 +90,16 @@
 - Gerrit
 
 
-## 🔨 System Architecture
-
----
-
-![Untitled](Untitled 201.png)
+# ⚙ 시스템 아키텍쳐
+![Untitled 201](https://github.com/user-attachments/assets/4ffedad2-df55-4d70-9c59-f946ed6b1ad7)
 
 ## ⚒️ CI/CD
-
----
-
 - GitLab, Gerrit과 Jenkins를 이용하여 지속적 통합 및 자동 배포
 - Gitlab을 통해 Git Flow를 생성하여 Branch를 구성하고 Feature를 생성하여 작업 진행
 - Feature에서 모든 코드 push 시 Gerrit을 통한 코드 리뷰 필수화
 - Develop에서 Master로 코드가 올라가면 Jenkins를 통해 자동 배포
 
-## 👨‍💻 Developer & Role & Contribution
-
----
-
-## Developer
-
+# 👩‍💻 팀원 역할 분배
 ### 김수혁 BE, AI
 
 - 게시글 이미지, 게시글 썸네일, 프로필 이미지 리사이징
